@@ -182,7 +182,7 @@ function Square({ row, rowindex, column }) {
       }
     }
 
-    /*checkEveryValue(fiveRow.fromLeft, "X");
+    checkEveryValue(fiveRow.fromLeft, "X");
     checkEveryValue(fiveRow.fromLeft, "O");
     checkEveryValue(fiveRow.fromRight, "X");
     checkEveryValue(fiveRow.fromRight, "O");
@@ -201,7 +201,7 @@ function Square({ row, rowindex, column }) {
     checkEveryValue(fiveDiagonal.rightTop, "O");
     checkEveryValue(fiveDiagonal.leftTop, "X");
     checkEveryValue(fiveDiagonal.leftTop, "O");
-    */
+
     console.log("new row");
     console.log("column from top: ", fiveColumn.fromTop);
     console.log("column from bottom: ", fiveColumn.fromBottom);
@@ -214,13 +214,13 @@ function Square({ row, rowindex, column }) {
   };
 
   // Check if arrays has 5 same item
-  /*const checkEveryValue = (array, symbol) => {
+  const checkEveryValue = (array, symbol) => {
     //console.log(array);
     if (array.every((item) => item && item === symbol)) {
       //console.log(`${symbol} Won!`);
       dispatch(setWinner(symbol));
     }
-  };*/
+  };
 
   const handleClick = (e) => {
     setRowState(e.target.attributes.row.value);
