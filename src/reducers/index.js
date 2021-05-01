@@ -1,10 +1,14 @@
 import { combineReducers } from "redux";
-import playerReducer from "./player-reducer";
+import playersReducer from "./players-reducer";
 import squareReducer from "./square-reducer";
+import symbolsReducer from "./symbols-reducer";
+import winnerReducer from "./winner-reducer";
 
 const reducers = combineReducers({
-  player: playerReducer,
+  players: playersReducer,
   square: squareReducer,
+  symbols: symbolsReducer,
+  winner: winnerReducer,
 });
 
 export default reducers;

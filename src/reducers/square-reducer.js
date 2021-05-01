@@ -1,18 +1,18 @@
-import { SET_ID, SET_VALUE } from "../constants";
+import { SET_SQUARE_INDEX, SET_SQUARE_VALUE } from "../constants";
 
 const initialState = {
-  id: "",
+  index: "",
   value: "",
 };
 
 const squareReducer = (state = initialState, action) => {
   switch (action.type) {
-    case SET_ID:
+    case SET_SQUARE_INDEX:
       return {
         ...state,
-        id: action.payload,
+        index: action.payload,
       };
-    case SET_VALUE:
+    case SET_SQUARE_VALUE:
       return {
         ...state,
         value: action.payload,

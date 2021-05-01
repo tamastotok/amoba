@@ -1,15 +1,15 @@
-import { SET_NAME, SET_SYMBOL } from "../constants";
+import { SET_PLAYER_BLUE_NAME, SET_PLAYER_RED_NAME } from "../constants";
 
-export const setName = (name) => {
+export const setPlayerBlueName = (name) => {
   return {
-    type: SET_NAME,
+    type: SET_PLAYER_BLUE_NAME,
     payload: name,
   };
 };
 
-export const setSymbol = (symbol) => {
+export const setPlayerRedName = (name) => {
   return {
-    type: SET_SYMBOL,
-    payload: symbol,
+    type: SET_PLAYER_RED_NAME,
+    payload: name,
   };
 };

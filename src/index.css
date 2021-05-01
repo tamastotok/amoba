@@ -12,3 +12,114 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+.player-names-container {
+  display: flex;
+  align-items: center;
+}
+
+.symbol-container {
+  max-width: 600px;
+  display: flex;
+  justify-content: center;
+  margin: 40px auto;
+}
+
+.starter-symbol-container {
+  display: flex;
+  align-items: center;
+}
+.starter-symbol-container h4 {
+  margin-right: 20px;
+}
+.starter-symbol-container label {
+  font-size: 16px;
+  font-weight: 800;
+  margin: 0 40px 0 5px;
+}
+
+.input-container {
+  max-width: 600px;
+  display: flex;
+  justify-content: space-between;
+  margin: 40px auto;
+}
+
+input[type="text"] {
+  width: 200px;
+  height: 30px;
+  border-radius: 5px;
+  color: #000000;
+  font-weight: 400;
+  margin-left: 10px;
+}
+
+.square-button {
+  width: 50px;
+  height: 50px;
+  padding: 5px;
+  background-color: rgb(247, 247, 247);
+  border: 1px solid rgb(194, 194, 194);
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.square-button:hover {
+  border: 3px solid rgb(138, 138, 138);
+}
+
+.square-button[disabled]:hover {
+  border: 1px solid rgb(194, 194, 194);
+}
+
+.square-button[value="O"] {
+  color: rgb(231, 58, 58);
+}
+
+.square-button[value="X"] {
+  color: rgb(58, 58, 231);
+}
+
+.board-container {
+  width: fit-content;
+  margin: 20px auto;
+  padding: 2px;
+  border: 2px solid rgb(78, 78, 78);
+}
+
+.players-container {
+  width: 500px;
+  height: 100px;
+  margin: auto;
+  display: flex;
+  justify-content: space-between;
+}
+
+.players-container h3 {
+  margin-bottom: 20px;
+}
+
+.start-button,
+.restart-button {
+  width: fit-content;
+  margin: auto;
+}
+
+.start-button button,
+.restart-button button {
+  width: 140px;
+  height: 36px;
+  border: none;
+  border-radius: 5px;
+  outline: none;
+  float: right;
+  background: linear-gradient(
+    151deg,
+    rgba(251, 108, 85, 1) 0%,
+    rgba(219, 57, 31, 1) 100%
+  );
+  font-weight: 700;
+  color: #e9e9e9;
+  text-transform: uppercase;
+  cursor: pointer;
+}
