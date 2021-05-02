@@ -1,236 +1,125 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { setNextSymbol } from "../../actions/symbols_action";
 import { setWinner } from "../../actions/winner_action";
 
 function Square({ row, rowindex, column }) {
-  const [value, setValue] = useState(" ");
-  const winner = useSelector((state) => state.winner);
-  const [isDisabled, setIsDisabled] = useState(false);
-  const nextSymbol = useSelector((state) => state.symbols.nextSymbol);
-  const buttonRef = useRef(null);
   const dispatch = useDispatch();
+  const winner = useSelector((state) => state.winner);
+  const nextSymbol = useSelector((state) => state.symbols.nextSymbol);
 
+  // Button settings
+  const [value, setValue] = useState(" ");
+  const [isDisabled, setIsDisabled] = useState(false);
   const [isClicked, setIsClicked] = useState(false);
-  const [rowState, setRowState] = useState("");
   const [rowIndexState, setRowIndexState] = useState(null);
   const [colState, setColState] = useState(null);
 
-  const allButton = document.querySelectorAll(".square-button");
-  const columns = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
+  //  Put every button into an array
+  const allButton = [...document.querySelectorAll(".square-button")];
+  //  Make a 2d array from buttons array
+  const allButtonMatrix = [];
+  while (allButton.length) allButtonMatrix.push(allButton.splice(0, 10));
 
+  // Create logic
   const winningFormation = () => {
-    let fiveRow = {
-      fromLeft: [],
-      fromRight: [],
-    };
-
-    let fiveColumn = {
-      fromTop: [],
-      fromBottom: [],
-    };
-
+    let fiveRow = [];
+    let fiveColumn = [];
     let fiveDiagonal = {
-      rightBottom: [],
-      leftBottom: [],
-      rightTop: [],
-      leftTop: [],
+      ascending: [],
+      descending: [],
     };
 
-    //  Check Row
-    //  (A1 => A5)
-    for (let i = colState - 1; i < colState + 4; i++) {
-      allButton.forEach((item) => {
-        if (
-          item.getAttribute("row") === rowState &&
-          item.getAttribute("col") === columns[i]
-        ) {
-          fiveRow.fromLeft.push(item.getAttribute("value"));
+    // Create empty array for selected buttons (+-4 from it't position)
+    let allButtonValues = [];
+
+    // Get every value around the selected button (+-4 from position)
+    for (let i = rowIndexState - 5; i <= rowIndexState + 3; i++) {
+      for (let j = colState - 5; j <= colState + 3; j++) {
+        // error handling (array position doesn't exist)
+        if (!allButtonMatrix[i] || !allButtonMatrix[i][j]) {
+          allButtonValues.push("null");
+        } else {
+          allButtonValues.push(allButtonMatrix[i][j]);
         }
-      });
-    }
-    //  (A5 => A1)
-    for (let j = colState - 1; j > colState - 6; j--) {
-      allButton.forEach((item) => {
-        if (
-          item.getAttribute("row") === rowState &&
-          item.getAttribute("col") === columns[j]
-        ) {
-          fiveRow.fromRight.push(item.getAttribute("value"));
-        }
-      });
-    }
-
-    //-----
-
-    //  Check Column
-    // (A1 => E1)
-    for (let i = rowIndexState; i <= rowIndexState + 4; i++) {
-      allButton.forEach((item) => {
-        if (
-          parseInt(item.getAttribute("rowindex")) === i &&
-          parseInt(item.getAttribute("col")) === colState
-        ) {
-          fiveColumn.fromTop.push(item.getAttribute("value"));
-        }
-      });
-    }
-    // (E1 => A1)
-    for (let j = rowIndexState; j >= rowIndexState - 4; j--) {
-      allButton.forEach((item) => {
-        if (
-          parseInt(item.getAttribute("rowindex")) === j &&
-          parseInt(item.getAttribute("col")) === colState
-        ) {
-          fiveColumn.fromBottom.push(item.getAttribute("value"));
-        }
-      });
-    }
-
-    //-----
-
-    // Check Diagonals
-    // (A1 => E5)
-    let rightBottomDOM = [];
-    for (let i = colState; i <= colState + 4; i++) {
-      for (let j = rowIndexState; j <= rowIndexState + 4; j++) {
-        allButton.forEach((item) => {
-          if (
-            parseInt(item.getAttribute("rowindex")) === j &&
-            parseInt(item.getAttribute("col")) === i
-          ) {
-            rightBottomDOM.push(item);
-          }
-        });
       }
     }
 
-    for (let i = 0; i < rightBottomDOM.length; i++) {
-      if (i % 6 === 0) {
-        //console.log(rightBottomDOM[i]);
-        fiveDiagonal.rightBottom.push(rightBottomDOM[i].getAttribute("value"));
+    //console.log(allButtonValues);
+
+    // Select buttons from array in order:
+    // Ascending (diagonal)
+    for (let i = allButtonValues.length - 2; i > 0; i--) {
+      //console.log(allButtonValues[i]);
+      if (i % 8 === 0) {
+        //console.log(allButtonValues[i]);
+        fiveDiagonal.ascending.push(allButtonValues[i]);
       }
     }
 
-    //  (E5 => A1)
-    let leftTopDOM = [];
-    for (let i = colState; i > colState - 5; i--) {
-      for (let j = rowIndexState; j > rowIndexState - 5; j--) {
-        allButton.forEach((item) => {
-          if (
-            parseInt(item.getAttribute("rowindex")) === j &&
-            parseInt(item.getAttribute("col")) === i
-          ) {
-            //console.log(item);
-            leftTopDOM.push(item);
-            //fveColumn.fromBottom.push(item.getAttribute("value"));
-          }
-        });
+    // Descending (diagonal)
+    for (let i = 0; i < allButtonValues.length; i++) {
+      //console.log(allButtonValues[i]);
+      if (i % 10 === 0) {
+        //console.log(allButtonValues[i]);
+        fiveDiagonal.descending.push(allButtonValues[i]);
       }
     }
 
-    for (let i = 0; i < leftTopDOM.length; i++) {
-      if (i % 6 === 0) {
-        //console.log(leftTopDOM[i]);
-        fiveDiagonal.leftTop.push(leftTopDOM[i].getAttribute("value"));
+    // Row
+    for (let i = 36; i < 45; i++) {
+      //console.log(allButtonValues[i]);
+      fiveRow.push(allButtonValues[i]);
+    }
+
+    // Column
+    for (let i = 0; i < allButtonValues.length; i++) {
+      if ((i + 5) % 9 === 0) {
+        //console.log(allButtonValues[i]);
+        fiveColumn.push(allButtonValues[i]);
       }
     }
 
-    //  (E1 => A5)
-    let rightTopDOM = [];
-    for (let i = colState; i <= colState + 4; i++) {
-      for (let j = rowIndexState; j > rowIndexState - 5; j--) {
-        allButton.forEach((item) => {
-          if (
-            parseInt(item.getAttribute("rowindex")) === j &&
-            parseInt(item.getAttribute("col")) === i
-          ) {
-            console.log(item);
-            rightTopDOM.push(item);
-          }
-        });
-      }
-    }
-
-    for (let i = 0; i < rightTopDOM.length; i++) {
-      if (i % 6 === 0) {
-        //console.log(rightTopDOM[i]);
-        fiveDiagonal.rightTop.push(rightTopDOM[i].getAttribute("value"));
-      }
-    }
-
-    //  (A5 => E1)
-    let leftBottomDOM = [];
-    for (let i = colState; i > colState - 5; i--) {
-      for (let j = rowIndexState; j <= rowIndexState + 4; j++) {
-        allButton.forEach((item) => {
-          if (
-            parseInt(item.getAttribute("rowindex")) === j &&
-            parseInt(item.getAttribute("col")) === i
-          ) {
-            //console.log(item);
-            leftBottomDOM.push(item);
-          }
-        });
-      }
-    }
-
-    for (let i = 0; i < leftBottomDOM.length; i++) {
-      if (i % 6 === 0) {
-        //console.log(leftBottomDOM[i].getAttribute("value"));
-        fiveDiagonal.leftBottom.push(leftBottomDOM[i].getAttribute("value"));
-      }
-    }
-
-    checkEveryValue(fiveRow.fromLeft, "X");
-    checkEveryValue(fiveRow.fromLeft, "O");
-    checkEveryValue(fiveRow.fromRight, "X");
-    checkEveryValue(fiveRow.fromRight, "O");
-
-    checkEveryValue(fiveColumn.fromTop, "X");
-    checkEveryValue(fiveColumn.fromTop, "O");
-    checkEveryValue(fiveColumn.fromBottom, "X");
-    checkEveryValue(fiveColumn.fromBottom, "O");
-
-    checkEveryValue(fiveDiagonal.rightBottom, "X");
-    checkEveryValue(fiveDiagonal.rightBottom, "O");
-    checkEveryValue(fiveDiagonal.leftBottom, "X");
-    checkEveryValue(fiveDiagonal.leftBottom, "O");
-
-    checkEveryValue(fiveDiagonal.rightTop, "X");
-    checkEveryValue(fiveDiagonal.rightTop, "O");
-    checkEveryValue(fiveDiagonal.leftTop, "X");
-    checkEveryValue(fiveDiagonal.leftTop, "O");
-
-    console.log("new row");
-    console.log("column from top: ", fiveColumn.fromTop);
-    console.log("column from bottom: ", fiveColumn.fromBottom);
-    console.log("row from left: ", fiveRow.fromLeft);
-    console.log("row from right: ", fiveRow.fromRight);
-    console.log("diagonal left bottom: ", fiveDiagonal.leftBottom);
-    console.log("diagonal left top: ", fiveDiagonal.leftTop);
-    console.log("diagonal right bottom: ", fiveDiagonal.rightBottom);
-    console.log("diagonal  right top: ", fiveDiagonal.rightTop);
+    checkWin(fiveRow);
+    checkWin(fiveColumn);
+    checkWin(fiveDiagonal.ascending);
+    checkWin(fiveDiagonal.descending);
   };
 
-  // Check if arrays has 5 same item
-  const checkEveryValue = (array, symbol) => {
-    //console.log(array);
-    if (array.every((item) => item && item === symbol)) {
-      //console.log(`${symbol} Won!`);
-      dispatch(setWinner(symbol));
+  // Check if arrays has 5 same value
+  const checkWin = (array) => {
+    //  Put selected buttons into an empty array
+    let values = [];
+    for (let i = 0; i < array.length; i++) {
+      values.push(array[i].value);
+      //console.log(array.slice(0, 5));
+    }
+
+    // Check if all values are the same
+    for (let i = 0; i <= 4; i++) {
+      if (values.slice(i, i + 5).every((v) => v === "X")) {
+        dispatch(setWinner("X"));
+        //console.log("X win");
+      }
+      if (values.slice(i, i + 5).every((v) => v === "O")) {
+        dispatch(setWinner("O"));
+        //console.log("O win");
+      }
+      //console.log(values.slice(i, i + 5));
     }
   };
 
   const handleClick = (e) => {
-    setRowState(e.target.attributes.row.value);
+    // Get button position
     setRowIndexState(parseInt(e.target.attributes.rowindex.value));
     setColState(parseInt(e.target.attributes.col.value));
 
+    // Change the symbol and disable the selected button
     setValue(nextSymbol);
     dispatch(setNextSymbol());
     setIsDisabled(true);
 
+    // Trigger function
     setIsClicked(true);
   };
 
@@ -251,7 +140,6 @@ function Square({ row, rowindex, column }) {
       rowindex={rowindex}
       col={column}
       value={value}
-      ref={buttonRef}
       onClick={handleClick}
       disabled={winner ? true : isDisabled}
     >

@@ -7,6 +7,7 @@ function StarterSymbol() {
   return (
     <div className="starter-symbol-container">
       <h4>Start with:</h4>
+
       <input
         onClick={() => dispatch(selectStarterSymbol("X"))}
         type="radio"
@@ -14,6 +15,7 @@ function StarterSymbol() {
         id="symbol-x"
       />
       <label htmlFor="symbol-x">X</label>
+
       <input
         onClick={() => dispatch(selectStarterSymbol("O"))}
         type="radio"

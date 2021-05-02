@@ -5,15 +5,16 @@ import { setWinner } from "../../actions/winner_action";
 import { resetNextSymbol } from "../../actions/symbols_action";
 
 function Board() {
+  const dispatch = useDispatch();
+
   const players = useSelector((state) => state.players);
   const symbols = useSelector((state) => state.symbols);
   const winner = useSelector((state) => state.winner);
 
-  const dispatch = useDispatch();
-
   const column = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
   const rows = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j"];
 
+  //  Create 2d array for render squares
   const combineArrays = () => {
     let board = [];
     for (let i = 0; i < column.length; i++) {
@@ -22,6 +23,7 @@ function Board() {
     return board;
   };
 
+  //  Reset winner and symbol
   const handleClick = () => {
     dispatch(setWinner(""));
     dispatch(resetNextSymbol(symbols.starterSymbol));

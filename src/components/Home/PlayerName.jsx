@@ -10,10 +10,8 @@ function PlayerName({ symbol, id, name }) {
   //  Store player names
   const handleChange = (e) => {
     if (id === "1") {
-      console.log("blue");
       dispatch(setPlayerBlueName(e.target.value));
     } else if (id === "2") {
-      console.log("red");
       dispatch(setPlayerRedName(e.target.value));
     } else return;
   };

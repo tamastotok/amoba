@@ -9,6 +9,7 @@ export default function Home() {
   const players = useSelector((state) => state.players);
   const symbol = useSelector((state) => state.symbols);
 
+  //  Set symbol to X if not selected
   const handleClick = () => {
     if (symbol.starterSymbol === "") {
       dispatch(selectStarterSymbol("X"));
