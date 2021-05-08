@@ -1,70 +1,126 @@
-# Getting Started with Create React App
+## 10x10 Tic-tac-toe game (Amőba)
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-## Available Scripts
+## Description:
 
-In the project directory, you can run:
+Local tic-tac-toe game in a 10x10 grid. Players may add their names and select what mark is going to be the first ("X" by default).
 
-### `npm start`
+Next mark (X or O) and players name are shown, above and below of the grid.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+The player who succeeds in placing five of their marks in a diagonal, horizontal, or vertical row is the winner.
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+When the game ends, players can restart the game. They will return to the "start page" where their names and the starter mark can be changed (names will be the same if previously added).
 
-### `npm test`
+## Usage:
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+```
+git clone "repository url"
+cd "repository folder"
+npm i
+npm start
+```
 
-### `npm run build`
+## How to calculate win:
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+0.  Create a 2d array from the 10x10 grid:
+    ![empty-field](img/empty-field.jpg)
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+    ```
+    const allButton = [...document.querySelectorAll(".square-button")];
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+    const allButtonMatrix = [];
+    while (allButton.length) allButtonMatrix.push(allButton.splice(0, 10));
+    ```
 
-### `npm run eject`
+1.  When a player put their mark anywhere on the grid, the game create a 9x9 grid around it and save their square values into an array:
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+    ![step-1](img/step-1.jpg)
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+    If this 9x9 grid falls outside of the original 10x10 grid, the game fills these squares with "null" values instead of getting an error or cut of the 9x9 grid (to 6x7 in this example):
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+    ![step-1-1](img/step-1-1.jpg)
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+    ```
+    for (let i = rowIndexState - 5; i <= rowIndexState + 3; i++) {
+      for (let j = colState - 5; j <= colState + 3; j++) {
+        if (!allButtonMatrix[i] || !allButtonMatrix[i][j]) {
+          allButtonValues.push("null");
+        } else {
+          allButtonValues.push(allButtonMatrix[i][j]);
+        }
+      }
+    }
+    ```
 
-## Learn More
+2.  After that, the game iterates through this array and get every value from row, column and 2 diagonal positions. These values are saved to 4 different arrays.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+    ![array-row](img/array-row.jpg)
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+    ```
+    // Row
 
-### Code Splitting
+    for (let i = 36; i < 45; i++) {
+      fiveRow.push(allButtonValues[i]);
+    }
+    ```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+    ![array-column](img/array-column.jpg)
 
-### Analyzing the Bundle Size
+    ```
+    // Column
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+    for (let i = 0; i < allButtonValues.length; i++) {
+      if ((i + 5) % 9 === 0) {
+        fiveColumn.push(allButtonValues[i]);
+      }
+    }
+    ```
 
-### Making a Progressive Web App
+    ![array-ascend](img/array-ascend.jpg)
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+    ```
+    // Ascending (diagonal)
 
-### Advanced Configuration
+    for (let i = allButtonValues.length - 2; i > 0; i--) {
+      if (i % 8 === 0) {
+        fiveDiagonal.ascending.push(allButtonValues[i]);
+      }
+    }
+    ```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+    ![array-descend](img/array-descend.jpg)
 
-### Deployment
+    ```
+    // Descending (diagonal)
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+    for (let i = 0; i < allButtonValues.length; i++) {
+      if (i % 10 === 0) {
+        fiveDiagonal.descending.push(allButtonValues[i]);
+      }
+    }
+    ```
 
-### `npm run build` fails to minify
+3.  The game iterates through these 4 arrays and get 5 of their values:\
+    First, from position 0 to 4. If these 5 values are not the same then change position from 1 to 5. These steps are repeating till position 4 to 8. If 5 values are same the game is ends and the winner is shown above the 10x10 grid.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+        const checkWin = (array) => {
+            let values = [];
+
+            for (let i = 0; i < array.length; i++) {
+            values.push(array[i].value);
+            }
+
+
+            for (let i = 0; i <= 4; i++) {
+                if (values.slice(i, i + 5).every((v) => v === "X")) {
+                    dispatch(setWinner("X"));
+                    //console.log("X win");
+                }
+
+                if (values.slice(i, i + 5).every((v) => v === "O")) {
+                    dispatch(setWinner("O"));
+                    //console.log("O win");
+                }
+            }
+        };
