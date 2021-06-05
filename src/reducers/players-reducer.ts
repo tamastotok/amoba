@@ -1,19 +1,20 @@
-import { SET_PLAYER_BLUE_NAME, SET_PLAYER_RED_NAME } from "../constants";
+import { SET_PLAYER_BLUE_NAME, SET_PLAYER_RED_NAME } from '../constants';
+import { Players, PlayerAction } from '../types/players';
 
-const initialState = {
+const initialState: Players = {
   blue: {
     id: 1,
-    name: "",
-    symbol: "X",
+    name: '',
+    mark: 'X',
   },
   red: {
     id: 2,
-    name: "",
-    symbol: "O",
+    name: '',
+    mark: 'O',
   },
 };
 
-const playersReducer = (state = initialState, action) => {
+const playersReducer = (state = initialState, action: PlayerAction) => {
   switch (action.type) {
     case SET_PLAYER_BLUE_NAME:
       return {
