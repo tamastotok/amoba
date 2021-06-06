@@ -21,7 +21,7 @@ export const getWinner = (row: number, col: number, array: any[]) => {
           [v,v,v,v,v,v,v,v,v]
           [v,v,v,v,v,v,v,v,v]
           [v,v,v,v,v,v,v,v,v]
-          [v,v,v,v,O,v,v,v,v]
+          [v,v,v,v,O,v,v,v,v]       'O' is the clicked button
           [v,v,v,v,v,v,v,v,v]
           [v,v,v,v,v,v,v,v,v]
           [v,v,v,v,v,v,v,v,v]
