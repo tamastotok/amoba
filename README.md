@@ -12,6 +12,8 @@ The player who succeeds in placing five of their marks in a diagonal, horizontal
 
 When the game ends, players can restart the game. They will return to the "start page" where their names and the starter mark can be changed (names will be the same if previously added).
 
+Tested in Chrome.
+
 ## Usage:
 
 ```
