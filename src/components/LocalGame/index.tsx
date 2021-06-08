@@ -7,8 +7,11 @@ import { Reducers } from '../../types';
 import { useCreateMatrix } from '../../gamelogic/useCreateMatrix';
 import { CSSProperties, useEffect, useRef } from 'react';
 import { getWinner } from '../../gamelogic/checkWinningPatterns';
+import Button from '@material-ui/core/Button';
+import { buttonStyles } from '../../styles';
 
 function LocalGame() {
+  const classes = buttonStyles();
   const dispatch = useDispatch();
   const players = useSelector((state: Reducers) => state.players);
   const marks = useSelector((state: Reducers) => state.marks);
@@ -75,7 +78,13 @@ function LocalGame() {
       {winner && (
         <div className="restart-button">
           <Link to="/">
-            <button onClick={handleRestartClick}>RESTART</button>
+            <Button
+              className={classes.button}
+              variant="outlined"
+              onClick={handleRestartClick}
+            >
+              Restart
+            </Button>
           </Link>
         </div>
       )}

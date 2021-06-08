@@ -16,7 +16,7 @@ body {
 }
 
 h1 {
-  margin: 40px auto;
+  margin: 20px auto;
   width: fit-content;
 }
 
@@ -26,7 +26,7 @@ h1 {
 }
 
 .winner-container {
-  height: 120px;
+  height: 100px;
 }
 
 .margin-auto {
@@ -100,11 +100,7 @@ h1 {
 
 .restart-button {
   width: fit-content;
-  position: absolute;
-  left: 0;
-  right: 0;
-  margin: auto;
-  top: 35px;
+  margin: 10px auto;
 }
 
 .message-board {
