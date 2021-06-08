@@ -1,5 +1,6 @@
 import store from '../store';
 import { setWinner } from '../actions/winner_action';
+import { setGridIsDisabled } from '../actions/disable_grid_action';
 
 //  Put pattern check functions into 1 function
 export const getWinner = (row: number, col: number, array: any[]) => {
@@ -132,11 +133,13 @@ const checkSameValues = (array: string[]) => {
   let values = array;
   for (let i = 0; i <= 5; ) {
     if (values.slice(i, i + 5).every((v) => v === 'X')) {
+      store.dispatch(setGridIsDisabled(true));
       store.dispatch(setWinner('X'));
       values = [];
       break;
     }
     if (values.slice(i, i + 5).every((v) => v === 'O')) {
+      store.dispatch(setGridIsDisabled(true));
       store.dispatch(setWinner('O'));
       values = [];
       break;
