@@ -10,6 +10,12 @@ function Home({ status }: any) {
     socket.emit('connect-to-server');
   };
 
+  const offlineMessage = () => {
+    setTimeout(() => {
+      return <h1>Server is currently offline.</h1>;
+    }, 1000);
+  };
+
   return (
     <main>
       <h1>Tic-tac-toe</h1>
@@ -34,7 +40,7 @@ function Home({ status }: any) {
           </Button>
         </Link>
       </div>
-      {!status ? <h1>Server is currently offline.</h1> : null}
+      {!status ? offlineMessage() : null}
     </main>
   );
 }
