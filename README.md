@@ -25,7 +25,7 @@ npm start
 
 ## Online:
 
-Server: [link](https://github.com/Yhunie-the-cat/amoba-server)
+Live server deployed on heroku. If it has any error, the code can be found here: [amoba-server](https://github.com/Yhunie-the-cat/amoba-server)
 
 For online mode, 1 player must create the game ('host'), the other player must join to that game:
 ![online-menu](img/online-menu.jpg)
