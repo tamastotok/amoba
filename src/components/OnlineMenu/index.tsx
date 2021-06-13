@@ -15,9 +15,10 @@ function OnlineMenu() {
         </Link>
         <Link className={classes.link} to="/online/join">
           <Button className={classes.button} variant="outlined">
-            Join
+            Join Game
           </Button>
         </Link>
+        <p></p>
       </div>
     </>
   );

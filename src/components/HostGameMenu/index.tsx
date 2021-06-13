@@ -73,7 +73,7 @@ function HostGameMenu({ roomId }: any) {
           variant="outlined"
           onClick={handleCreateGameButtonClick}
         >
-          Create game
+          Create
         </Button>
 
         <Button

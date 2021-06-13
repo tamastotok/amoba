@@ -41,6 +41,16 @@ function Home({ status }: any) {
         </Link>
       </div>
       {!status ? offlineMessage() : null}
+      <p className="guide-link">
+        Online game mode guide:{' '}
+        <a
+          href="https://docs.google.com/document/d/1qZUiurzM_Wrnh4W4VqhzW7foCdfjmICjUK_1VZoBdDE/edit?usp=sharing"
+          target="_blank"
+          rel="noreferrer"
+        >
+          link
+        </a>
+      </p>
     </main>
   );
 }

@@ -20,6 +20,15 @@ h1 {
   width: fit-content;
 }
 
+.guide-link {
+  position: absolute;
+  bottom: 5em;
+  left: 0;
+  right: 0;
+  width: fit-content;
+  margin: auto;
+}
+
 .textfield {
   width: 420px;
   margin-bottom: 40px;

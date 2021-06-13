@@ -27,19 +27,7 @@ npm start
 
 Live server deployed on heroku. If it has any error, the code can be found here: [amoba-server](https://github.com/Yhunie-the-cat/amoba-server)
 
-For online mode, 1 player must create the game ('host'), the other player must join to that game:
-![online-menu](img/online-menu.jpg)
-
-Host can decide game settings, such as marks and grid size (player who join will get the opposite mark).
-![create-game](img/create-game.jpg)
-
-When game is created, the server send a game id that is shown in the bottom right corner:
-![game-id](img/game-id.jpg)
-
-Player who select Join must give the right game id:
-![join-game](img/join-game.jpg)
-
-When the right game id is added and clicking Join the game will be start.
+### Guide: [link](https://docs.google.com/document/d/1qZUiurzM_Wrnh4W4VqhzW7foCdfjmICjUK_1VZoBdDE/edit?usp=sharing)
 
 ## How to calculate win:
 
