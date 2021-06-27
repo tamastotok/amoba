@@ -7,13 +7,15 @@ function Home({ status }: any) {
   const classes = buttonStyles();
 
   const handleClick = () => {
-    socket.emit('connect-to-server');
+    socket.emit('join-lobby');
   };
 
   const offlineMessage = () => {
-    setTimeout(() => {
-      return <h1>Server is currently offline.</h1>;
-    }, 1000);
+    if (!status) {
+      setTimeout(() => {
+        return <h1>Server is currently offline.</h1>;
+      }, 1000);
+    }
   };
 
   return (
@@ -25,12 +27,7 @@ function Home({ status }: any) {
             Start local
           </Button>
         </Link>
-        <Link
-          className={classes.link}
-          to={{
-            pathname: !status ? '/' : '/online',
-          }}
-        >
+        <Link className={classes.link} to={status ? '/online' : '/'}>
           <Button
             className={classes.button}
             variant="outlined"
@@ -40,17 +37,7 @@ function Home({ status }: any) {
           </Button>
         </Link>
       </div>
-      {!status ? offlineMessage() : null}
-      <p className="guide-link">
-        Online game mode guide:{' '}
-        <a
-          href="https://docs.google.com/document/d/1qZUiurzM_Wrnh4W4VqhzW7foCdfjmICjUK_1VZoBdDE/edit?usp=sharing"
-          target="_blank"
-          rel="noreferrer"
-        >
-          link
-        </a>
-      </p>
+      {offlineMessage()}
     </main>
   );
 }
