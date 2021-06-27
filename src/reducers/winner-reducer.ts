@@ -1,7 +1,7 @@
 import { SET_WINNER } from '../constants';
-import { WinnerAction } from '../types/winner';
+import { Action } from '../types';
 
-const winnerReducer = (state: string = '', action: WinnerAction) => {
+const winnerReducer = (state: string = '', action: Action<string>) => {
   switch (action.type) {
     case SET_WINNER:
       return action.payload;

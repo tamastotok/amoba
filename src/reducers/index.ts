@@ -5,15 +5,15 @@ import marksReducer from './marks-reducer';
 import winnerReducer from './winner-reducer';
 import gridSizeReducer from './grid-size-reducer';
 import gridIsDisabledReducer from './disable-grid-reducer';
-import { Reducers } from '../types/';
+import { Reducers } from '../types';
 
-const reducers: Reducers | any = combineReducers({
+const reducers: Reducers = combineReducers({
   players: playersReducer,
   gridSize: gridSizeReducer,
   square: squareReducer,
   marks: marksReducer,
   winner: winnerReducer,
   gridIsDisabled: gridIsDisabledReducer,
-});
+}) as any;
 
 export default reducers;

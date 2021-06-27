@@ -1,9 +1,9 @@
 import { CHANGE_GRID_STATE, DISABLE_GRID } from '../constants';
-import { DisableGridAction } from '../types/disable-grid';
+import { Action } from '../types';
 
 const gridIsDisabledReducer = (
   state: boolean = false,
-  action: DisableGridAction
+  action: Action<boolean>
 ) => {
   switch (action.type) {
     case DISABLE_GRID:

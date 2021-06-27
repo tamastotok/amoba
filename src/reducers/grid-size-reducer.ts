@@ -1,7 +1,7 @@
 import { SET_GRID_SIZE } from '../constants';
-import { GridSizeAction } from '../types/grid-size';
+import { Action } from '../types';
 
-const gridSizeReducer = (state: number = 8, action: GridSizeAction) => {
+const gridSizeReducer = (state: number = 8, action: Action<number>) => {
   switch (action.type) {
     case SET_GRID_SIZE:
       return action.payload;
