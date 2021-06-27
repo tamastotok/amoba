@@ -1,7 +1,7 @@
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 
 //  Text input
-export const textInput = makeStyles((theme: Theme) =>
+export const textInput = makeStyles(() =>
   createStyles({
     customTextField: {
       display: 'flex',
@@ -21,13 +21,11 @@ export const buttonStyles = makeStyles((theme: Theme) =>
       textDecoration: 'none',
       margin: theme.spacing(1),
     },
-
     button: {
       borderWidth: '2px',
       width: 180,
       height: 40,
       margin: '5px 0',
-
       '&:hover': {
         borderWidth: '2px',
       },

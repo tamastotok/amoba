@@ -43,8 +43,8 @@ h1 {
 }
 
 .square-button {
-  width: 50px;
-  height: 50px;
+  width: 40px;
+  height: 40px;
   padding: 5px;
   background-color: rgb(247, 247, 247);
   border: 1px solid rgb(194, 194, 194);
@@ -126,17 +126,15 @@ h1 {
   height: 80px;
   width: 300px;
   margin: 20px auto 0 auto;
+  padding: 10px;
   display: flex;
-  align-items: center;
+  flex-wrap: wrap;
+  flex-direction: row;
   justify-content: space-between;
 }
 
 .align-top-center {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  margin: auto;
+  flex: 1 0 100%;
 }
 .custom-p {
   font-weight: 600;
