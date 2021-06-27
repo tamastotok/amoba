@@ -1,5 +1,4 @@
-import { useSelector } from 'react-redux';
-import { Reducers } from '../types';
+import store from '../store';
 
 interface Sqr {
   row: number;
@@ -13,8 +12,11 @@ const square: Sqr = {
   value: '',
 };
 
-export const useCreateMatrix = () => {
-  const gridSize = useSelector((state: Reducers) => state.gridSize);
+export const createMatrix = () => {
+  const state: any = store.getState();
+
+  const gridSize = state.gridSize;
+
   let matrix = [];
   const grid = [];
 
