@@ -3,91 +3,56 @@ import { BrowserRouter, Switch, Route, Redirect } from 'react-router-dom';
 import HomePage from './components/Home';
 import LocalMenu from './components/LocalMenu';
 import socket from './server';
-import { selectStarterMark, setNextMark } from './actions/marks_action';
+import { setNextMark } from './actions/marks_action';
 import {
   changeGridState,
   setGridIsDisabled,
 } from './actions/disable_grid_action';
 import { useDispatch, useSelector } from 'react-redux';
 import LocalGame from './components/LocalGame';
-import OnlineGame from './components/OnlineGame';
-import HostGameMenu from './components/HostGameMenu';
 import OnlineMenu from './components/OnlineMenu';
-import JoinGameMenu from './components/JoinGameMenu';
+import OnlineGame from './components/OnlineGame';
+import MessageBoard from './components/MessageBoard';
 import { setPlayerBlueName, setPlayerRedName } from './actions/players_action';
 import { Reducers } from './types';
-import { setGridSize } from './actions/grid_size_action';
-import MessageBoard from './components/MessageBoard';
 
 function App() {
   const dispatch = useDispatch();
-  const players = useSelector((state: Reducers) => state.players);
   const [response, setResponse] = useState<any>([]);
-  const [yourMark, setYourMark] = useState<string>('');
-  const [link, setLink] = useState<string>('');
-  const [roomIdFromServer, setRoomIdFromServer] = useState<string>('');
+  const [roomId, setRoomId] = useState<any>('');
   const [onlineUserCount, setOnlineUserCount] = useState<number>(0);
   const [statusMessage, setStatusMessage] = useState<string>('');
   const [serverStatus, setServerStatus] = useState<boolean>(false);
-  const winner = useSelector((state: Reducers) => state.winner);
+  const playerMark = useSelector((state: Reducers) => state.marks.playerMark);
 
   useEffect(() => {
-    socket.on('server-online', (data: boolean) => {
+    socket.on('server-status', (data: boolean) => {
       setServerStatus(data);
     });
 
-    socket.on('user-connected', (data: number) => {
+    socket.on('user-count', (data: number) => {
       setOnlineUserCount(data);
     });
 
-    socket.on('create-game-response', (res: any) => {
+    socket.on('searching', (res: any) => {
+      const { playerMark, starterMark } = res;
+
       setStatusMessage('Waiting for another player...');
-      if (res.hostMark === 'X') {
-        setYourMark(players.blue.mark);
-      } else {
-        setYourMark(players.red.mark);
-      }
-      dispatch(selectStarterMark(res.starterMark));
-      dispatch(setGridSize(res.gridSize));
-
-      if (res.starterMark !== res.hostMark) {
-        dispatch(setGridIsDisabled(true));
-      }
-      setRoomIdFromServer(res.roomId);
-    });
-
-    socket.on('join-game-settings', (res: any) => {
-      if (res.joinMark === 'X') {
-        setYourMark(players.blue.mark);
-      } else {
-        setYourMark(players.red.mark);
-      }
-
-      if (res.starterMark !== res.joinMark) {
-        dispatch(setGridIsDisabled(true));
-      }
+      if (starterMark !== playerMark) dispatch(setGridIsDisabled(true));
+      if (starterMark === playerMark) dispatch(setGridIsDisabled(false));
     });
 
     socket.on('game-found', (res: any) => {
+      console.log(res);
+      setRoomId(res.roomId);
+
+      dispatch(setPlayerBlueName(res.players.blueName));
+      dispatch(setPlayerRedName(res.players.redName));
       setStatusMessage('');
-      dispatch(selectStarterMark(res.starterMark));
-      dispatch(setGridSize(res.gridSize));
-      setLink(res.roomId);
-      if (res.hostMark === 'X') {
-        dispatch(setPlayerBlueName(res.hostName));
-        dispatch(setPlayerRedName(res.joinName));
-      } else {
-        dispatch(setPlayerBlueName(res.joinName));
-        dispatch(setPlayerRedName(res.hostName));
-      }
     });
 
-    socket.on('invalid-id', (message: string) => {
-      setStatusMessage(message);
-    });
-
-    socket.on('leave-session', () => {
-      setLink('');
+    socket.on('leave-game', () => {
+      setRoomId('');
       setResponse([]);
     });
 
@@ -95,14 +60,9 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if (winner) {
-      setStatusMessage(`Winner: ${winner}`);
-    }
-  }, [winner]);
-
-  useEffect(() => {
-    if (link) {
-      socket.on(`square-btn-click-${link}`, (data: any) => {
+    if (roomId) {
+      socket.on(`square-btn-click-${roomId}`, (data: any) => {
+        console.log(data);
         setResponse(data.squares);
         dispatch(setNextMark());
         dispatch(changeGridState());
@@ -110,7 +70,7 @@ function App() {
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [link]);
+  }, [roomId]);
 
   return (
     <>
@@ -126,6 +86,10 @@ function App() {
         </Switch>
 
         <Switch>
+          <Route path="/local/game" exact component={LocalGame} />
+        </Switch>
+
+        <Switch>
           <Route path="/online" exact>
             <OnlineMenu />
             <MessageBoard
@@ -135,40 +99,15 @@ function App() {
           </Route>
         </Switch>
 
+        {roomId && <Redirect from="/online" to={`/online/game/id=${roomId}`} />}
+
         <Switch>
-          <Route path="/online/host" exact>
-            <HostGameMenu roomId={roomIdFromServer} />
-            <MessageBoard
-              onlineUserCount={onlineUserCount}
-              statusMessage={statusMessage}
-              roomId={roomIdFromServer}
+          <Route path="/online/game/:id">
+            <OnlineGame
+              roomId={roomId}
+              response={response}
+              playerMark={playerMark}
             />
-          </Route>
-        </Switch>
-
-        <Switch>
-          <Route path="/online/join" exact>
-            <JoinGameMenu />
-            <MessageBoard
-              onlineUserCount={onlineUserCount}
-              statusMessage={statusMessage}
-            />
-          </Route>
-        </Switch>
-
-        <Switch>
-          <Route path="/local/game" exact component={LocalGame} />
-        </Switch>
-
-        <Switch>
-          {link ? (
-            <Redirect from={'/online/host'} to={`/online/game/id#${link}`} />
-          ) : null}
-          {link ? (
-            <Redirect from={'/online/join'} to={`/online/game/id#${link}`} />
-          ) : null}
-          <Route path="/online/game/:game">
-            <OnlineGame link={link} response={response} yourMark={yourMark} />
             <MessageBoard
               onlineUserCount={onlineUserCount}
               statusMessage={statusMessage}

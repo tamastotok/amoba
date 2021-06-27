@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { selectStarterMark } from '../actions/marks_action';
+import { selectStarterMark, selectPlayerMark } from '../actions/marks_action';
 import Radio from '@material-ui/core/Radio';
 import RadioGroup from '@material-ui/core/RadioGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
@@ -35,19 +35,18 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-function SelectMark({ whatMark, label, getHostMark, getStarterMark }: any) {
+function SelectMark({ whatMark, label }: any) {
   const dispatch = useDispatch();
   const classes = useStyles();
   const [value, setValue] = useState('X');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setValue((e.target as HTMLInputElement).value);
-    dispatch(selectStarterMark(e.target.value as string));
-    if (getStarterMark && whatMark === 'starterMark') {
-      getStarterMark(e.target.value as string);
+    if (whatMark === 'starterMark') {
+      dispatch(selectStarterMark(e.target.value as string));
     }
-    if (getHostMark && whatMark === 'hostMark') {
-      getHostMark(e.target.value as string);
+    if (whatMark === 'playerMark') {
+      dispatch(selectPlayerMark(e.target.value as string));
     }
   };
 

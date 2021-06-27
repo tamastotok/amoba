@@ -2,6 +2,7 @@ import {
   SELECT_STARTER_MARK,
   SET_NEXT_MARK,
   RESET_NEXT_MARK,
+  SELECT_PLAYER_MARK,
 } from '../constants';
 
 export const selectStarterMark = (value: string) => {
@@ -20,6 +21,13 @@ export const setNextMark = () => {
 export const resetNextMark = (value: string) => {
   return {
     type: RESET_NEXT_MARK,
+    payload: value,
+  };
+};
+
+export const selectPlayerMark = (value: string) => {
+  return {
+    type: SELECT_PLAYER_MARK,
     payload: value,
   };
 };

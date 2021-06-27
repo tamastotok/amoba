@@ -1,9 +1,9 @@
 import { useSelector } from 'react-redux';
 import { Reducers } from '../types';
 
-function MessageBoard({ onlineUserCount, statusMessage, roomId }: any) {
-  const bluePlayer = useSelector((state: Reducers) => state.players.red);
-  const redPlayer = useSelector((state: Reducers) => state.players.blue);
+function MessageBoard({ onlineUserCount, statusMessage }: any) {
+  const bluePlayer = useSelector((state: Reducers) => state.players.blue);
+  const redPlayer = useSelector((state: Reducers) => state.players.red);
 
   const blue = bluePlayer.name && `${bluePlayer.mark}: ${bluePlayer.name}`;
   const red = redPlayer.name && `${redPlayer.mark}: ${redPlayer.name}`;
@@ -21,14 +21,6 @@ function MessageBoard({ onlineUserCount, statusMessage, roomId }: any) {
         <h4 className="align-top-center">Players</h4>
         <p className="custom-p blue">{blue}</p>
         <p className="custom-p red">{red}</p>
-      </div>
-
-      <div className="game-id-container">
-        {roomId && (
-          <h4 className="text-right">
-            GAME ID: <u>{roomId}</u>
-          </h4>
-        )}
       </div>
 
       <p className="bottom-right">{online}</p>
