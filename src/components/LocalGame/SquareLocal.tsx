@@ -22,7 +22,7 @@ function SquareLocal({ id, rowindex, colindex }: SquareProps) {
   const dispatch = useDispatch();
   const winner = useSelector((state: Reducers) => state.winner);
   const nextMark = useSelector((state: Reducers) => state.marks.nextMark);
-  const [squareValue, setSquareValue] = useState<string>('');
+  const [squareValue, setSquareValue] = useState('');
   const [squareIsDisabled, setSquareIsDisabled] = useState(false);
 
   const handleClick = (e: any) => {

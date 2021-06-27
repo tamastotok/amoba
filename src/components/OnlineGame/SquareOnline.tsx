@@ -15,10 +15,10 @@ interface SquareProps {
   id: string;
   rowindex: number;
   colindex: number;
-  link: string;
+  roomId: string;
 }
 
-function SquareOnline({ id, rowindex, colindex, link }: SquareProps) {
+function SquareOnline({ id, rowindex, colindex, roomId }: SquareProps) {
   const nextMark = useSelector((state: Reducers) => state.marks.nextMark);
   const [buttonValue, setButtonValue] = useState<string>('');
 
@@ -27,7 +27,7 @@ function SquareOnline({ id, rowindex, colindex, link }: SquareProps) {
       row: parseInt(e.target.attributes.row.value),
       col: parseInt(e.target.attributes.col.value),
       value: nextMark,
-      link: link,
+      roomId: roomId,
     };
 
     setButtonValue(nextMark);
