@@ -4,11 +4,14 @@ import { Link } from 'react-router-dom';
 import { setWinner } from '../../actions/winner_action';
 import { resetNextMark } from '../../actions/marks_action';
 import { Reducers } from '../../types';
-import { useCreateMatrix } from '../../gamelogic/useCreateMatrix';
-import { CSSProperties, useEffect, useRef } from 'react';
+import { createMatrix } from '../../gamelogic/createMatrix';
+import { CSSProperties, useEffect, useRef, useState } from 'react';
 import { getWinner } from '../../gamelogic/checkWinningPatterns';
 import Button from '@material-ui/core/Button';
 import { buttonStyles } from '../../styles';
+
+const blue = '2px solid #3f51b5';
+const red = '2px solid #f50057';
 
 function LocalGame() {
   const classes = buttonStyles();
@@ -19,15 +22,39 @@ function LocalGame() {
   const gridSize = useSelector((state: Reducers) => state.gridSize);
   const square = useSelector((state: Reducers) => state.square);
   const buttonsRef = useRef<any>(null);
+  const [borderColor, setBorderColor] = useState(
+    marks.starterMark === 'X' ? blue : red
+  );
+
+  useEffect(() => {
+    if (winner) {
+      setBorderColor(winner === 'X' ? blue : red);
+    } else {
+      setBorderColor(marks.nextMark === 'X' ? blue : red);
+    }
+  }, [winner, marks.nextMark]);
 
   const gridBorderStyle = {
     display: 'flex',
     flexWrap: 'wrap',
-    width: `${gridSize * 50 + 8}px`,
-    height: `${gridSize * 50 + 8}px`,
+    width: `${gridSize * 40 + 8}px`,
+    height: `${gridSize * 40 + 8}px`,
     margin: '20px auto',
     padding: '2px',
-    border: marks.nextMark === 'X' ? '2px solid #3f51b5' : '2px solid #f50057',
+    border: borderColor,
+  } as CSSProperties;
+
+  const customH1Style = {
+    textAlign: 'left',
+    width: `${gridSize * 40 + 8}px`,
+  } as CSSProperties;
+
+  const customNextPlayerStyle = {
+    color: `${marks.nextMark === 'X' ? `#3f51b5` : `#f50057`}`,
+  } as CSSProperties;
+
+  const customWinnerStyle = {
+    color: `${winner === 'X' ? `#3f51b5` : `#f50057`}`,
   } as CSSProperties;
 
   //  Get square DOM elements and put them in a 2d array
@@ -53,12 +80,19 @@ function LocalGame() {
   return (
     <>
       <div className="winner-container">
-        <h1>Next move: {marks.nextMark}</h1>
-        {winner && <h1>Winner: {winner}</h1>}
+        {winner ? (
+          <h1 style={customH1Style}>
+            Winner: <span style={customWinnerStyle}>{winner}</span>
+          </h1>
+        ) : (
+          <h1 style={customH1Style}>
+            Next: <span style={customNextPlayerStyle}>{marks.nextMark}</span>
+          </h1>
+        )}
       </div>
 
       <div ref={buttonsRef} style={gridBorderStyle}>
-        {useCreateMatrix().map((item: any, index: number) => {
+        {createMatrix().map((item: any, index: number) => {
           return (
             <SquareLocal
               key={index}
