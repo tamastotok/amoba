@@ -10,44 +10,6 @@ export const getWinner = (row: number, col: number, array: any[]) => {
   descendDiagonalPattern(row, col, array);
 };
 
-/*  
-    Example:
-    button position +-4 values = v (null in default)
-    button = X or O
-
-    1.  When a button is clicked on the grid, collect all values around it
-        (button position +-4 every dimension in a 2d array),
-        [
-          [v,v,v,v,v,v,v,v,v]
-          [v,v,v,v,v,v,v,v,v]
-          [v,v,v,v,v,v,v,v,v]
-          [v,v,v,v,v,v,v,v,v]
-          [v,v,v,v,O,v,v,v,v]       'O' is the clicked button
-          [v,v,v,v,v,v,v,v,v]
-          [v,v,v,v,v,v,v,v,v]
-          [v,v,v,v,v,v,v,v,v]
-          [v,v,v,v,v,v,v,v,v]
-        ]
-
-    2.  Check winning patterns (row, col, diagonal),
-        Example: diagonal
-        [
-          [v,v,v,v,v,v,v,v, "O" ]
-          [v,v,v,v,v,v,v, "X", v]
-          [v,v,v,v,v,v, "X", v,v]
-          [v,v,v,v,v, "O", v,v,v]
-          [v,v,v,v, "O", v,v,v,v]
-          [v,v,v, "X", v,v,v,v,v]
-          [v,v, "X", v,v,v,v,v,v]
-          [v, "X", v,v,v,v,v,v,v]
-          [ "X", v,v,v,v,v,v,v,v]
-        ]
-
-    3.  Put their values into an array
-        [v,v,v,v,"O",v,v,v,v] 
-        9 values in total
-*/
-
 //  Check row pattern
 const rowPattern = (row: number, col: number, array: any[]) => {
   const values: string[] = [];
@@ -115,19 +77,6 @@ const descendDiagonalPattern = (row: number, col: number, array: any[]) => {
   }
   checkSameValues(values);
 };
-
-/*  Check if array (created from patterns) has the same values (X or O)
-    
-    1.  Check if element from position 0 to 4 are the same (X or O)
-        Example:
-        [["O","O","X","X","X"],"X","X","O","O"]
-
-    2.  If yes, we got the winner
-
-    3.  If not, check again from position + 1
-        Example:
-        ["O",["O","X","X","X","X"],"X","O","O"]
-*/
 
 const checkSameValues = (array: string[]) => {
   let values = array;
