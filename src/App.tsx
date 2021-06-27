@@ -1,19 +1,22 @@
 import { useEffect, useState } from 'react';
 import { BrowserRouter, Switch, Route, Redirect } from 'react-router-dom';
-import HomePage from './components/Home';
-import LocalMenu from './components/LocalMenu';
+import HomePage from './views/MainMenu';
+import LocalMenu from './views/LocalMenu';
 import socket from './server';
-import { setNextMark } from './actions/marks_action';
+import { setNextMark } from './store/marks/marks.action';
 import {
   changeGridState,
   setGridIsDisabled,
-} from './actions/disable_grid_action';
+} from './store/grid-disable/grid-disable.action';
 import { useDispatch, useSelector } from 'react-redux';
-import LocalGame from './components/LocalGame';
-import OnlineMenu from './components/OnlineMenu';
-import OnlineGame from './components/OnlineGame';
+import LocalGame from './views/LocalGame';
+import OnlineMenu from './views/OnlineMenu';
+import OnlineGame from './views/OnlineGame';
 import MessageBoard from './components/MessageBoard';
-import { setPlayerBlueName, setPlayerRedName } from './actions/players_action';
+import {
+  setPlayerBlueName,
+  setPlayerRedName,
+} from './store/players/players.action';
 import { Reducers } from './types';
 
 function App() {

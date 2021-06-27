@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { setGridSize } from '../actions/grid_size_action';
+import { setGridSize } from '../store/grid-size/grid-size.action';
 import { teal } from '@material-ui/core/colors';
 import Radio, { RadioProps } from '@material-ui/core/Radio';
 import RadioGroup from '@material-ui/core/RadioGroup';
