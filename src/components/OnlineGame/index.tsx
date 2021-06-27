@@ -1,4 +1,4 @@
-import { CSSProperties, useEffect, useRef } from 'react';
+import { CSSProperties, useEffect, useRef, useState } from 'react';
 import Button from '@material-ui/core/Button';
 import SquareOnline from './SquareOnline';
 import { useHistory } from 'react-router-dom';
@@ -7,10 +7,14 @@ import { setWinner } from '../../actions/winner_action';
 import { Reducers } from '../../types';
 import { buttonStyles } from '../../styles';
 import { getWinner } from '../../gamelogic/checkWinningPatterns';
-import { useCreateMatrix } from '../../gamelogic/useCreateMatrix';
+import { createMatrix } from '../../gamelogic/createMatrix';
 import socket from '../../server';
+import GameStatus from './GameStatus';
 
-function OnlineGame({ response, yourMark, link }: any) {
+const blue = '2px solid #3f51b5';
+const red = '2px solid #f50057';
+
+function OnlineGame({ response, playerMark, roomId }: any) {
   const dispatch = useDispatch();
   const classes = buttonStyles();
   const gridSize = useSelector((state: Reducers) => state.gridSize);
@@ -19,32 +23,34 @@ function OnlineGame({ response, yourMark, link }: any) {
   const gridIsDisabled = useSelector((state: Reducers) => state.gridIsDisabled);
   const buttonsRef = useRef<any>(null);
   const history = useHistory();
+  const [borderColor, setBorderColor] = useState(
+    marks.starterMark === 'X' ? blue : red
+  );
+
+  useEffect(() => {
+    if (winner) {
+      setBorderColor(winner === 'X' ? blue : red);
+    } else {
+      setBorderColor(marks.nextMark === 'X' ? blue : red);
+    }
+  }, [winner, marks.nextMark]);
 
   const gridBorderStyle = {
     display: 'flex',
     flexWrap: 'wrap',
-    width: `${gridSize * 50 + 8}px`,
-    height: `${gridSize * 50 + 8}px`,
+    width: `${gridSize * 40 + 8}px`,
+    height: `${gridSize * 40 + 8}px`,
     margin: '20px auto',
     padding: '2px',
-    border: marks.nextMark === 'X' ? '2px solid #3f51b5' : '2px solid #f50057',
+    border: borderColor,
   } as CSSProperties;
 
-  const yourMarkStyle = {
-    color: `${yourMark === 'X' ? `#3f51b5` : `#f50057`}`,
+  const playerMarkStyle = {
+    color: `${playerMark === 'X' ? `#3f51b5` : `#f50057`}`,
     margin: '10px auto',
-    width: `${gridSize * 50 + 8}px`,
+    width: `${gridSize * 40 + 8}px`,
     textAlign: 'right',
     paddingRight: '20px',
-  } as CSSProperties;
-
-  const customH1Style = {
-    textAlign: 'left',
-    width: `${gridSize * 50 + 8}px`,
-  } as CSSProperties;
-
-  const customSpanStyle = {
-    color: `${marks.nextMark === 'X' ? `#3f51b5` : `#f50057`}`,
   } as CSSProperties;
 
   useEffect(() => {
@@ -68,7 +74,7 @@ function OnlineGame({ response, yourMark, link }: any) {
       while (allButton.length)
         allButtonMatrix.push(allButton.splice(0, gridSize));
 
-      socket.on(`square-btn-click-${link}`, (data: any) => {
+      socket.on(`square-btn-click-${roomId}`, (data: any) => {
         const { row, col, value } = data.squares;
         allButtonMatrix[row][col].value = value;
         allButtonMatrix[row][col].innerText = value;
@@ -89,21 +95,14 @@ function OnlineGame({ response, yourMark, link }: any) {
   };
 
   return (
-    <>
-      <div className="margin-auto">
-        <h1 style={customH1Style}>
-          Next:{' '}
-          <span style={customSpanStyle}>
-            {!gridIsDisabled ? 'You' : marks.nextMark}
-          </span>
-        </h1>
-      </div>
+    <div>
+      <GameStatus />
 
       <div ref={buttonsRef} style={gridBorderStyle}>
-        {useCreateMatrix().map((item: any, index: number) => {
+        {createMatrix().map((item: any, index: number) => {
           return (
             <SquareOnline
-              link={link}
+              roomId={roomId}
               key={index}
               id={`${item.row}/${item.col}`}
               rowindex={item.row}
@@ -113,7 +112,7 @@ function OnlineGame({ response, yourMark, link }: any) {
         })}
       </div>
 
-      <h1 style={yourMarkStyle}> {yourMark} </h1>
+      <h1 style={playerMarkStyle}> {playerMark} </h1>
 
       {winner ? (
         <div className="restart-button">
@@ -126,7 +125,7 @@ function OnlineGame({ response, yourMark, link }: any) {
           </Button>
         </div>
       ) : null}
-    </>
+    </div>
   );
 }
 
