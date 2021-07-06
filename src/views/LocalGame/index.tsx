@@ -69,7 +69,6 @@ function LocalGame() {
   //  Check if game has a winner in every click
   useEffect(() => {
     getWinner(square.row, square.col, allButtonMatrix);
-
     //  Check draw
     if (buttonsRef.current) {
       const buttonValues = [...buttonsRef.current.children].map(
