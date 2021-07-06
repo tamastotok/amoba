@@ -22,6 +22,7 @@ function LocalGame() {
   const gridSize = useSelector((state: Reducers) => state.gridSize);
   const square = useSelector((state: Reducers) => state.square);
   const buttonsRef = useRef<any>(null);
+  const [gameIsDraw, setGameIsDraw] = useState(false);
   const [borderColor, setBorderColor] = useState(
     marks.starterMark === 'X' ? blue : red
   );
@@ -68,6 +69,16 @@ function LocalGame() {
   //  Check if game has a winner in every click
   useEffect(() => {
     getWinner(square.row, square.col, allButtonMatrix);
+
+    //  Check draw
+    if (buttonsRef.current) {
+      const buttonValues = [...buttonsRef.current.children].map(
+        (item) => item.value
+      );
+      if (!buttonValues.includes('')) {
+        setGameIsDraw(true);
+      }
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [square]);
 
@@ -77,19 +88,29 @@ function LocalGame() {
     dispatch(resetNextMark(marks.starterMark));
   };
 
+  const gameStatus = () => {
+    if (winner) {
+      return (
+        <h1 style={customH1Style}>
+          Winner: <span style={customWinnerStyle}>{winner}</span>
+        </h1>
+      );
+    }
+
+    if (gameIsDraw) {
+      return <h1 style={customH1Style}>Draw</h1>;
+    }
+
+    return (
+      <h1 style={customH1Style}>
+        Next: <span style={customNextPlayerStyle}>{marks.nextMark}</span>
+      </h1>
+    );
+  };
+
   return (
     <>
-      <div className="winner-container">
-        {winner ? (
-          <h1 style={customH1Style}>
-            Winner: <span style={customWinnerStyle}>{winner}</span>
-          </h1>
-        ) : (
-          <h1 style={customH1Style}>
-            Next: <span style={customNextPlayerStyle}>{marks.nextMark}</span>
-          </h1>
-        )}
-      </div>
+      <div className="winner-container">{gameStatus()}</div>
 
       <div ref={buttonsRef} style={gridBorderStyle}>
         {createMatrix().map((item: any, index: number) => {
@@ -109,7 +130,7 @@ function LocalGame() {
         <h3>{players.red.name && `Player O: ${players.red.name}`}</h3>
       </div>
 
-      {winner && (
+      {winner || gameIsDraw ? (
         <div className="restart-button">
           <Link className={classes.link} to="/">
             <Button
@@ -121,7 +142,7 @@ function LocalGame() {
             </Button>
           </Link>
         </div>
-      )}
+      ) : null}
     </>
   );
 }

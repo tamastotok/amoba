@@ -23,6 +23,7 @@ function OnlineGame({ response, playerMark, roomId }: any) {
   const gridIsDisabled = useSelector((state: Reducers) => state.gridIsDisabled);
   const buttonsRef = useRef<any>(null);
   const history = useHistory();
+  const [gameIsDraw, setGameIsDraw] = useState(false);
   const [borderColor, setBorderColor] = useState(
     marks.starterMark === 'X' ? blue : red
   );
@@ -80,6 +81,15 @@ function OnlineGame({ response, playerMark, roomId }: any) {
         allButtonMatrix[row][col].innerText = value;
         allButtonMatrix[row][col].disabled = true;
         getWinner(row, col, allButtonMatrix);
+        //  Check draw
+        if (buttonsRef.current) {
+          const buttonValues = [...buttonsRef.current.children].map(
+            (item) => item.value
+          );
+          if (!buttonValues.includes('')) {
+            setGameIsDraw(true);
+          }
+        }
       });
     }
 
@@ -96,7 +106,7 @@ function OnlineGame({ response, playerMark, roomId }: any) {
 
   return (
     <div>
-      <GameStatus />
+      <GameStatus gameIsDraw={gameIsDraw} />
 
       <div ref={buttonsRef} style={gridBorderStyle}>
         {createMatrix().map((item: any, index: number) => {
@@ -114,7 +124,7 @@ function OnlineGame({ response, playerMark, roomId }: any) {
 
       <h1 style={playerMarkStyle}> {playerMark} </h1>
 
-      {winner ? (
+      {winner || gameIsDraw ? (
         <div className="restart-button">
           <Button
             className={classes.button}
