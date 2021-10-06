@@ -7,7 +7,7 @@ function BackButton() {
   const history = useHistory();
 
   const handleClick = () => {
-    history.goBack();
+    history.replace('/');
   };
 
   return (
