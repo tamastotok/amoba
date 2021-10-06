@@ -1,5 +1,3 @@
-import store from '../../store';
-
 interface Sqr {
   row: number;
   col: number;
@@ -12,16 +10,12 @@ const square: Sqr = {
   value: '',
 };
 
-export const createMatrix = () => {
-  const state: any = store.getState();
-
-  const gridSize = state.gridSize;
-
+export const createMatrix = (size: number) => {
   let matrix = [];
   const grid = [];
 
-  for (let i = 0; i < gridSize; i++) {
-    const items = [...Array(gridSize).keys()].map(
+  for (let i = 0; i < size; i++) {
+    const items = [...Array(size).keys()].map(
       (item: any, index: number) => (item = { ...square, row: i, col: index })
     );
     matrix[i] = items;
@@ -32,5 +26,6 @@ export const createMatrix = () => {
       grid.push(item);
     }
   }
+
   return grid;
 };

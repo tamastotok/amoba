@@ -9,6 +9,7 @@ import { CSSProperties, useEffect, useRef, useState } from 'react';
 import { getWinner } from '../../utils/helpers/checkWinningPatterns';
 import Button from '@material-ui/core/Button';
 import { buttonStyles } from '../../styles/components';
+import { setGridSize } from '../../store/grid-size/grid-size.action';
 
 const blue = '2px solid #3f51b5';
 const red = '2px solid #f50057';
@@ -83,6 +84,7 @@ function LocalGame() {
 
   //  Reset winner and mark if RESTART button clicked
   const handleRestartClick = () => {
+    dispatch(setGridSize(8));
     dispatch(setWinner(''));
     dispatch(resetNextMark(marks.starterMark));
   };
@@ -112,7 +114,7 @@ function LocalGame() {
       <div className="winner-container">{gameStatus()}</div>
 
       <div ref={buttonsRef} style={gridBorderStyle}>
-        {createMatrix().map((item: any, index: number) => {
+        {createMatrix(gridSize).map((item: any, index: number) => {
           return (
             <SquareLocal
               key={index}

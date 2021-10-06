@@ -1,23 +1,21 @@
 import { useEffect, useState } from 'react';
 import { BrowserRouter, Switch, Route, Redirect } from 'react-router-dom';
-import HomePage from './views/MainMenu';
-import LocalMenu from './views/LocalMenu';
-import socket from './server';
-import { setNextMark } from './store/marks/marks.action';
-import {
-  changeGridState,
-  setGridIsDisabled,
-} from './store/grid-disable/grid-disable.action';
 import { useDispatch, useSelector } from 'react-redux';
-import LocalGame from './views/LocalGame';
-import OnlineMenu from './views/OnlineMenu';
-import OnlineGame from './views/OnlineGame';
+import socket from './server';
+import { Reducers } from './types';
 import MessageBoard from './components/MessageBoard';
+import { setGridIsDisabled } from './store/grid-disable/grid-disable.action';
+import { setGridSize } from './store/grid-size/grid-size.action';
+import { selectPlayerMark, resetNextMark } from './store/marks/marks.action';
 import {
   setPlayerBlueName,
   setPlayerRedName,
 } from './store/players/players.action';
-import { Reducers } from './types';
+import HomePage from './views/MainMenu';
+import LocalMenu from './views/LocalMenu';
+import LocalGame from './views/LocalGame';
+import OnlineMenu from './views/OnlineMenu';
+import OnlineGame from './views/OnlineGame';
 
 function App() {
   const dispatch = useDispatch();
@@ -27,6 +25,10 @@ function App() {
   const [statusMessage, setStatusMessage] = useState<string>('');
   const [serverStatus, setServerStatus] = useState<boolean>(false);
   const playerMark = useSelector((state: Reducers) => state.marks.playerMark);
+  const location = window.location.pathname;
+  const pageIsReloaded = sessionStorage.getItem('reloaded');
+  const [clientIsReloaded, setClientIsReloaded] = useState(false);
+  const mark = sessionStorage.getItem('playerMark') as string;
 
   useEffect(() => {
     socket.on('server-status', (data: boolean) => {
@@ -39,18 +41,15 @@ function App() {
 
     socket.on('searching', (res: any) => {
       const { playerMark, starterMark } = res;
-
       setStatusMessage('Waiting for another player...');
       if (starterMark !== playerMark) dispatch(setGridIsDisabled(true));
       if (starterMark === playerMark) dispatch(setGridIsDisabled(false));
     });
 
     socket.on('game-found', (res: any) => {
-      console.log(res);
       setRoomId(res.roomId);
-
-      dispatch(setPlayerBlueName(res.players.blueName));
-      dispatch(setPlayerRedName(res.players.redName));
+      dispatch(setPlayerBlueName(res.playerData.blueName));
+      dispatch(setPlayerRedName(res.playerData.redName));
       setStatusMessage('');
     });
 
@@ -59,21 +58,27 @@ function App() {
       setResponse([]);
     });
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    //  When page is refreshed
+    if (pageIsReloaded === 'true' && location.includes('id=')) {
+      const idFromUrl = location.slice(location.indexOf('=') + 1);
+      socket.emit('join-lobby');
+      socket.emit('reconnect', idFromUrl);
 
-  useEffect(() => {
-    if (roomId) {
-      socket.on(`square-btn-click-${roomId}`, (data: any) => {
-        console.log(data);
-        setResponse(data.squares);
-        dispatch(setNextMark());
-        dispatch(changeGridState());
-        setStatusMessage('');
+      socket.on(`continue-${idFromUrl}`, (data: any) => {
+        setResponse(data);
+        dispatch(selectPlayerMark(mark));
+        setRoomId(data.roomId);
+        dispatch(setGridSize(data.boardSize));
+        dispatch(setPlayerBlueName(data.bluePlayerName));
+        dispatch(setPlayerRedName(data.redPlayerName));
+        dispatch(resetNextMark(data.whoIsNext));
+        setClientIsReloaded(true);
+
+        if (mark !== data.whoIsNext) dispatch(setGridIsDisabled(true));
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [roomId]);
+  }, []);
 
   return (
     <>
@@ -110,6 +115,7 @@ function App() {
               roomId={roomId}
               response={response}
               playerMark={playerMark}
+              clientIsReloaded={clientIsReloaded}
             />
             <MessageBoard
               onlineUserCount={onlineUserCount}

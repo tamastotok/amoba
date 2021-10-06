@@ -10,11 +10,14 @@ import { getWinner } from '../../utils/helpers/checkWinningPatterns';
 import { createMatrix } from '../../utils/helpers/createMatrix';
 import socket from '../../server';
 import GameStatus from './GameStatus';
+import { getSquareFromDOM } from '../../utils/helpers/accessToDOM';
+import { setNextMark } from '../../store/marks/marks.action';
+import { changeGridState } from '../../store/grid-disable/grid-disable.action';
 
 const blue = '2px solid #3f51b5';
 const red = '2px solid #f50057';
 
-function OnlineGame({ response, playerMark, roomId }: any) {
+function OnlineGame({ response, playerMark, roomId, clientIsReloaded }: any) {
   const dispatch = useDispatch();
   const classes = buttonStyles();
   const gridSize = useSelector((state: Reducers) => state.gridSize);
@@ -54,6 +57,7 @@ function OnlineGame({ response, playerMark, roomId }: any) {
     paddingRight: '20px',
   } as CSSProperties;
 
+  //  Disable every button or the ones that has value depends on who is next
   useEffect(() => {
     if (!buttonsRef.current) return;
     const buttonsArray = [...buttonsRef.current.children];
@@ -68,38 +72,61 @@ function OnlineGame({ response, playerMark, roomId }: any) {
   }, [gridIsDisabled]);
 
   useEffect(() => {
-    if (response) {
-      //  Get square DOM elements and put them in a 2d array
-      const allButton = [...buttonsRef.current.children];
-      const allButtonMatrix: any = [];
-      while (allButton.length)
-        allButtonMatrix.push(allButton.splice(0, gridSize));
+    if (roomId) {
+      const allButtonMatrix = getSquareFromDOM(buttonsRef, gridSize);
 
-      socket.on(`square-btn-click-${roomId}`, (data: any) => {
-        const { row, col, value } = data.squares;
-        allButtonMatrix[row][col].value = value;
-        allButtonMatrix[row][col].innerText = value;
-        allButtonMatrix[row][col].disabled = true;
-        getWinner(row, col, allButtonMatrix);
-        //  Check draw
-        if (buttonsRef.current) {
-          const buttonValues = [...buttonsRef.current.children].map(
-            (item) => item.value
-          );
-          if (!buttonValues.includes('')) {
-            setGameIsDraw(true);
+      socket.on(`square-btn-click-${roomId}`, async (data: any) => {
+        dispatch(setNextMark());
+        dispatch(changeGridState());
+
+        try {
+          const lastRowPosition = await data.positions[
+            data.positions.length - 1
+          ].row;
+          const lastColPosition = await data.positions[
+            data.positions.length - 1
+          ].col;
+
+          data.positions.forEach((item: any) => {
+            allButtonMatrix[item.row][item.col].value = item.value;
+            allButtonMatrix[item.row][item.col].innerText = item.value;
+            allButtonMatrix[item.row][item.col].disabled = true;
+          });
+
+          getWinner(lastRowPosition, lastColPosition, allButtonMatrix);
+          //  Check draw
+          if (buttonsRef.current) {
+            const buttonValues = [...buttonsRef.current.children].map(
+              (item) => item.value
+            );
+            if (!buttonValues.includes('')) {
+              setGameIsDraw(true);
+            }
           }
+        } catch (error) {
+          console.error(error);
         }
       });
     }
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [response]);
+  }, [roomId]);
+
+  useEffect(() => {
+    if (clientIsReloaded) {
+      const allButtonMatrix = getSquareFromDOM(buttonsRef, gridSize);
+      response.positions.forEach((item: any) => {
+        allButtonMatrix[item.row][item.col].value = item.value;
+        allButtonMatrix[item.row][item.col].innerText = item.value;
+        allButtonMatrix[item.row][item.col].disabled = true;
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [clientIsReloaded]);
 
   //  Reset winner and mark if RESTART button clicked
   const handleRestartClick = () => {
     dispatch(setWinner(''));
-    socket.emit('leave-session');
+    socket.emit('leave-game', roomId);
     history.replace('/');
     window.location.reload();
   };
@@ -109,7 +136,7 @@ function OnlineGame({ response, playerMark, roomId }: any) {
       <GameStatus gameIsDraw={gameIsDraw} />
 
       <div ref={buttonsRef} style={gridBorderStyle}>
-        {createMatrix().map((item: any, index: number) => {
+        {createMatrix(gridSize).map((item: any, index: number) => {
           return (
             <SquareOnline
               roomId={roomId}

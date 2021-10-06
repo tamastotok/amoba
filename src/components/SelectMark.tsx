@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import {
   selectStarterMark,
@@ -38,6 +38,8 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
+const sessionStorage = window.sessionStorage;
+
 function SelectMark({ whatMark, label }: any) {
   const dispatch = useDispatch();
   const classes = useStyles();
@@ -52,6 +54,11 @@ function SelectMark({ whatMark, label }: any) {
       dispatch(selectPlayerMark(e.target.value as string));
     }
   };
+
+  useEffect(() => {
+    sessionStorage.setItem('playerMark', value);
+    sessionStorage.setItem('reloaded', 'false');
+  }, [value]);
 
   return (
     <div className="center">

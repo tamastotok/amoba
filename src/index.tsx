@@ -5,6 +5,12 @@ import App from './App';
 import { Provider } from 'react-redux';
 import store from './store';
 
+const sessionStorage = window.sessionStorage;
+
+window.onunload = function () {
+  sessionStorage.setItem('reloaded', 'true');
+};
+
 ReactDOM.render(
   <React.StrictMode>
     <Provider store={store}>
