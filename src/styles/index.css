@@ -20,6 +20,13 @@ h1 {
   width: fit-content;
 }
 
+.server-status {
+  width: fit-content;
+  margin-top: 20px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 .guide-link {
   position: absolute;
   bottom: 5em;

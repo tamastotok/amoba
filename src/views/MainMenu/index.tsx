@@ -4,19 +4,11 @@ import { buttonStyles } from '../../styles/components';
 import socket from '../../server';
 import StartButton from '../../components/StartButton';
 
-function MainMenu({ status }: any) {
+function MainMenu({ status, serverStatusMessage }: any) {
   const classes = buttonStyles();
 
   const handleClick = () => {
     socket.emit('join-lobby');
-  };
-
-  const offlineMessage = () => {
-    if (!status) {
-      setTimeout(() => {
-        return <h1>Server is currently offline.</h1>;
-      }, 1000);
-    }
   };
 
   return (
@@ -29,12 +21,13 @@ function MainMenu({ status }: any) {
             className={classes.button}
             variant="outlined"
             onClick={handleClick}
+            disabled={!status}
           >
             Start online
           </Button>
         </Link>
       </div>
-      {offlineMessage()}
+      <h2 className="server-status">{serverStatusMessage}</h2>
     </main>
   );
 }

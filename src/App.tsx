@@ -24,6 +24,9 @@ function App() {
   const [onlineUserCount, setOnlineUserCount] = useState<number>(0);
   const [statusMessage, setStatusMessage] = useState<string>('');
   const [serverStatus, setServerStatus] = useState<boolean>(false);
+  const [serverStatusMessage, setServerStatusMessage] = useState(
+    'Connecting to server...'
+  );
   const playerMark = useSelector((state: Reducers) => state.marks.playerMark);
   const location = window.location.pathname;
   const pageIsReloaded = sessionStorage.getItem('reloaded');
@@ -31,8 +34,8 @@ function App() {
   const mark = sessionStorage.getItem('playerMark') as string;
 
   useEffect(() => {
-    socket.on('server-status', (data: boolean) => {
-      setServerStatus(data);
+    socket.on('connect', () => {
+      setServerStatus(socket.connected);
     });
 
     socket.on('user-count', (data: number) => {
@@ -77,15 +80,31 @@ function App() {
         if (mark !== data.whoIsNext) dispatch(setGridIsDisabled(true));
       });
     }
+
+    socket.on('disconnect', () => {
+      setServerStatus(socket.connected);
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (serverStatus) {
+      setServerStatusMessage('');
+    }
+    setTimeout(() => {
+      setServerStatusMessage('Server is offline!');
+    }, 8000);
+  }, [serverStatus]);
 
   return (
     <>
       <BrowserRouter>
         <Switch>
           <Route path="/" exact>
-            <HomePage status={serverStatus} />
+            <HomePage
+              status={serverStatus}
+              serverStatusMessage={serverStatusMessage}
+            />
           </Route>
         </Switch>
 
