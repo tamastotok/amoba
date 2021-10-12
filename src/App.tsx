@@ -82,6 +82,10 @@ function App() {
       });
     }
 
+    socket.on('connect_error', () => {
+      setServerStatus(socket.connected);
+    });
+
     socket.on('disconnect', () => {
       setServerStatus(socket.connected);
     });
@@ -89,10 +93,8 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if (!serverStatus) {
-      setServerStatusMessage('Server is offline!');
-    }
-    setServerStatusMessage('');
+    if (serverStatus) setServerStatusMessage('');
+    if (serverStatus === false) setServerStatusMessage('Server is offline!');
   }, [serverStatus]);
 
   return (
