@@ -1,8 +1,6 @@
 import { useEffect, useState } from 'react';
 import { BrowserRouter, Switch, Route, Redirect } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import socket from './server';
-import { Reducers } from './types';
 import MessageBoard from './components/MessageBoard';
 import { setGridIsDisabled } from './store/grid-disable/grid-disable.action';
 import { setGridSize } from './store/grid-size/grid-size.action';
@@ -11,11 +9,13 @@ import {
   setPlayerBlueName,
   setPlayerRedName,
 } from './store/players/players.action';
-import HomePage from './views/MainMenu';
-import LocalMenu from './views/LocalMenu';
 import LocalGame from './views/LocalGame';
-import OnlineMenu from './views/OnlineMenu';
+import LocalMenu from './views/LocalMenu';
+import HomePage from './views/MainMenu';
 import OnlineGame from './views/OnlineGame';
+import OnlineMenu from './views/OnlineMenu';
+import socket from './server';
+import { Reducers } from './types';
 
 function App() {
   const dispatch = useDispatch();
@@ -23,11 +23,12 @@ function App() {
   const [roomId, setRoomId] = useState<any>('');
   const [onlineUserCount, setOnlineUserCount] = useState<number>(0);
   const [statusMessage, setStatusMessage] = useState<string>('');
-  const [serverStatus, setServerStatus] = useState<boolean>(false);
+  const [serverStatus, setServerStatus] = useState<boolean>();
   const [serverStatusMessage, setServerStatusMessage] = useState(
     'Connecting to server...'
   );
   const playerMark = useSelector((state: Reducers) => state.marks.playerMark);
+
   const location = window.location.pathname;
   const pageIsReloaded = sessionStorage.getItem('reloaded');
   const [clientIsReloaded, setClientIsReloaded] = useState(false);
@@ -68,13 +69,13 @@ function App() {
       socket.emit('reconnect', idFromUrl);
 
       socket.on(`continue-${idFromUrl}`, (data: any) => {
-        setResponse(data);
         dispatch(selectPlayerMark(mark));
-        setRoomId(data.roomId);
         dispatch(setGridSize(data.boardSize));
-        dispatch(setPlayerBlueName(data.bluePlayerName));
-        dispatch(setPlayerRedName(data.redPlayerName));
+        dispatch(setPlayerBlueName(data.bluePlayer.name));
+        dispatch(setPlayerRedName(data.redPlayer.name));
         dispatch(resetNextMark(data.whoIsNext));
+        setResponse(data);
+        setRoomId(data.roomId);
         setClientIsReloaded(true);
 
         if (mark !== data.whoIsNext) dispatch(setGridIsDisabled(true));
@@ -88,12 +89,10 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if (serverStatus) {
-      setServerStatusMessage('');
-    }
-    setTimeout(() => {
+    if (!serverStatus) {
       setServerStatusMessage('Server is offline!');
-    }, 8000);
+    }
+    setServerStatusMessage('');
   }, [serverStatus]);
 
   return (
