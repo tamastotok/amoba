@@ -1,18 +1,18 @@
 import { CSSProperties, useEffect, useRef, useState } from 'react';
-import Button from '@material-ui/core/Button';
-import SquareOnline from './SquareOnline';
 import { useHistory } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
+import Button from '@material-ui/core/Button';
+import { changeGridState } from '../../store/grid-disable/grid-disable.action';
+import { setNextMark } from '../../store/marks/marks.action';
 import { setWinner } from '../../store/winner/winner.action';
-import { Reducers } from '../../types';
 import { buttonStyles } from '../../styles/components';
+import { getSquareFromDOM } from '../../utils/helpers/accessToDOM';
 import { getWinner } from '../../utils/helpers/checkWinningPatterns';
 import { createMatrix } from '../../utils/helpers/createMatrix';
 import socket from '../../server';
+import { Reducers } from '../../types';
 import GameStatus from './GameStatus';
-import { getSquareFromDOM } from '../../utils/helpers/accessToDOM';
-import { setNextMark } from '../../store/marks/marks.action';
-import { changeGridState } from '../../store/grid-disable/grid-disable.action';
+import SquareOnline from './SquareOnline';
 
 const blue = '2px solid #3f51b5';
 const red = '2px solid #f50057';
@@ -20,7 +20,8 @@ const red = '2px solid #f50057';
 function OnlineGame({ response, playerMark, roomId, clientIsReloaded }: any) {
   const dispatch = useDispatch();
   const classes = buttonStyles();
-  const gridSize = useSelector((state: Reducers) => state.gridSize);
+  const sessionSize = sessionStorage.getItem('gridSize') as string;
+  const gridSize = parseInt(sessionSize);
   const marks = useSelector((state: Reducers) => state.marks);
   const winner = useSelector((state: Reducers) => state.winner);
   const gridIsDisabled = useSelector((state: Reducers) => state.gridIsDisabled);
@@ -75,36 +76,26 @@ function OnlineGame({ response, playerMark, roomId, clientIsReloaded }: any) {
     if (roomId) {
       const allButtonMatrix = getSquareFromDOM(buttonsRef, gridSize);
 
-      socket.on(`square-btn-click-${roomId}`, async (data: any) => {
+      socket.on(`square-btn-click-${roomId}`, (data: any) => {
         dispatch(setNextMark());
         dispatch(changeGridState());
+        const lastPos = data.positions[data.positions.length - 1];
 
-        try {
-          const lastRowPosition = await data.positions[
-            data.positions.length - 1
-          ].row;
-          const lastColPosition = await data.positions[
-            data.positions.length - 1
-          ].col;
+        allButtonMatrix[lastPos.row][lastPos.col].value = lastPos.value;
+        allButtonMatrix[lastPos.row][lastPos.col].innerText = lastPos.value;
+        allButtonMatrix[lastPos.row][lastPos.col].disabled = true;
 
-          data.positions.forEach((item: any) => {
-            allButtonMatrix[item.row][item.col].value = item.value;
-            allButtonMatrix[item.row][item.col].innerText = item.value;
-            allButtonMatrix[item.row][item.col].disabled = true;
-          });
+        //  Calculate winner
+        getWinner(lastPos.row, lastPos.col, allButtonMatrix);
 
-          getWinner(lastRowPosition, lastColPosition, allButtonMatrix);
-          //  Check draw
-          if (buttonsRef.current) {
-            const buttonValues = [...buttonsRef.current.children].map(
-              (item) => item.value
-            );
-            if (!buttonValues.includes('')) {
-              setGameIsDraw(true);
-            }
+        //  Check draw
+        if (buttonsRef.current) {
+          const buttonValues = [...buttonsRef.current.children].map(
+            (item) => item.value
+          );
+          if (!buttonValues.includes('')) {
+            setGameIsDraw(true);
           }
-        } catch (error) {
-          console.error(error);
         }
       });
     }
@@ -114,6 +105,7 @@ function OnlineGame({ response, playerMark, roomId, clientIsReloaded }: any) {
   useEffect(() => {
     if (clientIsReloaded) {
       const allButtonMatrix = getSquareFromDOM(buttonsRef, gridSize);
+
       response.positions.forEach((item: any) => {
         allButtonMatrix[item.row][item.col].value = item.value;
         allButtonMatrix[item.row][item.col].innerText = item.value;
