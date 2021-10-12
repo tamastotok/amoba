@@ -1,8 +1,8 @@
-import PlayerInputs from './PlayerInputs';
 import SelectMark from '../../components/SelectMark';
 import GridSize from '../../components/GridSize';
 import StartButton from '../../components/StartButton';
 import BackButton from '../../components/BackButton';
+import PlayerInputs from './PlayerInputs';
 
 function LocalMenu() {
   return (

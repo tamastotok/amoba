@@ -1,18 +1,17 @@
-import TextField from '@material-ui/core/TextField';
-import { textInput } from '../../styles/components';
 import { ChangeEvent } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import TextField from '@material-ui/core/TextField';
 import {
   setPlayerBlueName,
   setPlayerRedName,
 } from '../../store/players/players.action';
+import { textInput } from '../../styles/components';
 import { Reducers } from '../../types';
 
 function PlayerInputs() {
+  const dispatch = useDispatch();
   const text = textInput();
   const players = useSelector((state: Reducers) => state.players);
-
-  const dispatch = useDispatch();
 
   const handleChange = (e: ChangeEvent<{ value: unknown; name: unknown }>) => {
     if (e.target.name === '1') {

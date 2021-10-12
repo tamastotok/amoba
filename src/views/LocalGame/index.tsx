@@ -1,15 +1,15 @@
-import SquareLocal from './SquareLocal';
-import { useSelector, useDispatch } from 'react-redux';
-import { Link } from 'react-router-dom';
-import { setWinner } from '../../store/winner/winner.action';
-import { resetNextMark } from '../../store/marks/marks.action';
-import { Reducers } from '../../types';
-import { createMatrix } from '../../utils/helpers/createMatrix';
 import { CSSProperties, useEffect, useRef, useState } from 'react';
-import { getWinner } from '../../utils/helpers/checkWinningPatterns';
+import { Link } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
 import Button from '@material-ui/core/Button';
-import { buttonStyles } from '../../styles/components';
 import { setGridSize } from '../../store/grid-size/grid-size.action';
+import { resetNextMark } from '../../store/marks/marks.action';
+import { setWinner } from '../../store/winner/winner.action';
+import { buttonStyles } from '../../styles/components';
+import { getWinner } from '../../utils/helpers/checkWinningPatterns';
+import { createMatrix } from '../../utils/helpers/createMatrix';
+import { Reducers } from '../../types';
+import SquareLocal from './SquareLocal';
 
 const blue = '2px solid #3f51b5';
 const red = '2px solid #f50057';

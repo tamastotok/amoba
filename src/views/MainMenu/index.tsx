@@ -1,8 +1,8 @@
 import { Link } from 'react-router-dom';
 import Button from '@material-ui/core/Button';
+import StartButton from '../../components/StartButton';
 import { buttonStyles } from '../../styles/components';
 import socket from '../../server';
-import StartButton from '../../components/StartButton';
 
 function MainMenu({ status, serverStatusMessage }: any) {
   const classes = buttonStyles();
