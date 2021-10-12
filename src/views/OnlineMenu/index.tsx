@@ -1,19 +1,20 @@
-import TextField from '@material-ui/core/TextField';
-import SelectMark from '../../components/SelectMark';
-import GridSize from '../../components/GridSize';
-import { buttonStyles, textInput } from '../../styles/components';
-import { useHistory } from 'react-router-dom';
-import Button from '@material-ui/core/Button';
 import { ChangeEvent, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useHistory } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import Button from '@material-ui/core/Button';
+import TextField from '@material-ui/core/TextField';
+import GridSize from '../../components/GridSize';
+import SelectMark from '../../components/SelectMark';
+import { setGridSize } from '../../store/grid-size/grid-size.action';
+import { buttonStyles, textInput } from '../../styles/components';
 import socket from '../../server';
 import { Reducers } from '../../types';
 
 function OnlineMenu() {
+  const dispatch = useDispatch();
   const text = textInput();
   const history = useHistory();
   const buttonClasses = buttonStyles();
-
   const [playerName, setPlayerName] = useState('');
   const playerMark = useSelector((state: Reducers) => state.marks.playerMark);
   const starterMark = useSelector((state: Reducers) => state.marks.starterMark);
@@ -28,12 +29,15 @@ function OnlineMenu() {
   };
 
   const handleCreateGameButtonClick = () => {
+    if (gridSize === 0) {
+      dispatch(setGridSize(8));
+    }
     //  Send data to server
     socket.emit('search-game', {
       playerName,
       playerMark,
       starterMark,
-      gridSize,
+      gridSize: gridSize === 0 ? 8 : gridSize,
     });
   };
 

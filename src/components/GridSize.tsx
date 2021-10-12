@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { setGridSize } from '../store/grid-size/grid-size.action';
 import { teal } from '@material-ui/core/colors';
@@ -51,15 +51,23 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
+const sessionStorage = window.sessionStorage;
+
 function GridSize() {
   const dispatch = useDispatch();
   const [value, setValue] = useState('8x8');
+  const [size, setSize] = useState('8');
   const classes = useStyles();
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSize(event.target.value);
     setValue((event.target as HTMLInputElement).value);
     dispatch(setGridSize(parseInt(event.target.value)));
   };
+
+  useEffect(() => {
+    sessionStorage.setItem('gridSize', size);
+  }, [size]);
 
   return (
     <div className="center">
