@@ -6,6 +6,7 @@ import StartButton from '../../components/StartButton';
 
 function MainMenu({ status }: any) {
   const classes = buttonStyles();
+  console.log(status);
 
   const handleClick = () => {
     socket.emit('join-lobby');

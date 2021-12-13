@@ -79,20 +79,19 @@ const descendDiagonalPattern = (row: number, col: number, array: any[]) => {
 };
 
 const checkSameValues = (array: string[]) => {
-  let values = array;
-  for (let i = 0; i <= 5; ) {
-    if (values.slice(i, i + 5).every((v) => v === 'X')) {
+  for (let i = 0; i < 6; i++) {
+    if (i > 4) return;
+
+    if (array.slice(i, i + 5).every((v: string) => v === 'X')) {
+      console.log('x true', array.slice(i, i + 5));
       store.dispatch(setGridIsDisabled(true));
       store.dispatch(setWinner('X'));
-      values = [];
-      break;
     }
-    if (values.slice(i, i + 5).every((v) => v === 'O')) {
+
+    if (array.slice(i, i + 5).every((v: string) => v === 'O')) {
+      console.log('o true');
       store.dispatch(setGridIsDisabled(true));
       store.dispatch(setWinner('O'));
-      values = [];
-      break;
     }
-    i++;
   }
 };
