@@ -4,8 +4,7 @@ import './styles/index.css';
 import App from './App';
 import { Provider } from 'react-redux';
 import store from './store';
-
-const sessionStorage = window.sessionStorage;
+import { BrowserRouter } from 'react-router-dom';
 
 window.onunload = function () {
   sessionStorage.setItem('reloaded', 'true');
@@ -14,7 +13,9 @@ window.onunload = function () {
 ReactDOM.render(
   <React.StrictMode>
     <Provider store={store}>
-      <App />
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
     </Provider>
   </React.StrictMode>,
   document.getElementById('root')

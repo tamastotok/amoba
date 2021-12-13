@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { BrowserRouter, Switch, Route, Redirect } from 'react-router-dom';
+import { Switch, Route, useHistory, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import MessageBoard from './components/MessageBoard';
 import { setGridIsDisabled } from './store/grid-disable/grid-disable.action';
@@ -29,10 +29,13 @@ function App() {
   );
   const playerMark = useSelector((state: Reducers) => state.marks.playerMark);
 
-  const location = window.location.pathname;
   const pageIsReloaded = sessionStorage.getItem('reloaded');
   const [clientIsReloaded, setClientIsReloaded] = useState(false);
+  const [isDisabled, setIsDisabled] = useState(false);
   const mark = sessionStorage.getItem('playerMark') as string;
+
+  const history = useHistory();
+  const location = useLocation();
 
   useEffect(() => {
     socket.on('connect', () => {
@@ -51,10 +54,14 @@ function App() {
     });
 
     socket.on('game-found', (res: any) => {
-      setRoomId(res.roomId);
-      dispatch(setPlayerBlueName(res.playerData.blueName));
-      dispatch(setPlayerRedName(res.playerData.redName));
-      setStatusMessage('');
+      if (res.roomId) {
+        history.push(`/online/game/id=${res.roomId}`);
+        sessionStorage.setItem('room', res.roomId);
+        setRoomId(res.roomId);
+        dispatch(setPlayerBlueName(res.playerData.blueName));
+        dispatch(setPlayerRedName(res.playerData.redName));
+        setStatusMessage('');
+      }
     });
 
     socket.on('leave-game', () => {
@@ -63,8 +70,11 @@ function App() {
     });
 
     //  When page is refreshed
-    if (pageIsReloaded === 'true' && location.includes('id=')) {
-      const idFromUrl = location.slice(location.indexOf('=') + 1);
+    if (pageIsReloaded === 'true' && location.pathname.includes('id=')) {
+      const idFromUrl = location.pathname.slice(
+        location.pathname.indexOf('=') + 1
+      );
+
       socket.emit('join-lobby');
       socket.emit('reconnect', idFromUrl);
 
@@ -89,61 +99,64 @@ function App() {
     socket.on('disconnect', () => {
       setServerStatus(socket.connected);
     });
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
-    if (serverStatus) setServerStatusMessage('');
     if (serverStatus === false) setServerStatusMessage('Server is offline!');
+    if (serverStatus) setServerStatusMessage('');
   }, [serverStatus]);
+
+  //  Redirect if room is not exist
+  useEffect(() => {
+    if (!sessionStorage.getItem('room') && location.pathname.includes('id')) {
+      history.push('/');
+      setIsDisabled(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.pathname]);
+
+  //  Send alert if room is not exist
+  useEffect(() => {
+    if (isDisabled) alert('Invalid room.');
+  }, [isDisabled]);
 
   return (
     <>
-      <BrowserRouter>
-        <Switch>
-          <Route path="/" exact>
-            <HomePage
-              status={serverStatus}
-              serverStatusMessage={serverStatusMessage}
-            />
-          </Route>
-        </Switch>
+      <Switch>
+        <Route path="/" exact>
+          <HomePage
+            status={serverStatus}
+            serverStatusMessage={serverStatusMessage}
+          />
+        </Route>
 
-        <Switch>
-          <Route path="/local" exact component={LocalMenu} />
-        </Switch>
+        <Route path="/local" exact component={LocalMenu} />
 
-        <Switch>
-          <Route path="/local/game" exact component={LocalGame} />
-        </Switch>
+        <Route path="/local/game" exact component={LocalGame} />
 
-        <Switch>
-          <Route path="/online" exact>
-            <OnlineMenu />
-            <MessageBoard
-              onlineUserCount={onlineUserCount}
-              statusMessage={statusMessage}
-            />
-          </Route>
-        </Switch>
+        <Route path="/online" exact>
+          <OnlineMenu />
+          <MessageBoard
+            onlineUserCount={onlineUserCount}
+            statusMessage={statusMessage}
+          />
+        </Route>
 
-        {roomId && <Redirect from="/online" to={`/online/game/id=${roomId}`} />}
-
-        <Switch>
-          <Route path="/online/game/:id">
-            <OnlineGame
-              roomId={roomId}
-              response={response}
-              playerMark={playerMark}
-              clientIsReloaded={clientIsReloaded}
-            />
-            <MessageBoard
-              onlineUserCount={onlineUserCount}
-              statusMessage={statusMessage}
-            />
-          </Route>
-        </Switch>
-      </BrowserRouter>
+        <Route path="/online/game/:id">
+          <OnlineGame
+            roomId={roomId}
+            response={response}
+            playerMark={playerMark}
+            clientIsReloaded={clientIsReloaded}
+          />
+          <MessageBoard
+            onlineUserCount={onlineUserCount}
+            statusMessage={statusMessage}
+          />
+        </Route>
+      </Switch>
     </>
   );
 }
