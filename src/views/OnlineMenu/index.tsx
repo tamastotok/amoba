@@ -25,7 +25,7 @@ function OnlineMenu() {
   };
 
   const handleClick = () => {
-    history.goBack();
+    history.replace('/');
   };
 
   const handleCreateGameButtonClick = () => {
