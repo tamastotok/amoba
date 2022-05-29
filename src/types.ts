@@ -1,6 +1,8 @@
+type DefaultMark = 'X' | 'O';
+
 interface SinglePlayer {
   name: string;
-  mark: string;
+  mark: DefaultMark;
 }
 
 export interface Players {
@@ -9,9 +11,9 @@ export interface Players {
 }
 
 export interface Marks {
-  starterMark: string;
-  nextMark: string;
-  playerMark: string;
+  starterMark: DefaultMark;
+  nextMark: DefaultMark;
+  playerMark: DefaultMark;
 }
 
 export interface Square {

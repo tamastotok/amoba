@@ -99,7 +99,6 @@ function App() {
     socket.on('disconnect', () => {
       setServerStatus(socket.connected);
     });
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -117,7 +116,7 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname]);
 
-  //  Send alert if room is not exist
+  //  Send alert if room is not exist or 2 players are already in match in the same room
   useEffect(() => {
     if (isDisabled) alert('Invalid room.');
   }, [isDisabled]);

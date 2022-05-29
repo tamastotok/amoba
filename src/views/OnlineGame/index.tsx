@@ -13,6 +13,7 @@ import socket from '../../server';
 import { Reducers } from '../../types';
 import GameStatus from './GameStatus';
 import SquareOnline from './SquareOnline';
+import ChatWindow from '../../components/ChatWindow';
 
 const blue = '2px solid #3f51b5';
 const red = '2px solid #f50057';
@@ -154,6 +155,8 @@ function OnlineGame({ response, playerMark, roomId, clientIsReloaded }: any) {
           </Button>
         </div>
       ) : null}
+
+      <ChatWindow />
     </div>
   );
 }
