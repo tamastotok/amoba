@@ -1,14 +1,17 @@
 import { useEffect, useState } from 'react';
-import { Switch, Route, useHistory, useLocation } from 'react-router-dom';
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  useLocation,
+  useNavigate,
+} from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import MessageBoard from './components/MessageBoard';
 import { setGridIsDisabled } from './store/grid-disable/grid-disable.action';
 import { setGridSize } from './store/grid-size/grid-size.action';
 import { selectPlayerMark, resetNextMark } from './store/marks/marks.action';
-import {
-  setPlayerBlueName,
-  setPlayerRedName,
-} from './store/players/players.action';
+import { setPlayerBlueName, setPlayerRedName } from './store/players/players.action';
 import LocalGame from './views/LocalGame';
 import LocalMenu from './views/LocalMenu';
 import HomePage from './views/MainMenu';
@@ -34,7 +37,7 @@ function App() {
   const [isDisabled, setIsDisabled] = useState(false);
   const mark = sessionStorage.getItem('playerMark') as string;
 
-  const history = useHistory();
+  const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
@@ -55,7 +58,7 @@ function App() {
 
     socket.on('game-found', (res: any) => {
       if (res.roomId) {
-        history.push(`/online/game/id=${res.roomId}`);
+        navigate(`/online/game/id=${res.roomId}`);
         sessionStorage.setItem('room', res.roomId);
         setRoomId(res.roomId);
         dispatch(setPlayerBlueName(res.playerData.blueName));
@@ -71,9 +74,7 @@ function App() {
 
     //  When page is refreshed
     if (pageIsReloaded === 'true' && location.pathname.includes('id=')) {
-      const idFromUrl = location.pathname.slice(
-        location.pathname.indexOf('=') + 1
-      );
+      const idFromUrl = location.pathname.slice(location.pathname.indexOf('=') + 1);
 
       socket.emit('join-lobby');
       socket.emit('reconnect', idFromUrl);
@@ -110,7 +111,7 @@ function App() {
   //  Redirect if room is not exist
   useEffect(() => {
     if (!sessionStorage.getItem('room') && location.pathname.includes('id')) {
-      history.push('/');
+      navigate('/');
       setIsDisabled(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -122,20 +123,20 @@ function App() {
   }, [isDisabled]);
 
   return (
-    <>
-      <Switch>
-        <Route path="/" exact>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/">
           <HomePage
             status={serverStatus}
             serverStatusMessage={serverStatusMessage}
           />
         </Route>
 
-        <Route path="/local" exact component={LocalMenu} />
+        <Route path="/local" Component={LocalMenu} />
 
-        <Route path="/local/game" exact component={LocalGame} />
+        <Route path="/local/game" Component={LocalGame} />
 
-        <Route path="/online" exact>
+        <Route path="/online">
           <OnlineMenu />
           <MessageBoard
             onlineUserCount={onlineUserCount}
@@ -155,8 +156,8 @@ function App() {
             statusMessage={statusMessage}
           />
         </Route>
-      </Switch>
-    </>
+      </Routes>
+    </BrowserRouter>
   );
 }
 

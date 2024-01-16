@@ -1,6 +1,6 @@
 import { ChangeEvent } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import TextField from '@material-ui/core/TextField';
+import { TextField } from '@mui/material';
 import {
   setPlayerBlueName,
   setPlayerRedName,
@@ -10,7 +10,7 @@ import { Reducers } from '../../types';
 
 function PlayerInputs() {
   const dispatch = useDispatch();
-  const text = textInput();
+  const { customTextField } = textInput;
   const players = useSelector((state: Reducers) => state.players);
 
   const handleChange = (e: ChangeEvent<{ value: unknown; name: unknown }>) => {
@@ -22,7 +22,7 @@ function PlayerInputs() {
   };
 
   return (
-    <form className={text.customTextField} noValidate autoComplete="off">
+    <form className={customTextField} noValidate autoComplete="off">
       <TextField
         id="outlined-basic"
         label="Player X name (optional)"

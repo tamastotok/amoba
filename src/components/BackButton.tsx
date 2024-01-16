@@ -1,17 +1,16 @@
-import { useHistory } from 'react-router-dom';
-import Button from '@material-ui/core/Button';
+import { useNavigate } from 'react-router-dom';
+import { Button } from '@mui/material';
 import { buttonStyles } from '../styles/components';
 
 function BackButton() {
-  const classes = buttonStyles();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const handleClick = () => {
-    history.replace('/');
+    navigate('/');
   };
 
   return (
-    <Button className={classes.button} variant="outlined" onClick={handleClick}>
+    <Button className={buttonStyles} variant="outlined" onClick={handleClick}>
       Back
     </Button>
   );

@@ -1,8 +1,7 @@
 import { ChangeEvent, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import Button from '@material-ui/core/Button';
-import TextField from '@material-ui/core/TextField';
+import { Button, TextField } from '@mui/material';
 import GridSize from '../../components/GridSize';
 import SelectMark from '../../components/SelectMark';
 import { setGridSize } from '../../store/grid-size/grid-size.action';
@@ -12,9 +11,9 @@ import { Reducers } from '../../types';
 
 function OnlineMenu() {
   const dispatch = useDispatch();
-  const text = textInput();
-  const history = useHistory();
-  const buttonClasses = buttonStyles();
+  const { customTextField } = textInput;
+  const navigate = useNavigate();
+  const { button } = buttonStyles;
   const [playerName, setPlayerName] = useState('');
   const playerMark = useSelector((state: Reducers) => state.marks.playerMark);
   const starterMark = useSelector((state: Reducers) => state.marks.starterMark);
@@ -25,7 +24,7 @@ function OnlineMenu() {
   };
 
   const handleClick = () => {
-    history.replace('/');
+    navigate('/');
   };
 
   const handleCreateGameButtonClick = () => {
@@ -44,7 +43,7 @@ function OnlineMenu() {
   return (
     <main>
       <h1>Settings</h1>
-      <form className={text.customTextField} noValidate autoComplete="off">
+      <form className={customTextField} noValidate autoComplete="off">
         <TextField
           style={{ width: '420px' }}
           id="outlined-basic"
@@ -62,18 +61,14 @@ function OnlineMenu() {
 
       <div className="button-group-center">
         <Button
-          className={buttonClasses.button}
+          className={button}
           variant="outlined"
           onClick={handleCreateGameButtonClick}
         >
           Create
         </Button>
 
-        <Button
-          className={buttonClasses.button}
-          variant="outlined"
-          onClick={handleClick}
-        >
+        <Button className={button} variant="outlined" onClick={handleClick}>
           Back
         </Button>
       </div>

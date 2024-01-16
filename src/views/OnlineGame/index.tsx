@@ -1,7 +1,7 @@
 import { CSSProperties, useEffect, useRef, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import Button from '@material-ui/core/Button';
+import { Button } from '@mui/material';
 import { changeGridState } from '../../store/grid-disable/grid-disable.action';
 import { setNextMark } from '../../store/marks/marks.action';
 import { setWinner } from '../../store/winner/winner.action';
@@ -20,14 +20,14 @@ const red = '2px solid #f50057';
 
 function OnlineGame({ response, playerMark, roomId, clientIsReloaded }: any) {
   const dispatch = useDispatch();
-  const classes = buttonStyles();
+  const { button } = buttonStyles;
   const sessionSize = sessionStorage.getItem('gridSize') as string;
   const gridSize = parseInt(sessionSize);
   const marks = useSelector((state: Reducers) => state.marks);
   const winner = useSelector((state: Reducers) => state.winner);
   const gridIsDisabled = useSelector((state: Reducers) => state.gridIsDisabled);
   const buttonsRef = useRef<any>(null);
-  const history = useHistory();
+  const navigate = useNavigate();
   const [gameIsDraw, setGameIsDraw] = useState(false);
   const [borderColor, setBorderColor] = useState(
     marks.starterMark === 'X' ? blue : red
@@ -67,9 +67,7 @@ function OnlineGame({ response, playerMark, roomId, clientIsReloaded }: any) {
     if (gridIsDisabled) {
       buttonsArray.map((item) => (item.disabled = true));
     } else {
-      buttonsArray.map(
-        (item) => (item.disabled = item.value === '' ? false : true)
-      );
+      buttonsArray.map((item) => (item.disabled = item.value === '' ? false : true));
     }
   }, [gridIsDisabled]);
 
@@ -120,7 +118,7 @@ function OnlineGame({ response, playerMark, roomId, clientIsReloaded }: any) {
   const handleRestartClick = () => {
     dispatch(setWinner(''));
     socket.emit('leave-game', roomId);
-    history.replace('/');
+    navigate('/');
     window.location.reload();
   };
 
@@ -146,11 +144,7 @@ function OnlineGame({ response, playerMark, roomId, clientIsReloaded }: any) {
 
       {winner || gameIsDraw ? (
         <div className="restart-button">
-          <Button
-            className={classes.button}
-            variant="outlined"
-            onClick={handleRestartClick}
-          >
+          <Button className={button} variant="outlined" onClick={handleRestartClick}>
             Leave
           </Button>
         </div>

@@ -1,9 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import {
-  selectStarterMark,
-  selectPlayerMark,
-} from '../store/marks/marks.action';
+import { selectStarterMark, selectPlayerMark } from '../store/marks/marks.action';
 import Radio from '@material-ui/core/Radio';
 import RadioGroup from '@material-ui/core/RadioGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';

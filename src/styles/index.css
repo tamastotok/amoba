@@ -33,12 +33,19 @@ h1 {
   left: 0;
   right: 0;
   width: fit-content;
-  margin: auto;
+  /*margin: auto;*/
 }
 
 .textfield {
   width: 420px;
   margin-bottom: 40px;
+}
+
+.text-input {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: auto;
 }
 
 .winner-container {
@@ -53,18 +60,18 @@ h1 {
   width: 40px;
   height: 40px;
   padding: 5px;
-  background-color: rgb(247, 247, 247);
-  border: 1px solid rgb(194, 194, 194);
+  background-color: #f7f7f7;
+  border: 1px solid #c2c2c2;
   font-size: 24px;
   font-weight: 600;
 }
 
 .square-button:hover {
-  border: 3px solid rgb(138, 138, 138);
+  border: 3px solid #8a8a8a;
 }
 
 .square-button[disabled]:hover {
-  border: 1px solid rgb(194, 194, 194);
+  border: 1px solid #c2c2c2;
 }
 
 .square-button[value='O'] {
@@ -128,7 +135,7 @@ h1 {
 
 .players-center {
   position: relative;
-  border: 1px solid rgb(138, 138, 138);
+  border: 1px solid #8a8a8a;
   text-align: center;
   height: 80px;
   width: 300px;
@@ -160,14 +167,14 @@ h1 {
   text-align: right;
   bottom: 10px;
   right: 10px;
-  color: rgb(54, 172, 39);
+  color: #36ac27;
   font-weight: 600;
 }
 
 .chat-window {
   width: 300px;
   padding: 5px;
-  border: 1px solid black;
+  border: 1px solid #000;
   border-radius: 5px;
   position: relative;
   margin-left: auto;
@@ -183,18 +190,18 @@ h1 {
 }
 
 .chat-window input {
-  border: 1px solid gray;
+  border: 1px solid #808080;
   height: 30px;
   border-radius: 5px;
   width: calc(100% - 80px);
 }
 
 .chat-window input:focus {
-  border: 1px solid black;
+  border: 1px solid #000;
 }
 
 .chat-window button {
-  border: 1px solid gray;
+  border: 1px solid #808080;
   border-radius: 5px;
   width: 75px;
   height: 30px;
@@ -204,4 +211,52 @@ h1 {
 .chat-window button:hover {
   border: 2px solid #3f51b5;
   cursor: pointer;
+}
+
+.color-teal {
+  background-color: #26a69a;
+}
+
+.color-teal:checked {
+  background-color: #00897b;
+}
+
+.form-theme {
+  width: 420px;
+  margin: 10px auto 40px auto;
+  border: 1px solid #0000003b;
+  border-radius: 4px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.form-theme > * {
+  margin: 8px;
+}
+
+.form-theme > div {
+  width: 300px;
+  justify-content: flex-end;
+}
+
+.form-theme & label {
+  width: 80px;
+  margin-right: 20px;
+}
+
+.custom-button {
+  border-width: 2px;
+  width: 180px;
+  height: 40px;
+  margin: 5px 0;
+}
+
+.custom-button:hover {
+  border-width: 2px;
+}
+
+.custom-link {
+  text-decoration: none;
+  margin: 8px;
 }
