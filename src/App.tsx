@@ -1,11 +1,5 @@
 import { useEffect, useState } from 'react';
-import {
-  BrowserRouter,
-  Routes,
-  Route,
-  useLocation,
-  useNavigate,
-} from 'react-router-dom';
+import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import MessageBoard from './components/MessageBoard';
 import { setGridIsDisabled } from './store/grid-disable/grid-disable.action';
@@ -123,41 +117,51 @@ function App() {
   }, [isDisabled]);
 
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/">
+    <Routes>
+      <Route
+        path="/"
+        element={
           <HomePage
             status={serverStatus}
             serverStatusMessage={serverStatusMessage}
           />
-        </Route>
+        }
+      />
 
-        <Route path="/local" Component={LocalMenu} />
+      <Route path="/local" element={<LocalMenu />} />
+      <Route path="/local/game" element={<LocalGame />} />
 
-        <Route path="/local/game" Component={LocalGame} />
+      <Route
+        path="/online"
+        element={
+          <>
+            <OnlineMenu />{' '}
+            <MessageBoard
+              onlineUserCount={onlineUserCount}
+              statusMessage={statusMessage}
+            />
+          </>
+        }
+      />
 
-        <Route path="/online">
-          <OnlineMenu />
-          <MessageBoard
-            onlineUserCount={onlineUserCount}
-            statusMessage={statusMessage}
-          />
-        </Route>
-
-        <Route path="/online/game/:id">
-          <OnlineGame
-            roomId={roomId}
-            response={response}
-            playerMark={playerMark}
-            clientIsReloaded={clientIsReloaded}
-          />
-          <MessageBoard
-            onlineUserCount={onlineUserCount}
-            statusMessage={statusMessage}
-          />
-        </Route>
-      </Routes>
-    </BrowserRouter>
+      <Route
+        path="/online/game/:id"
+        element={
+          <>
+            <OnlineGame
+              roomId={roomId}
+              response={response}
+              playerMark={playerMark}
+              clientIsReloaded={clientIsReloaded}
+            />
+            <MessageBoard
+              onlineUserCount={onlineUserCount}
+              statusMessage={statusMessage}
+            />
+          </>
+        }
+      />
+    </Routes>
   );
 }
 

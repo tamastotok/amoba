@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { setGridSize } from '../store/grid-size/grid-size.action';
-import { Radio, RadioGroup, FormControlLabel, FormControl } from '@mui/material';
+import { RadioGroup, Radio, FormControlLabel, FormControl } from '@mui/material';
 
 const sessionStorage = window.sessionStorage;
 

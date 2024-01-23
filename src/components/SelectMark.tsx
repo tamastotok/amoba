@@ -1,45 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { selectStarterMark, selectPlayerMark } from '../store/marks/marks.action';
-import Radio from '@material-ui/core/Radio';
-import RadioGroup from '@material-ui/core/RadioGroup';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import FormControl from '@material-ui/core/FormControl';
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    root: {
-      width: '420px',
-      margin: '10px auto 10px auto',
-      border: '1px solid rgba(0, 0, 0, 0.23)',
-      borderRadius: '4px',
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-
-      '& > *': {
-        margin: theme.spacing(1),
-      },
-
-      '& > div': {
-        width: '300px',
-        justifyContent: 'flex-end',
-      },
-
-      '& label': {
-        width: '80px',
-        marginRight: '20px',
-      },
-    },
-  })
-);
+import { FormControl, FormControlLabel, Radio, RadioGroup } from '@mui/material';
 
 const sessionStorage = window.sessionStorage;
 
 function SelectMark({ whatMark, label }: any) {
   const dispatch = useDispatch();
-  const classes = useStyles();
   const [value, setValue] = useState('X');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -59,7 +26,7 @@ function SelectMark({ whatMark, label }: any) {
 
   return (
     <div className="center">
-      <FormControl className={classes.root} component="fieldset">
+      <FormControl className="form-theme" component="fieldset">
         <p>{label}</p>
 
         <RadioGroup

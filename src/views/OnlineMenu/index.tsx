@@ -5,15 +5,12 @@ import { Button, TextField } from '@mui/material';
 import GridSize from '../../components/GridSize';
 import SelectMark from '../../components/SelectMark';
 import { setGridSize } from '../../store/grid-size/grid-size.action';
-import { buttonStyles, textInput } from '../../styles/components';
 import socket from '../../server';
 import { Reducers } from '../../types';
 
 function OnlineMenu() {
   const dispatch = useDispatch();
-  const { customTextField } = textInput;
   const navigate = useNavigate();
-  const { button } = buttonStyles;
   const [playerName, setPlayerName] = useState('');
   const playerMark = useSelector((state: Reducers) => state.marks.playerMark);
   const starterMark = useSelector((state: Reducers) => state.marks.starterMark);
@@ -43,7 +40,7 @@ function OnlineMenu() {
   return (
     <main>
       <h1>Settings</h1>
-      <form className={customTextField} noValidate autoComplete="off">
+      <form className="textfield" noValidate autoComplete="off">
         <TextField
           style={{ width: '420px' }}
           id="outlined-basic"
@@ -61,14 +58,14 @@ function OnlineMenu() {
 
       <div className="button-group-center">
         <Button
-          className={button}
+          className="custom-button"
           variant="outlined"
           onClick={handleCreateGameButtonClick}
         >
           Create
         </Button>
 
-        <Button className={button} variant="outlined" onClick={handleClick}>
+        <Button className="custom-button" variant="outlined" onClick={handleClick}>
           Back
         </Button>
       </div>

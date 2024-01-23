@@ -5,7 +5,6 @@ import { Button } from '@mui/material';
 import { changeGridState } from '../../store/grid-disable/grid-disable.action';
 import { setNextMark } from '../../store/marks/marks.action';
 import { setWinner } from '../../store/winner/winner.action';
-import { buttonStyles } from '../../styles/components';
 import { getSquareFromDOM } from '../../utils/helpers/accessToDOM';
 import { getWinner } from '../../utils/helpers/checkWinningPatterns';
 import { createMatrix } from '../../utils/helpers/createMatrix';
@@ -20,7 +19,6 @@ const red = '2px solid #f50057';
 
 function OnlineGame({ response, playerMark, roomId, clientIsReloaded }: any) {
   const dispatch = useDispatch();
-  const { button } = buttonStyles;
   const sessionSize = sessionStorage.getItem('gridSize') as string;
   const gridSize = parseInt(sessionSize);
   const marks = useSelector((state: Reducers) => state.marks);
@@ -144,7 +142,11 @@ function OnlineGame({ response, playerMark, roomId, clientIsReloaded }: any) {
 
       {winner || gameIsDraw ? (
         <div className="restart-button">
-          <Button className={button} variant="outlined" onClick={handleRestartClick}>
+          <Button
+            className="custom-button"
+            variant="outlined"
+            onClick={handleRestartClick}
+          >
             Leave
           </Button>
         </div>

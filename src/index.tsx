@@ -1,22 +1,24 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
-import './styles/index.css';
-import App from './App';
+import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
-import store from './store';
 import { BrowserRouter } from 'react-router-dom';
+import App from './App';
+import store from './store';
+import './styles/index.css';
 
 window.onunload = function () {
   sessionStorage.setItem('reloaded', 'true');
 };
 
-ReactDOM.render(
+const container = document.getElementById('app');
+const root = createRoot(container!);
+
+root.render(
   <React.StrictMode>
     <Provider store={store}>
       <BrowserRouter>
         <App />
       </BrowserRouter>
     </Provider>
-  </React.StrictMode>,
-  document.getElementById('root')
+  </React.StrictMode>
 );

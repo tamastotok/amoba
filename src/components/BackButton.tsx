@@ -1,6 +1,5 @@
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@mui/material';
-import { buttonStyles } from '../styles/components';
 
 function BackButton() {
   const navigate = useNavigate();
@@ -10,7 +9,7 @@ function BackButton() {
   };
 
   return (
-    <Button className={buttonStyles} variant="outlined" onClick={handleClick}>
+    <Button className="custom-button" variant="outlined" onClick={handleClick}>
       Back
     </Button>
   );

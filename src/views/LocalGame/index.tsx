@@ -5,7 +5,6 @@ import { Button } from '@mui/material';
 import { setGridSize } from '../../store/grid-size/grid-size.action';
 import { resetNextMark } from '../../store/marks/marks.action';
 import { setWinner } from '../../store/winner/winner.action';
-import { buttonStyles } from '../../styles/components';
 import { getWinner } from '../../utils/helpers/checkWinningPatterns';
 import { createMatrix } from '../../utils/helpers/createMatrix';
 import { Reducers } from '../../types';
@@ -15,7 +14,6 @@ const blue = '2px solid #3f51b5';
 const red = '2px solid #f50057';
 
 function LocalGame() {
-  const { link, button } = buttonStyles;
   const dispatch = useDispatch();
   const players = useSelector((state: Reducers) => state.players);
   const marks = useSelector((state: Reducers) => state.marks);
@@ -133,9 +131,9 @@ function LocalGame() {
 
       {winner || gameIsDraw ? (
         <div className="restart-button">
-          <Link className={link} to="/">
+          <Link className="custom-link" to="/">
             <Button
-              className={button}
+              className="custom-button"
               variant="outlined"
               onClick={handleRestartClick}
             >

@@ -5,12 +5,11 @@ import {
   setPlayerBlueName,
   setPlayerRedName,
 } from '../../store/players/players.action';
-import { textInput } from '../../styles/components';
 import { Reducers } from '../../types';
 
 function PlayerInputs() {
   const dispatch = useDispatch();
-  const { customTextField } = textInput;
+
   const players = useSelector((state: Reducers) => state.players);
 
   const handleChange = (e: ChangeEvent<{ value: unknown; name: unknown }>) => {
@@ -22,7 +21,7 @@ function PlayerInputs() {
   };
 
   return (
-    <form className={customTextField} noValidate autoComplete="off">
+    <form className="textfield" noValidate autoComplete="off">
       <TextField
         id="outlined-basic"
         label="Player X name (optional)"
