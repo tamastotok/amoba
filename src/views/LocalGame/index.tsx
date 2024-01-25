@@ -1,7 +1,5 @@
 import { CSSProperties, useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { Button } from '@mui/material';
 import { setGridSize } from '../../store/grid-size/grid-size.action';
 import { resetNextMark } from '../../store/marks/marks.action';
 import { setWinner } from '../../store/winner/winner.action';
@@ -9,6 +7,7 @@ import { getWinner } from '../../utils/helpers/checkWinningPatterns';
 import { createMatrix } from '../../utils/helpers/createMatrix';
 import { Reducers } from '../../types';
 import SquareLocal from './SquareLocal';
+import EventButton from '../../components/EventButton';
 
 const blue = '2px solid #3f51b5';
 const red = '2px solid #f50057';
@@ -130,17 +129,7 @@ function LocalGame() {
       </div>
 
       {winner || gameIsDraw ? (
-        <div className="restart-button">
-          <Link className="custom-link" to="/">
-            <Button
-              className="custom-button"
-              variant="outlined"
-              onClick={handleRestartClick}
-            >
-              Restart
-            </Button>
-          </Link>
-        </div>
+        <EventButton linkTo="/" clickEvent={handleRestartClick} text="Restart" />
       ) : null}
     </>
   );

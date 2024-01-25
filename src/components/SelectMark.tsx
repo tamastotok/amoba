@@ -44,7 +44,15 @@ function SelectMark({ whatMark, label }: any) {
           />
           <FormControlLabel
             value="O"
-            control={<Radio color="secondary" />}
+            control={
+              <Radio
+                sx={{
+                  '&.Mui-checked': {
+                    color: '#f50057',
+                  },
+                }}
+              />
+            }
             label="O"
             labelPlacement="end"
           />

@@ -1,16 +1,16 @@
 import { ChangeEvent, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { Button, TextField } from '@mui/material';
 import GridSize from '../../components/GridSize';
 import SelectMark from '../../components/SelectMark';
 import { setGridSize } from '../../store/grid-size/grid-size.action';
 import socket from '../../server';
 import { Reducers } from '../../types';
+import EventButton from '../../components/EventButton';
+import { TextField } from '@mui/material';
 
 function OnlineMenu() {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
+
   const [playerName, setPlayerName] = useState('');
   const playerMark = useSelector((state: Reducers) => state.marks.playerMark);
   const starterMark = useSelector((state: Reducers) => state.marks.starterMark);
@@ -18,10 +18,6 @@ function OnlineMenu() {
 
   const handleChange = (e: ChangeEvent<{ value: unknown }>) => {
     setPlayerName(e.target.value as string);
-  };
-
-  const handleClick = () => {
-    navigate('/');
   };
 
   const handleCreateGameButtonClick = () => {
@@ -57,17 +53,12 @@ function OnlineMenu() {
       <GridSize />
 
       <div className="button-group-center">
-        <Button
-          className="custom-button"
-          variant="outlined"
-          onClick={handleCreateGameButtonClick}
-        >
-          Create
-        </Button>
-
-        <Button className="custom-button" variant="outlined" onClick={handleClick}>
-          Back
-        </Button>
+        <EventButton
+          linkTo=""
+          clickEvent={handleCreateGameButtonClick}
+          text="Create Game"
+        />
+        <EventButton linkTo="/" text="Back" />
       </div>
     </main>
   );

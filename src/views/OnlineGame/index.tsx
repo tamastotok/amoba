@@ -1,7 +1,6 @@
 import { CSSProperties, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { Button } from '@mui/material';
 import { changeGridState } from '../../store/grid-disable/grid-disable.action';
 import { setNextMark } from '../../store/marks/marks.action';
 import { setWinner } from '../../store/winner/winner.action';
@@ -13,6 +12,7 @@ import { Reducers } from '../../types';
 import GameStatus from './GameStatus';
 import SquareOnline from './SquareOnline';
 import ChatWindow from '../../components/ChatWindow';
+import EventButton from '../../components/EventButton';
 
 const blue = '2px solid #3f51b5';
 const red = '2px solid #f50057';
@@ -141,15 +141,7 @@ function OnlineGame({ response, playerMark, roomId, clientIsReloaded }: any) {
       <h1 style={playerMarkStyle}> {playerMark} </h1>
 
       {winner || gameIsDraw ? (
-        <div className="restart-button">
-          <Button
-            className="custom-button"
-            variant="outlined"
-            onClick={handleRestartClick}
-          >
-            Leave
-          </Button>
-        </div>
+        <EventButton linkTo="/" clickEvent={handleRestartClick} text="Restart" />
       ) : null}
 
       <ChatWindow />

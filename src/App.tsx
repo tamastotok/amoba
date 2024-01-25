@@ -14,6 +14,8 @@ import OnlineMenu from './views/OnlineMenu';
 import socket from './server';
 import { Reducers } from './types';
 
+//! src/views/MainMenu gombokat rendberakni (linkTo és disbled button)
+
 function App() {
   const dispatch = useDispatch();
   const [response, setResponse] = useState<any>([]);
