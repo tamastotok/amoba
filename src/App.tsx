@@ -14,7 +14,7 @@ import OnlineMenu from './views/OnlineMenu';
 import socket from './server';
 import { Reducers } from './types';
 
-//! src/views/MainMenu gombokat rendberakni (linkTo és disbled button)
+//TODO src/views/MainMenu Online gombot tesztelni élesbe
 
 function App() {
   const dispatch = useDispatch();

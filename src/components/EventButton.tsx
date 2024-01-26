@@ -5,9 +5,15 @@ interface Props {
   linkTo: string;
   clickEvent?: () => void;
   text: string;
+  isDisabled?: boolean;
 }
 
-export default function EventButton({ linkTo, clickEvent, text }: Props) {
+export default function EventButton({
+  linkTo,
+  clickEvent,
+  text,
+  isDisabled,
+}: Props) {
   return (
     <Link to={linkTo}>
       <Button
@@ -15,6 +21,7 @@ export default function EventButton({ linkTo, clickEvent, text }: Props) {
         color="primary"
         variant="outlined"
         onClick={clickEvent}
+        disabled={isDisabled}
       >
         {text}
       </Button>

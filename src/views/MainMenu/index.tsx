@@ -15,6 +15,7 @@ function MainMenu({ status, serverStatusMessage }: any) {
           linkTo={status ? '/online' : '/'}
           clickEvent={handleClick}
           text="Online"
+          isDisabled={!status}
         />
       </div>
       <h2 className="server-status">{serverStatusMessage}</h2>
