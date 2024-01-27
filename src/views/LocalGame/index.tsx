@@ -7,7 +7,7 @@ import { getWinner } from '../../utils/helpers/checkWinningPatterns';
 import { createMatrix } from '../../utils/helpers/createMatrix';
 import { Reducers } from '../../types';
 import SquareLocal from './SquareLocal';
-import EventButton from '../../components/EventButton';
+import EventButton from '../../components/Button/Button';
 
 const blue = '2px solid #3f51b5';
 const red = '2px solid #f50057';
@@ -33,7 +33,7 @@ function LocalGame() {
     }
   }, [winner, marks.nextMark]);
 
-  const gridBorderStyle = {
+  const gridBorderStyle: CSSProperties = {
     display: 'flex',
     flexWrap: 'wrap',
     width: `${gridSize * 40 + 8}px`,
@@ -41,20 +41,20 @@ function LocalGame() {
     margin: '20px auto',
     padding: '2px',
     border: borderColor,
-  } as CSSProperties;
+  };
 
-  const customH1Style = {
+  const customH1Style: CSSProperties = {
     textAlign: 'left',
     width: `${gridSize * 40 + 8}px`,
-  } as CSSProperties;
+  };
 
-  const customNextPlayerStyle = {
-    color: `${marks.nextMark === 'X' ? `#3f51b5` : `#f50057`}`,
-  } as CSSProperties;
+  const customNextPlayerStyle: CSSProperties = {
+    color: `${marks.nextMark === 'X' ? 'blue' : 'red'}`,
+  };
 
-  const customWinnerStyle = {
-    color: `${winner === 'X' ? `#3f51b5` : `#f50057`}`,
-  } as CSSProperties;
+  const customWinnerStyle: CSSProperties = {
+    color: `${winner === 'X' ? 'blue' : 'red'}`,
+  };
 
   //  Get square DOM elements and put them in a 2d array
   let allButton: any[] = [];

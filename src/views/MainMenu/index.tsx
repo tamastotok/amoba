@@ -1,5 +1,5 @@
 import socket from '../../server';
-import EventButton from '../../components/EventButton';
+import EventButton from '../../components/Button/Button';
 
 function MainMenu({ status, serverStatusMessage }: any) {
   const handleClick = () => {

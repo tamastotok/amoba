@@ -12,7 +12,7 @@ import { Reducers } from '../../types';
 import GameStatus from './GameStatus';
 import SquareOnline from './SquareOnline';
 import ChatWindow from '../../components/ChatWindow';
-import EventButton from '../../components/EventButton';
+import EventButton from '../../components/Button/Button';
 
 const blue = '2px solid #3f51b5';
 const red = '2px solid #f50057';

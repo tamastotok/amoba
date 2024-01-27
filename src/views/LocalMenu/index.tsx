@@ -1,7 +1,7 @@
 import SelectMark from '../../components/SelectMark';
 import GridSize from '../../components/GridSize';
 import PlayerInputs from './PlayerInputs';
-import EventButton from '../../components/EventButton';
+import EventButton from '../../components/Button/Button';
 
 function LocalMenu() {
   return (
