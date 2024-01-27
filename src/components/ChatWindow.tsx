@@ -56,11 +56,7 @@ function ChatWindow() {
       <div className="chat-window-textarea" ref={chatWindowRef}>
         {chatData.map((item: any) => (
           <p key={item._id}>
-            <b
-              style={{
-                color: item.playerName === bluePlayerName ? '#3f51b5' : '#f50057',
-              }}
-            >
+            <b className={item.playerName === bluePlayerName ? 'blue' : 'red'}>
               {item.playerName}:
             </b>{' '}
             {item.message}
