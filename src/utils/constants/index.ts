@@ -22,3 +22,7 @@ export const SET_WINNER = 'SET_WINNER';
 //  Grid
 export const DISABLE_GRID = 'DISABLE_GRID';
 export const CHANGE_GRID_STATE = 'CHANGE_GRID_STATE';
+
+//  Colors
+export const BLUE = '#3f51b5';
+export const RED = '#f50057';
