@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { Reducers } from '../types';
+import { Reducers } from '../../types';
 
 function MessageBoard({ onlineUserCount, statusMessage }: any) {
-  const [userOnline, setUserOnline] = useState(null);
+  const [userOnline, setUserOnline] = useState(0);
   const bluePlayer = useSelector((state: Reducers) => state.players.blue);
   const redPlayer = useSelector((state: Reducers) => state.players.red);
 
@@ -20,11 +20,14 @@ function MessageBoard({ onlineUserCount, statusMessage }: any) {
 
       <div className="players-center">
         <h4 className="align-top-center">Players</h4>
-        <p className="custom-p blue">{blue}</p>
-        <p className="custom-p red">{red}</p>
+        <p className="fw-600 blue">{blue}</p>
+        <p className="fw-600 red">{red}</p>
       </div>
 
-      <p className="bottom-right">{userOnline} user(s) online</p>
+      <p className="bottom-right">
+        {userOnline}
+        <span> user(s) online</span>
+      </p>
     </div>
   );
 }

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import MessageBoard from './components/MessageBoard';
+import MessageBoard from './components/MessageBoard/MessageBoard';
 import { setGridIsDisabled } from './store/grid-disable/grid-disable.action';
 import { setGridSize } from './store/grid-size/grid-size.action';
 import { selectPlayerMark, resetNextMark } from './store/marks/marks.action';
