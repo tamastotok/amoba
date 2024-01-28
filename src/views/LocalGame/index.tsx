@@ -1,4 +1,4 @@
-import { CSSProperties, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { setGridSize } from '../../store/grid-size/grid-size.action';
 import { resetNextMark } from '../../store/marks/marks.action';
@@ -8,9 +8,7 @@ import { createMatrix } from '../../utils/helpers/createMatrix';
 import { Reducers } from '../../types';
 import SquareLocal from './SquareLocal';
 import Button from '../../components/Button/Button';
-
-const blue = '2px solid #3f51b5';
-const red = '2px solid #f50057';
+import { BLUE, RED } from '../../utils/constants';
 
 function LocalGame() {
   const dispatch = useDispatch();
@@ -22,39 +20,16 @@ function LocalGame() {
   const buttonsRef = useRef<any>(null);
   const [gameIsDraw, setGameIsDraw] = useState(false);
   const [borderColor, setBorderColor] = useState(
-    marks.starterMark === 'X' ? blue : red
+    marks.starterMark === 'X' ? BLUE : RED
   );
 
   useEffect(() => {
     if (winner) {
-      setBorderColor(winner === 'X' ? blue : red);
+      setBorderColor(winner === 'X' ? BLUE : RED);
     } else {
-      setBorderColor(marks.nextMark === 'X' ? blue : red);
+      setBorderColor(marks.nextMark === 'X' ? BLUE : RED);
     }
   }, [winner, marks.nextMark]);
-
-  const gridBorderStyle: CSSProperties = {
-    display: 'flex',
-    flexWrap: 'wrap',
-    width: `${gridSize * 40 + 8}px`,
-    height: `${gridSize * 40 + 8}px`,
-    margin: '20px auto',
-    padding: '2px',
-    border: borderColor,
-  };
-
-  const customH1Style: CSSProperties = {
-    textAlign: 'left',
-    width: `${gridSize * 40 + 8}px`,
-  };
-
-  const customNextPlayerStyle: CSSProperties = {
-    color: `${marks.nextMark === 'X' ? 'blue' : 'red'}`,
-  };
-
-  const customWinnerStyle: CSSProperties = {
-    color: `${winner === 'X' ? 'blue' : 'red'}`,
-  };
 
   //  Get square DOM elements and put them in a 2d array
   let allButton: any[] = [];
@@ -89,19 +64,22 @@ function LocalGame() {
   const gameStatus = () => {
     if (winner) {
       return (
-        <h1 style={customH1Style}>
-          Winner: <span style={customWinnerStyle}>{winner}</span>
+        <h1 className="ta-left grid-width">
+          Winner: <span className={winner === 'X' ? 'blue' : 'red'}>{winner}</span>
         </h1>
       );
     }
 
     if (gameIsDraw) {
-      return <h1 style={customH1Style}>Draw</h1>;
+      return <h1 className="ta-left grid-width">Draw</h1>;
     }
 
     return (
-      <h1 style={customH1Style}>
-        Next: <span style={customNextPlayerStyle}>{marks.nextMark}</span>
+      <h1 className="ta-left grid-width">
+        Next:{' '}
+        <span className={marks.nextMark === 'X' ? 'blue' : 'red'}>
+          {marks.nextMark}
+        </span>
       </h1>
     );
   };
@@ -110,7 +88,11 @@ function LocalGame() {
     <>
       <div className="winner-container">{gameStatus()}</div>
 
-      <div ref={buttonsRef} style={gridBorderStyle}>
+      <div
+        ref={buttonsRef}
+        className="grid-border grid-size"
+        style={{ borderColor }}
+      >
         {createMatrix(gridSize).map((item: any, index: number) => {
           return (
             <SquareLocal
