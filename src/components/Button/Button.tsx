@@ -8,7 +8,7 @@ interface Props {
   isDisabled?: boolean;
 }
 
-export default function Button({ linkTo, clickEvent, text, isDisabled }: Props) {
+function Button({ linkTo, clickEvent, text, isDisabled }: Props) {
   return (
     <Link to={linkTo}>
       <Btn
@@ -24,3 +24,5 @@ export default function Button({ linkTo, clickEvent, text, isDisabled }: Props) 
     </Link>
   );
 }
+
+export default Button;

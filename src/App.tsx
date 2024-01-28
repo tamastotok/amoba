@@ -18,10 +18,10 @@ import { Reducers } from './types';
 
 function App() {
   const dispatch = useDispatch();
-  const [response, setResponse] = useState<any>([]);
-  const [roomId, setRoomId] = useState<any>('');
-  const [onlineUserCount, setOnlineUserCount] = useState<number>(0);
-  const [statusMessage, setStatusMessage] = useState<string>('');
+  const [response, setResponse] = useState([]);
+  const [roomId, setRoomId] = useState('');
+  const [onlineUserCount, setOnlineUserCount] = useState(0);
+  const [statusMessage, setStatusMessage] = useState('');
   const [serverStatus, setServerStatus] = useState<boolean>();
   const [serverStatusMessage, setServerStatusMessage] = useState(
     'Connecting to server...'

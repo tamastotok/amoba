@@ -1,5 +1,5 @@
 import socket from '../../server';
-import EventButton from '../../components/Button/Button';
+import Button from '../../components/Button/Button';
 
 function MainMenu({ status, serverStatusMessage }: any) {
   const handleClick = () => {
@@ -10,8 +10,8 @@ function MainMenu({ status, serverStatusMessage }: any) {
     <main>
       <h1>Tic-tac-toe</h1>
       <div className="button-group-center">
-        <EventButton linkTo="/local" text="Local" />
-        <EventButton
+        <Button linkTo="/local" text="Local" />
+        <Button
           linkTo={status ? '/online' : '/'}
           clickEvent={handleClick}
           text="Online"

@@ -5,7 +5,7 @@ import SelectMark from '../../components/SelectMark';
 import { setGridSize } from '../../store/grid-size/grid-size.action';
 import socket from '../../server';
 import { Reducers } from '../../types';
-import EventButton from '../../components/Button/Button';
+import Button from '../../components/Button/Button';
 import { TextField } from '@mui/material';
 
 function OnlineMenu() {
@@ -53,12 +53,12 @@ function OnlineMenu() {
       <GridSize />
 
       <div className="button-group-center">
-        <EventButton
+        <Button
           linkTo=""
           clickEvent={handleCreateGameButtonClick}
           text="Create Game"
         />
-        <EventButton linkTo="/" text="Back" />
+        <Button linkTo="/" text="Back" />
       </div>
     </main>
   );

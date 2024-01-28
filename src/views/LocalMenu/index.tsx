@@ -1,7 +1,7 @@
 import SelectMark from '../../components/SelectMark';
 import GridSize from '../../components/GridSize';
 import PlayerInputs from './PlayerInputs';
-import EventButton from '../../components/Button/Button';
+import Button from '../../components/Button/Button';
 
 function LocalMenu() {
   return (
@@ -11,8 +11,8 @@ function LocalMenu() {
       <SelectMark label="Start game with:" whatMark="starterMark" />
       <GridSize />
       <div className="button-group-center">
-        <EventButton linkTo="/local/game" text="Start Game" />
-        <EventButton linkTo="/" text="Back" />
+        <Button linkTo="/local/game" text="Start Game" />
+        <Button linkTo="/" text="Back" />
       </div>
     </main>
   );

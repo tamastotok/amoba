@@ -7,7 +7,7 @@ import { getWinner } from '../../utils/helpers/checkWinningPatterns';
 import { createMatrix } from '../../utils/helpers/createMatrix';
 import { Reducers } from '../../types';
 import SquareLocal from './SquareLocal';
-import EventButton from '../../components/Button/Button';
+import Button from '../../components/Button/Button';
 
 const blue = '2px solid #3f51b5';
 const red = '2px solid #f50057';
@@ -129,7 +129,7 @@ function LocalGame() {
       </div>
 
       {winner || gameIsDraw ? (
-        <EventButton linkTo="/" clickEvent={handleRestartClick} text="Restart" />
+        <Button linkTo="/" clickEvent={handleRestartClick} text="Restart" />
       ) : null}
     </>
   );

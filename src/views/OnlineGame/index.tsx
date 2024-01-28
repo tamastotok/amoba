@@ -11,8 +11,8 @@ import socket from '../../server';
 import { Reducers } from '../../types';
 import GameStatus from './GameStatus';
 import SquareOnline from './SquareOnline';
-import ChatWindow from '../../components/ChatWindow';
-import EventButton from '../../components/Button/Button';
+import Chat from '../../components/Chat/Chat';
+import Button from '../../components/Button/Button';
 
 const blue = '2px solid #3f51b5';
 const red = '2px solid #f50057';
@@ -141,10 +141,10 @@ function OnlineGame({ response, playerMark, roomId, clientIsReloaded }: any) {
       <h1 style={playerMarkStyle}> {playerMark} </h1>
 
       {winner || gameIsDraw ? (
-        <EventButton linkTo="/" clickEvent={handleRestartClick} text="Restart" />
+        <Button linkTo="/" clickEvent={handleRestartClick} text="Restart" />
       ) : null}
 
-      <ChatWindow />
+      <Chat />
     </div>
   );
 }
