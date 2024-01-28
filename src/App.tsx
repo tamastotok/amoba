@@ -14,8 +14,6 @@ import OnlineMenu from './views/OnlineMenu';
 import socket from './server';
 import { Reducers } from './types';
 
-//TODO src/views/MainMenu Online gombot tesztelni élesbe
-
 function App() {
   const dispatch = useDispatch();
   const [response, setResponse] = useState([]);
