@@ -1,4 +1,7 @@
-type DefaultMark = 'X' | 'O';
+export type DefaultMark = 'X' | 'O';
+export type Mark = 'X' | 'O';
+export type Cell = Mark | '';
+export type Board = Cell[][];
 
 interface SinglePlayer {
   name: string;
@@ -16,24 +19,39 @@ export interface Marks {
   playerMark: DefaultMark;
 }
 
-export interface Square {
-  row: number;
-  col: number;
-  value: string;
-}
-
 //  Default Redux Action
-export interface Action<Type> extends Square {
+export interface Action<T = unknown> {
   type: string;
-  payload: Type;
+  payload: T;
 }
 
-//  CombineReducer
 export interface Reducers {
   players: Players;
   marks: Marks;
-  square: Square;
+  square: Board;
   gridSize: number;
   winner: string;
   gridIsDisabled: boolean;
+}
+
+export interface SearchingPayload {
+  playerMark: string;
+  starterMark: string;
+}
+
+export interface GameFoundPayload {
+  roomId: string;
+  playerData: {
+    blueName: string;
+    redName: string;
+  };
+}
+
+export interface ContinuePayload {
+  boardSize: number;
+  bluePlayer: { name: string };
+  redPlayer: { name: string };
+  whoIsNext: string;
+  roomId: string;
+  positions: Array<{ row: number; col: number; value: string }>;
 }

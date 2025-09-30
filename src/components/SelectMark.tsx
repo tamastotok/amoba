@@ -1,11 +1,24 @@
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { selectStarterMark, selectPlayerMark } from '../store/marks/marks.action';
-import { FormControl, FormControlLabel, Radio, RadioGroup } from '@mui/material';
+import {
+  selectStarterMark,
+  selectPlayerMark,
+} from '../store/marks/marks.action';
+import {
+  FormControl,
+  FormControlLabel,
+  Radio,
+  RadioGroup,
+} from '@mui/material';
 
 const sessionStorage = window.sessionStorage;
 
-function SelectMark({ whatMark, label }: any) {
+interface SelectMarkProps {
+  whatMark: string;
+  label: string;
+}
+
+function SelectMark({ whatMark, label }: SelectMarkProps) {
   const dispatch = useDispatch();
   const [value, setValue] = useState('X');
 

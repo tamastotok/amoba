@@ -1,5 +1,5 @@
 import { SET_WINNER } from '../../utils/constants';
-import { Action } from '../../types';
+import type { Action } from '../../types';
 
 const winnerReducer = (state: string = '', action: Action<string>) => {
   switch (action.type) {

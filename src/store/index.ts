@@ -1,13 +1,11 @@
-import { createStore, compose } from 'redux';
-import reducers from './rootReducer';
+import { configureStore } from '@reduxjs/toolkit';
+import rootReducer from './rootReducer';
 
-declare global {
-  interface Window {
-    __REDUX_DEVTOOLS_EXTENSION_COMPOSE__?: typeof compose;
-  }
-}
+const store = configureStore({
+  reducer: rootReducer,
+});
 
-const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
-const store = createStore(reducers as any, composeEnhancers());
+export type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch;
 
 export default store;

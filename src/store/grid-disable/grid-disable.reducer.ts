@@ -1,5 +1,5 @@
 import { CHANGE_GRID_STATE, DISABLE_GRID } from '../../utils/constants';
-import { Action } from '../../types';
+import type { Action } from '../../types';
 
 const gridIsDisabledReducer = (
   state: boolean = false,

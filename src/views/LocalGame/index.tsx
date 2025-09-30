@@ -3,12 +3,11 @@ import { useSelector, useDispatch } from 'react-redux';
 import { setGridSize } from '../../store/grid-size/grid-size.action';
 import { resetNextMark } from '../../store/marks/marks.action';
 import { setWinner } from '../../store/winner/winner.action';
-import { getWinner } from '../../utils/helpers/checkWinningPatterns';
 import { createMatrix } from '../../utils/helpers/createMatrix';
-import { Reducers } from '../../types';
+import { BLUE, RED } from '../../utils/constants';
+import type { Reducers } from '../../types';
 import SquareLocal from './SquareLocal';
 import Button from '../../components/Button/Button';
-import { BLUE, RED } from '../../utils/constants';
 
 function LocalGame() {
   const dispatch = useDispatch();
@@ -17,7 +16,7 @@ function LocalGame() {
   const winner = useSelector((state: Reducers) => state.winner);
   const gridSize = useSelector((state: Reducers) => state.gridSize);
   const square = useSelector((state: Reducers) => state.square);
-  const buttonsRef = useRef<any>(null);
+  const buttonsRef = useRef<HTMLDivElement>(null);
   const [gameIsDraw, setGameIsDraw] = useState(false);
   const [borderColor, setBorderColor] = useState(
     marks.starterMark === 'X' ? BLUE : RED
@@ -32,26 +31,26 @@ function LocalGame() {
   }, [winner, marks.nextMark]);
 
   //  Get square DOM elements and put them in a 2d array
-  let allButton: any[] = [];
-  const allButtonMatrix: any = [];
+  let allButton: HTMLButtonElement[] = [];
+  const allButtonMatrix: HTMLButtonElement[][] = [];
   if (buttonsRef.current) {
-    allButton = [...buttonsRef.current.children];
+    allButton = Array.from(buttonsRef.current.children).map(
+      (el) => el as HTMLButtonElement
+    );
   }
   while (allButton.length) allButtonMatrix.push(allButton.splice(0, gridSize));
 
   //  Check if game has a winner in every click
   useEffect(() => {
-    getWinner(square.row, square.col, allButtonMatrix);
     //  Check draw
     if (buttonsRef.current) {
       const buttonValues = [...buttonsRef.current.children].map(
-        (item) => item.value
+        (item) => (item as HTMLButtonElement).value
       );
       if (!buttonValues.includes('')) {
         setGameIsDraw(true);
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [square]);
 
   //  Reset winner and mark if RESTART button clicked
@@ -65,7 +64,8 @@ function LocalGame() {
     if (winner) {
       return (
         <h1 className="ta-left grid-width">
-          Winner: <span className={winner === 'X' ? 'blue' : 'red'}>{winner}</span>
+          Winner:{' '}
+          <span className={winner === 'X' ? 'blue' : 'red'}>{winner}</span>
         </h1>
       );
     }
@@ -90,19 +90,21 @@ function LocalGame() {
 
       <div
         ref={buttonsRef}
-        className="grid-border grid-size"
-        style={{ borderColor }}
+        className="grid-border"
+        style={{
+          borderColor,
+          width: `${gridSize * 40 + 8}px`,
+          height: `${gridSize * 40 + 8}px`,
+        }}
       >
-        {createMatrix(gridSize).map((item: any, index: number) => {
-          return (
-            <SquareLocal
-              key={index}
-              id={`${item.row}/${item.col}`}
-              rowindex={item.row}
-              colindex={item.col}
-            />
-          );
-        })}
+        {createMatrix(gridSize).map((item, index) => (
+          <SquareLocal
+            key={index}
+            id={`${item.row}/${item.col}`}
+            rowindex={item.row}
+            colindex={item.col}
+          />
+        ))}
       </div>
 
       <div className="players-container">

@@ -1,5 +1,8 @@
-import { SET_PLAYER_BLUE_NAME, SET_PLAYER_RED_NAME } from '../../utils/constants';
-import { Players, Action } from '../../types';
+import {
+  SET_PLAYER_BLUE_NAME,
+  SET_PLAYER_RED_NAME,
+} from '../../utils/constants';
+import type { Players, Action } from '../../types';
 
 const initialState: Players = {
   blue: {

@@ -1,15 +1,5 @@
-import { useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useAppSelector } from '../../store/hooks';
 import socket from '../../server';
-import { Reducers } from '../../types';
-
-declare module 'react' {
-  interface HTMLAttributes<T> extends AriaAttributes, DOMAttributes<T> {
-    // extends React's HTMLAttributes
-    row?: number;
-    col?: number;
-  }
-}
 
 interface SquareProps {
   id: string;
@@ -19,23 +9,14 @@ interface SquareProps {
 }
 
 function SquareOnline({ id, rowindex, colindex, roomId }: SquareProps) {
-  const nextMark = useSelector((state: Reducers) => state.marks.nextMark);
-  const [buttonValue, setButtonValue] = useState<string>('');
+  const value = useAppSelector((s) => s.board[rowindex][colindex]);
+  const nextMark = useAppSelector((s) => s.marks.nextMark);
+  const gridIsDisabled = useAppSelector((s) => s.gridIsDisabled);
 
-  const handleClick = (e: any) => {
-    let squares = {
-      row: parseInt(e.target.attributes.row.value),
-      col: parseInt(e.target.attributes.col.value),
-      value: nextMark,
-      roomId: roomId,
-    };
-
-    setButtonValue(nextMark);
-    e.target.disabled = true;
-
-    //  Send data to server
+  const handleClick = () => {
+    if (gridIsDisabled || value) return;
     socket.emit('square-btn-click', {
-      squares,
+      squares: { row: rowindex, col: colindex, value: nextMark, roomId },
     });
   };
 
@@ -43,12 +24,13 @@ function SquareOnline({ id, rowindex, colindex, roomId }: SquareProps) {
     <button
       className="square-button"
       id={id}
-      row={rowindex}
-      col={colindex}
-      value={buttonValue}
+      data-row={rowindex}
+      data-col={colindex}
+      value={value}
       onClick={handleClick}
+      disabled={gridIsDisabled || !!value}
     >
-      {}
+      {value}
     </button>
   );
 }

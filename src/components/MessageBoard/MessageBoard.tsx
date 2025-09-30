@@ -1,8 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { Reducers } from '../../types';
+import type { Reducers } from '../../types';
 
-function MessageBoard({ onlineUserCount, statusMessage }: any) {
+interface MessageBoardProps {
+  onlineUserCount: number;
+  statusMessage: string;
+}
+
+function MessageBoard({ onlineUserCount, statusMessage }: MessageBoardProps) {
   const [userOnline, setUserOnline] = useState(0);
   const bluePlayer = useSelector((state: Reducers) => state.players.blue);
   const redPlayer = useSelector((state: Reducers) => state.players.red);

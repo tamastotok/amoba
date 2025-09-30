@@ -2,96 +2,76 @@ import store from '../../store';
 import { setWinner } from '../../store/winner/winner.action';
 import { setGridIsDisabled } from '../../store/grid-disable/grid-disable.action';
 
-//  Put pattern check functions into 1 function
-export const getWinner = (row: number, col: number, array: any[]) => {
-  rowPattern(row, col, array);
-  colPattern(row, col, array);
-  ascendDiagonalPattern(row, col, array);
-  descendDiagonalPattern(row, col, array);
-};
+export type Mark = 'X' | 'O';
+export type Board = (Mark | '')[][];
 
-//  Check row pattern
-const rowPattern = (row: number, col: number, array: any[]) => {
-  const values: string[] = [];
-  for (let j = col - 4; j <= col + 4; ) {
-    if (!array[row] || !array[row][j]) {
-      values.push('null');
-      j++;
-    } else {
-      values.push(array[row][j].attributes.value.value);
-      j++;
+const isMark = (x: string): x is Mark => x === 'X' || x === 'O';
+
+export const getWinner = (
+  row: number,
+  col: number,
+  board: Board
+): Mark | null => {
+  const directions: Array<[number, number]> = [
+    [0, 1], // →
+    [1, 0], // ↓
+    [1, 1], // ↘
+    [-1, 1], // ↗
+  ];
+
+  const mark = board[row]?.[col];
+  if (!mark || !isMark(mark)) return null;
+
+  for (const [dRow, dCol] of directions) {
+    if (checkDirection(row, col, dRow, dCol, board, mark)) {
+      return mark; // return winner; let caller dispatch
     }
   }
-  checkSameValues(values);
+  return null;
 };
 
-//  Check col pattern
-const colPattern = (row: number, col: number, array: any[]) => {
-  const values: string[] = [];
-  for (let i = row - 4; i <= row + 4; ) {
-    if (!array[i] || !array[i][col]) {
-      values.push('null');
-      i++;
-    } else {
-      values.push(array[i][col].attributes.value.value);
-      i++;
-    }
+const checkDirection = (
+  row: number,
+  col: number,
+  dRow: number,
+  dCol: number,
+  board: Board,
+  mark: Mark
+): boolean => {
+  let count = 1;
+  count += countMatches(row, col, dRow, dCol, board, mark);
+  count += countMatches(row, col, -dRow, -dCol, board, mark);
+  return count >= 5;
+};
+
+const countMatches = (
+  row: number,
+  col: number,
+  dRow: number,
+  dCol: number,
+  board: Board,
+  mark: Mark
+): number => {
+  let matches = 0;
+  let r = row + dRow;
+  let c = col + dCol;
+  while (board[r]?.[c] === mark) {
+    matches++;
+    r += dRow;
+    c += dCol;
   }
-  checkSameValues(values);
+  return matches;
 };
 
-//  Check diagonal pattern
-const ascendDiagonalPattern = (row: number, col: number, array: any[]) => {
-  const values: string[] = [];
-  for (let i = row - 4; i <= row + 4; ) {
-    for (let j = col + 4; j >= col - 4; ) {
-      if (!array[i] || !array[i][j]) {
-        values.push('null');
-        i++;
-        j--;
-      } else {
-        values.push(array[i][j].attributes.value.value);
-        i++;
-        j--;
-      }
-    }
-  }
-  checkSameValues(values);
-};
-
-//  Check diagonal pattern
-const descendDiagonalPattern = (row: number, col: number, array: any[]) => {
-  const values: string[] = [];
-  for (let i = row - 4; i <= row + 4; ) {
-    for (let j = col - 4; j <= col + 4; ) {
-      if (!array[i] || !array[i][j]) {
-        values.push('null');
-        i++;
-        j++;
-      } else {
-        values.push(array[i][j].attributes.value.value);
-        i++;
-        j++;
-      }
-    }
-  }
-  checkSameValues(values);
-};
-
-const checkSameValues = (array: string[]) => {
-  for (let i = 0; i < 6; i++) {
-    if (i > 4) return;
-
-    if (array.slice(i, i + 5).every((v: string) => v === 'X')) {
-      console.log('x true', array.slice(i, i + 5));
-      store.dispatch(setGridIsDisabled(true));
-      store.dispatch(setWinner('X'));
-    }
-
-    if (array.slice(i, i + 5).every((v: string) => v === 'O')) {
-      console.log('o true');
-      store.dispatch(setGridIsDisabled(true));
-      store.dispatch(setWinner('O'));
-    }
+// Helper if you still want to keep old behavior here:
+export const checkAndDispatchWinner = (
+  row: number,
+  col: number,
+  board: Board
+) => {
+  const winner = getWinner(row, col, board);
+  if (winner) {
+    store.dispatch(setGridIsDisabled(true));
+    store.dispatch(setWinner(winner));
   }
 };

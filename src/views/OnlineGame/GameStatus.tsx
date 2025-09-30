@@ -1,6 +1,6 @@
-import { CSSProperties } from 'react';
+import type { CSSProperties } from 'react';
+import type { Reducers } from '../../types';
 import { useSelector } from 'react-redux';
-import { Reducers } from '../../types';
 
 interface Draw {
   gameIsDraw: boolean;

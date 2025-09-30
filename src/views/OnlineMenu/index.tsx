@@ -1,12 +1,13 @@
-import { ChangeEvent, useState } from 'react';
+import { useState } from 'react';
+import type { ChangeEvent } from 'react';
+import type { Reducers } from '../../types';
 import { useDispatch, useSelector } from 'react-redux';
+import { setGridSize } from '../../store/grid-size/grid-size.action';
+import { TextField } from '@mui/material';
+import Button from '../../components/Button/Button';
 import GridSize from '../../components/GridSize';
 import SelectMark from '../../components/SelectMark';
-import { setGridSize } from '../../store/grid-size/grid-size.action';
 import socket from '../../server';
-import { Reducers } from '../../types';
-import Button from '../../components/Button/Button';
-import { TextField } from '@mui/material';
 
 function OnlineMenu() {
   const dispatch = useDispatch();

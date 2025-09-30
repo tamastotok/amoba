@@ -1,29 +1,15 @@
-interface Sqr {
+export interface Sqr {
   row: number;
   col: number;
   value: string;
 }
 
-const square: Sqr = {
-  row: 0,
-  col: 0,
-  value: '',
-};
+export const createMatrix = (size: number): Sqr[] => {
+  const grid: Sqr[] = [];
 
-export const createMatrix = (size: number) => {
-  let matrix = [];
-  const grid = [];
-
-  for (let i = 0; i < size; i++) {
-    const items = [...Array(size).keys()].map(
-      (item: any, index: number) => (item = { ...square, row: i, col: index })
-    );
-    matrix[i] = items;
-  }
-
-  for (let row of matrix) {
-    for (let item of row) {
-      grid.push(item);
+  for (let row = 0; row < size; row++) {
+    for (let col = 0; col < size; col++) {
+      grid.push({ row, col, value: '' });
     }
   }
 

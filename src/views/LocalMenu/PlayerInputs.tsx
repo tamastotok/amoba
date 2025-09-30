@@ -1,11 +1,11 @@
-import { ChangeEvent } from 'react';
+import type { ChangeEvent } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { TextField } from '@mui/material';
 import {
   setPlayerBlueName,
   setPlayerRedName,
 } from '../../store/players/players.action';
-import { Reducers } from '../../types';
+import type { Reducers } from '../../types';
 
 function PlayerInputs() {
   const dispatch = useDispatch();

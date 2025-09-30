@@ -1,7 +1,12 @@
 import socket from '../../server';
 import Button from '../../components/Button/Button';
 
-function MainMenu({ status, serverStatusMessage }: any) {
+interface MainMenuProps {
+  status: boolean;
+  serverStatusMessage: string;
+}
+
+function MainMenu({ status, serverStatusMessage }: MainMenuProps) {
   const handleClick = () => {
     socket.emit('join-lobby');
   };

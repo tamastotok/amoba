@@ -7,8 +7,9 @@ export const SET_PLAYER_RED_NAME = 'SET_PLAYER_RED_NAME';
 //  Grid Size
 export const SET_GRID_SIZE = 'SET_GRID_SIZE';
 
-//  Square data
-export const SET_SQUARE_DATA = 'SET_SQUARE_DATA';
+//  Square data/Board
+export const SET_BOARD_DATA = 'SET_BOARD_DATA';
+export const HYDRATE_BOARD = 'HYDRATE_BOARD';
 
 //  Marks
 export const SELECT_STARTER_MARK = 'SELECT_STARTER_MARK';

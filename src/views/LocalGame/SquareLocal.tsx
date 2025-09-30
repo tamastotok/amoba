@@ -1,54 +1,47 @@
-import { useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
+import { setBoardData } from '../../store/board/board.action';
 import { setNextMark } from '../../store/marks/marks.action';
-import { setSquareData } from '../../store/square/square.action';
-import { Reducers } from '../../types';
+import { checkAndDispatchWinner } from '../../utils/helpers/checkWinningPatterns';
+import type { Mark } from '../../types';
 
-declare module 'react' {
-  interface HTMLAttributes<T> extends AriaAttributes, DOMAttributes<T> {
-    // extends React's HTMLAttributes
-    row?: number;
-    col?: number;
-  }
-}
-
-interface SquareProps {
+interface BoardProps {
   id: string;
   rowindex: number;
   colindex: number;
 }
 
-function SquareLocal({ id, rowindex, colindex }: SquareProps) {
-  const dispatch = useDispatch();
-  const winner = useSelector((state: Reducers) => state.winner);
-  const nextMark = useSelector((state: Reducers) => state.marks.nextMark);
-  const [squareValue, setSquareValue] = useState('');
-  const [squareIsDisabled, setSquareIsDisabled] = useState(false);
+function SquareLocal({ id, rowindex, colindex }: BoardProps) {
+  const dispatch = useAppDispatch();
 
-  const handleClick = (e: any) => {
-    setSquareValue(nextMark);
-    setSquareIsDisabled(true);
-    dispatch(
-      setSquareData(
-        parseInt(e.target.attributes.row.value),
-        parseInt(e.target.attributes.col.value),
-        nextMark
-      )
-    );
+  const value = useAppSelector((s) => s.board[rowindex][colindex]); // '' | 'X' | 'O'
+  const nextMark = useAppSelector((s) => s.marks.nextMark);
+  const gridDisabled = useAppSelector((s) => s.gridIsDisabled);
+  const board = useAppSelector((s) => s.board);
+
+  const handleClick = () => {
+    if (gridDisabled || value) return;
+
+    // clone board
+    const nextBoard = board.map((r) => r.slice());
+    nextBoard[rowindex][colindex] = nextMark as Mark;
+
+    dispatch(setBoardData(rowindex, colindex, nextMark as Mark));
     dispatch(setNextMark());
+
+    checkAndDispatchWinner(rowindex, colindex, nextBoard);
   };
 
   return (
     <button
       className="square-button"
       id={id}
-      row={rowindex}
-      col={colindex}
-      value={squareValue}
+      data-row={rowindex}
+      data-col={colindex}
+      value={value}
       onClick={handleClick}
-      disabled={winner ? true : squareIsDisabled}
+      disabled={gridDisabled || !!value}
     >
-      {squareValue}
+      {value}
     </button>
   );
 }
