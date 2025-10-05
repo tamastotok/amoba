@@ -9,7 +9,7 @@ import GridSize from '../../components/GridSize';
 import SelectMark from '../../components/SelectMark';
 import socket from '../../server';
 
-function OnlineMenu() {
+function OnlineHumanMenu() {
   const dispatch = useDispatch();
 
   const [playerName, setPlayerName] = useState('');
@@ -65,4 +65,4 @@ function OnlineMenu() {
   );
 }
 
-export default OnlineMenu;
+export default OnlineHumanMenu;

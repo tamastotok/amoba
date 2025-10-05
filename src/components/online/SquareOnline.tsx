@@ -6,6 +6,8 @@ interface SquareProps {
   rowindex: number;
   colindex: number;
   roomId: string;
+  isAIGame?: boolean;
+  aiMark?: 'X' | 'O'; // Optional
 }
 
 function SquareOnline({ id, rowindex, colindex, roomId }: SquareProps) {
@@ -15,6 +17,8 @@ function SquareOnline({ id, rowindex, colindex, roomId }: SquareProps) {
 
   const handleClick = () => {
     if (gridIsDisabled || value) return;
+
+    // Human vs human
     socket.emit('square-btn-click', {
       squares: { row: rowindex, col: colindex, value: nextMark, roomId },
     });

@@ -25,8 +25,10 @@ import MessageBoard from './components/MessageBoard/MessageBoard';
 import LocalGame from './views/LocalGame';
 import LocalMenu from './views/LocalMenu';
 import HomePage from './views/MainMenu';
-import OnlineGame from './views/OnlineGame';
-import OnlineMenu from './views/OnlineMenu';
+import OnlineGameHuman from './views/OnlineGameHuman';
+import OnlineGameAI from './views/OnlineGameAI';
+import OnlineHumanMenu from './views/OnlineHumanMenu';
+import OnlineAIMenu from './views/OnlineAIMenu';
 import socket from './server';
 
 function App() {
@@ -75,6 +77,19 @@ function App() {
         setRoomId(payload.roomId);
         dispatch(setPlayerBlueName(payload.playerData.blueName));
         dispatch(setPlayerRedName(payload.playerData.redName));
+        setStatusMessage('');
+      }
+    },
+
+    'ai-game-created': (res: unknown) => {
+      const payload = res as GameFoundPayload;
+      if (payload.roomId) {
+        navigate(`/ai/game/${payload.roomId}`);
+        sessionStorage.setItem('room', payload.roomId);
+        localStorage.setItem('room', payload.roomId);
+        setRoomId(payload.roomId);
+        dispatch(setPlayerBlueName(payload.playerData.blueName || ''));
+        dispatch(setPlayerRedName(payload.playerData.redName || ''));
         setStatusMessage('');
       }
     },
@@ -233,7 +248,20 @@ function App() {
         path="/online"
         element={
           <>
-            <OnlineMenu />
+            <OnlineHumanMenu />
+            <MessageBoard
+              onlineUserCount={onlineUserCount}
+              statusMessage={statusMessage}
+            />
+          </>
+        }
+      />
+
+      <Route
+        path="/ai"
+        element={
+          <>
+            <OnlineAIMenu />
             <MessageBoard
               onlineUserCount={onlineUserCount}
               statusMessage={statusMessage}
@@ -246,10 +274,28 @@ function App() {
         path="/online/game/:id"
         element={
           <>
-            <OnlineGame
+            <OnlineGameHuman
               roomId={roomId}
               response={response}
-              playerMark={playerMark as 'X' | 'O'} // cast until Redux typing is fully strict
+              playerMark={playerMark as 'X' | 'O'}
+              clientIsReloaded={clientIsReloaded}
+            />
+            <MessageBoard
+              onlineUserCount={onlineUserCount}
+              statusMessage={statusMessage}
+            />
+          </>
+        }
+      />
+
+      <Route
+        path="/ai/game/:id"
+        element={
+          <>
+            <OnlineGameAI
+              roomId={roomId}
+              response={response}
+              playerMark={playerMark as 'X' | 'O'}
               clientIsReloaded={clientIsReloaded}
             />
             <MessageBoard

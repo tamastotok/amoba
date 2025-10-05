@@ -19,7 +19,13 @@ function MainMenu({ status, serverStatusMessage }: MainMenuProps) {
         <Button
           linkTo={status ? '/online' : '/'}
           clickEvent={handleClick}
-          text="Online"
+          text="Online vs Human"
+          isDisabled={!status}
+        />
+        <Button
+          linkTo={status ? '/ai' : '/'}
+          clickEvent={handleClick}
+          text="Online vs AI"
           isDisabled={!status}
         />
       </div>
