@@ -21,7 +21,9 @@ function OnlineAIMenu() {
   const dispatch = useDispatch();
 
   const [playerName, setPlayerName] = useState('');
-  const [difficulty, setDifficulty] = useState<'easy' | 'hard'>('easy');
+  const [difficulty, setDifficulty] = useState<'easy' | 'medium' | 'hard'>(
+    'easy'
+  );
 
   const playerMark = useSelector((state: Reducers) => state.marks.playerMark);
   const starterMark = useSelector((state: Reducers) => state.marks.starterMark);
@@ -31,8 +33,10 @@ function OnlineAIMenu() {
     setPlayerName(e.target.value as string);
   };
 
-  const handleDifficultyChange = (e: SelectChangeEvent<'easy' | 'hard'>) => {
-    setDifficulty(e.target.value as 'easy' | 'hard');
+  const handleDifficultyChange = (
+    e: SelectChangeEvent<'easy' | 'medium' | 'hard'>
+  ) => {
+    setDifficulty(e.target.value as 'easy' | 'medium' | 'hard');
   };
 
   const handleStartAIGame = () => {
@@ -79,6 +83,7 @@ function OnlineAIMenu() {
           onChange={handleDifficultyChange}
         >
           <MenuItem value="easy">Easy</MenuItem>
+          <MenuItem value="medium">Medium</MenuItem>
           <MenuItem value="hard">Hard</MenuItem>
         </Select>
       </FormControl>

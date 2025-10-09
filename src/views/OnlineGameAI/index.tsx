@@ -44,7 +44,7 @@ function OnlineGameAI({
     marks.starterMark === 'X' ? blue : red
   );
 
-  // 🔹 Update border color when turn/winner changes
+  // Update border color when turn/winner changes
   useEffect(() => {
     if (winner) {
       setBorderColor(winner === 'X' ? blue : red);
@@ -71,7 +71,7 @@ function OnlineGameAI({
     paddingRight: '20px',
   };
 
-  // 🔹 Disable grid when needed
+  // Disable grid when needed
   useEffect(() => {
     if (!buttonsRef.current) return;
     const buttonsArray = [
@@ -85,17 +85,17 @@ function OnlineGameAI({
     }
   }, [gridIsDisabled]);
 
-  // 🔹 Listen to AI-specific socket events
+  // Listen to AI-specific socket events
   useEffect(() => {
     if (!roomId) return;
 
-    // 1️⃣ Emberi lépés után a szerver broadcastolja a square-btn-click-${roomId} eseményt
+    // After human player step, the server broadcast square-btn... event
     const onSquareClick = (data: {
       positions: Array<{ row: number; col: number; value: Mark }>;
     }) => {
       const last = data.positions[data.positions.length - 1];
 
-      // Táblafrissítés
+      // Refresh board
       dispatch(setBoardData(last.row, last.col, last.value));
       dispatch(setNextMark());
       dispatch(changeGridState());
@@ -103,24 +103,24 @@ function OnlineGameAI({
       const currentBoard = store.getState().board;
       checkAndDispatchWinner(last.row, last.col, currentBoard);
 
-      // Döntetlen-ellenőrzés
+      // Check draw
       if (!currentBoard.flat().includes('')) {
         setGameIsDraw(true);
         return;
       }
 
-      // Ha már van győztes, ne kérjünk AI-t
+      // If we have a winner, we don't trigger ai anymore
       const w = store.getState().winner;
       if (w) return;
 
-      // 2️⃣ Ember lépés után kérjünk AI-lépést (roomId alapján)
+      // After human player step, we trigger ai to move (by roomid)
       socket.emit('request-ai-move', { roomId, playerMark });
     };
 
-    // 3️⃣ AI lépés visszaküldése a szervertől
+    // Receive Ai step data from the server
     const onAiMove = (data: { row: number; col: number; value: Mark }) => {
       if (!data) return;
-      // Frissítjük a táblát az AI lépés után
+      // Refresh board
       dispatch(setBoardData(data.row, data.col, data.value));
       dispatch(setNextMark());
       dispatch(changeGridState());
@@ -140,13 +140,23 @@ function OnlineGameAI({
     };
   }, [roomId, dispatch, playerMark]);
 
-  // 🔹 Handle reconnect
+  useEffect(() => {
+    if (winner) {
+      socket.emit('game-result', {
+        roomId,
+        result: winner === playerMark ? 'loss' : 'win',
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [winner]);
+
+  // Handle reconnect
   useEffect(() => {
     if (!clientIsReloaded || !response) return;
     dispatch(hydrateBoard(response.boardSize, response.positions));
   }, [clientIsReloaded, response, dispatch]);
 
-  // 🔹 Restart & Leave
+  // Restart & Leave
   const resolveRoomId = () => {
     return (
       roomId ||
@@ -175,7 +185,7 @@ function OnlineGameAI({
     localStorage.removeItem('room');
   };
 
-  // 🔹 AI’s mark is always opposite of player’s
+  // AI’s mark is always opposite of player’s
   const aiMark = playerMark === 'X' ? 'O' : 'X';
 
   return (
