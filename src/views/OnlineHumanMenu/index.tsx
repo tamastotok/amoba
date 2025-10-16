@@ -3,11 +3,14 @@ import type { ChangeEvent } from 'react';
 import type { Reducers } from '../../types';
 import { useDispatch, useSelector } from 'react-redux';
 import { setGridSize } from '../../store/grid-size/grid-size.action';
-import { TextField } from '@mui/material';
+import { Box, TextField } from '@mui/material';
 import Button from '../../components/Button/Button';
 import GridSize from '../../components/GridSize';
 import SelectMark from '../../components/SelectMark';
+import SearchOverlay from '../../components/SearchOverlay';
 import socket from '../../server';
+import SelectStarter from '../../components/SelectStarter';
+import BoxWrapper from '../../components/BoxWrapper';
 
 function OnlineHumanMenu() {
   const dispatch = useDispatch();
@@ -16,8 +19,13 @@ function OnlineHumanMenu() {
   const playerMark = useSelector((state: Reducers) => state.marks.playerMark);
   const starterMark = useSelector((state: Reducers) => state.marks.starterMark);
   const gridSize = useSelector((state: Reducers) => state.gridSize);
+  const [isSearching, setIsSearching] = useState(false);
 
-  const handleChange = (e: ChangeEvent<{ value: unknown }>) => {
+  const handleCancel = () => {
+    setIsSearching(false);
+  };
+
+  const handleNameChange = (e: ChangeEvent<{ value: unknown }>) => {
     setPlayerName(e.target.value as string);
   };
 
@@ -32,36 +40,60 @@ function OnlineHumanMenu() {
       starterMark,
       gridSize: gridSize === 0 ? 8 : gridSize,
     });
+    setIsSearching(true);
   };
 
   return (
-    <main>
+    <>
+      {isSearching && (
+        <SearchOverlay
+          message="Searching for opponent..."
+          type="search"
+          onCancel={handleCancel}
+        />
+      )}
       <h1>Settings</h1>
-      <form className="textfield" noValidate autoComplete="off">
+      <Box
+        component="form"
+        noValidate
+        autoComplete="off"
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          width: '100%',
+          mt: 3,
+          pl: 1,
+          pr: 1,
+        }}
+      >
         <TextField
-          style={{ width: '420px' }}
-          id="outlined-basic"
-          label="Enter your name (optional)"
+          label="Your name (optional)"
           variant="outlined"
           margin="dense"
           color="primary"
-          onChange={handleChange}
+          name="1"
+          sx={{
+            flex: 1,
+            maxWidth: 420,
+          }}
+          onChange={handleNameChange}
         />
-      </form>
+      </Box>
 
       <SelectMark label="Select your mark:" whatMark="playerMark" />
-      <SelectMark label="Start game with:" whatMark="starterMark" />
+      <SelectStarter />
       <GridSize />
 
-      <div className="button-group-center">
+      <BoxWrapper>
         <Button
           linkTo=""
           clickEvent={handleCreateGameButtonClick}
-          text="Create Game"
+          text="Search Game"
         />
         <Button linkTo="/" text="Back" />
-      </div>
-    </main>
+      </BoxWrapper>
+    </>
   );
 }
 

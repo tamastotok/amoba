@@ -1,6 +1,6 @@
 import type { ChangeEvent } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { TextField } from '@mui/material';
+import { Box, TextField } from '@mui/material';
 import {
   setPlayerBlueName,
   setPlayerRedName,
@@ -9,21 +9,33 @@ import type { Reducers } from '../../types';
 
 function PlayerInputs() {
   const dispatch = useDispatch();
-
   const players = useSelector((state: Reducers) => state.players);
 
-  const handleChange = (e: ChangeEvent<{ value: unknown; name: unknown }>) => {
-    if (e.target.name === '1') {
-      dispatch(setPlayerBlueName(e.target.value as string));
-    } else if (e.target.name === '2') {
-      dispatch(setPlayerRedName(e.target.value as string));
-    } else return;
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    if (name === '1') {
+      dispatch(setPlayerBlueName(value));
+    } else if (name === '2') {
+      dispatch(setPlayerRedName(value));
+    }
   };
 
   return (
-    <form className="textfield" noValidate autoComplete="off">
+    <Box
+      component="form"
+      noValidate
+      autoComplete="off"
+      sx={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        gap: 2,
+        width: '100%',
+        pl: 1,
+        pr: 1,
+      }}
+    >
       <TextField
-        id="outlined-basic"
         label="Player X name (optional)"
         variant="outlined"
         margin="dense"
@@ -33,7 +45,6 @@ function PlayerInputs() {
         onChange={handleChange}
       />
       <TextField
-        id="outlined-basic"
         label="Player O name (optional)"
         variant="outlined"
         margin="dense"
@@ -42,7 +53,7 @@ function PlayerInputs() {
         value={players.red.name}
         onChange={handleChange}
       />
-    </form>
+    </Box>
   );
 }
 

@@ -1,36 +1,117 @@
-import socket from '../../server';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  TextField,
+  DialogActions,
+} from '@mui/material';
 import Button from '../../components/Button/Button';
+import socket from '../../server';
 
-interface MainMenuProps {
-  status: boolean;
-  serverStatusMessage: string;
-}
+function MainMenu() {
+  const navigate = useNavigate();
+  const [isConnected, setIsConnected] = useState(socket.connected);
+  const [open, setOpen] = useState(false);
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
 
-function MainMenu({ status, serverStatusMessage }: MainMenuProps) {
+  // Track socket connection state (replaces old "status" prop)
+  useEffect(() => {
+    const handleConnect = () => setIsConnected(true);
+    const handleDisconnect = () => setIsConnected(false);
+    const handleConnectError = () => setIsConnected(false);
+
+    socket.on('connect', handleConnect);
+    socket.on('disconnect', handleDisconnect);
+    socket.on('connect_error', handleConnectError);
+
+    // cleanup
+    return () => {
+      socket.off('connect', handleConnect);
+      socket.off('disconnect', handleDisconnect);
+      socket.off('connect_error', handleConnectError);
+    };
+  }, []);
+
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => {
+    setPassword('');
+    setError('');
+    setOpen(false);
+  };
+
+  const handleSubmit = async () => {
+    try {
+      const res = await fetch('/api/admin/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password }),
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        sessionStorage.setItem('ai_dashboard_auth', 'true');
+        navigate('/ai-dashboard');
+      } else {
+        setError('Invalid admin password');
+      }
+    } catch {
+      setError('Server error');
+    }
+  };
+
   const handleClick = () => {
-    socket.emit('join-lobby');
+    if (isConnected) socket.emit('join-lobby');
   };
 
   return (
-    <main>
-      <h1>Tic-tac-toe</h1>
+    <>
+      <h1>Gomoku</h1>
+
       <div className="button-group-center">
         <Button linkTo="/local" text="Local" />
+
         <Button
-          linkTo={status ? '/online' : '/'}
+          linkTo={isConnected ? '/online' : '/'}
           clickEvent={handleClick}
           text="Online vs Human"
-          isDisabled={!status}
+          isDisabled={!isConnected}
         />
+
         <Button
-          linkTo={status ? '/ai' : '/'}
+          linkTo={isConnected ? '/ai' : '/'}
           clickEvent={handleClick}
           text="Online vs AI"
-          isDisabled={!status}
+          isDisabled={!isConnected}
         />
+
+        <Button linkTo="" text="AI Dashboard" clickEvent={handleOpen} />
       </div>
-      <h2 className="server-status">{serverStatusMessage}</h2>
-    </main>
+
+      {/* 🔐 Admin password popup */}
+      <Dialog open={open} onClose={handleClose}>
+        <DialogTitle>Admin Access Required</DialogTitle>
+        <DialogContent>
+          <TextField
+            label="Enter admin password"
+            type="password"
+            fullWidth
+            variant="outlined"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            margin="normal"
+            error={!!error}
+            helperText={error}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button linkTo="" text="Cancel" clickEvent={handleClose} />
+          <Button linkTo="" text="Enter" clickEvent={handleSubmit} />
+        </DialogActions>
+      </Dialog>
+    </>
   );
 }
 

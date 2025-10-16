@@ -5,10 +5,10 @@ import {
   selectPlayerMark,
 } from '../store/marks/marks.action';
 import {
-  FormControl,
-  FormControlLabel,
-  Radio,
-  RadioGroup,
+  Box,
+  Typography,
+  ToggleButton,
+  ToggleButtonGroup,
 } from '@mui/material';
 
 const sessionStorage = window.sessionStorage;
@@ -20,58 +20,93 @@ interface SelectMarkProps {
 
 function SelectMark({ whatMark, label }: SelectMarkProps) {
   const dispatch = useDispatch();
-  const [value, setValue] = useState('X');
+  const [value, setValue] = useState<'X' | 'O'>('X');
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setValue((e.target as HTMLInputElement).value);
+  const handleChange = (
+    _event: React.MouseEvent<HTMLElement>,
+    newValue: 'X' | 'O' | null
+  ) => {
+    if (!newValue) return;
+    setValue(newValue);
+
     if (whatMark === 'starterMark') {
-      dispatch(selectStarterMark(e.target.value as string));
-    }
-    if (whatMark === 'playerMark') {
-      dispatch(selectPlayerMark(e.target.value as string));
+      dispatch(selectStarterMark(newValue));
+    } else if (whatMark === 'playerMark') {
+      dispatch(selectPlayerMark(newValue));
     }
   };
 
   useEffect(() => {
-    sessionStorage.setItem('playerMark', value);
-    sessionStorage.setItem('reloaded', 'false');
-  }, [value]);
+    if (whatMark === 'playerMark') {
+      sessionStorage.setItem('playerMark', value);
+      sessionStorage.setItem('reloaded', 'false');
+    }
+  }, [value, whatMark]);
 
   return (
-    <div className="center">
-      <FormControl className="form-theme" component="fieldset">
-        <p>{label}</p>
+    <Box
+      sx={{
+        display: 'flex',
+        justifyContent: 'center',
+        mb: 1,
+        px: 1,
+      }}
+    >
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          width: 420,
+          border: '1px solid',
+          borderColor: 'text.primary',
+          borderRadius: 2,
+          p: 1,
+        }}
+      >
+        <Typography
+          variant="subtitle1"
+          sx={{
+            fontWeight: 500,
+            flex: 1,
+            ml: 1,
+          }}
+        >
+          {label}
+        </Typography>
 
-        <RadioGroup
-          row
-          aria-label="mark"
-          name="mark1"
+        <ToggleButtonGroup
+          exclusive
           value={value}
           onChange={handleChange}
+          sx={{
+            display: 'flex',
+            gap: 1,
+            mr: 1,
+          }}
         >
-          <FormControlLabel
+          <ToggleButton
             value="X"
-            control={<Radio color="primary" />}
-            label="X"
-            labelPlacement="end"
-          />
-          <FormControlLabel
+            color="primary"
+            sx={{
+              minWidth: 60,
+              fontWeight: 600,
+            }}
+          >
+            X
+          </ToggleButton>
+          <ToggleButton
             value="O"
-            control={
-              <Radio
-                sx={{
-                  '&.Mui-checked': {
-                    color: '#f50057',
-                  },
-                }}
-              />
-            }
-            label="O"
-            labelPlacement="end"
-          />
-        </RadioGroup>
-      </FormControl>
-    </div>
+            color="secondary"
+            sx={{
+              minWidth: 60,
+              fontWeight: 600,
+            }}
+          >
+            O
+          </ToggleButton>
+        </ToggleButtonGroup>
+      </Box>
+    </Box>
   );
 }
 

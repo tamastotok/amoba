@@ -1,16 +1,25 @@
 import { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { setGridSize } from '../../store/grid-size/grid-size.action';
-import { resetNextMark } from '../../store/marks/marks.action';
+import {
+  resetNextMark,
+  selectStarterMark,
+} from '../../store/marks/marks.action';
 import { setWinner } from '../../store/winner/winner.action';
+import { setGridIsDisabled } from '../../store/grid-disable/grid-disable.action';
 import { createMatrix } from '../../utils/helpers/createMatrix';
-import { BLUE, RED } from '../../utils/constants';
+import { BLUE_BORDER, RED_BORDER } from '../../utils/constants';
 import type { Reducers } from '../../types';
 import SquareLocal from './SquareLocal';
-import Button from '../../components/Button/Button';
+import { handleLeaveGame } from '../../utils/helpers/handleLeaveGame';
+import { hydrateBoard } from '../../store/board/board.action';
+import EndGameActions from '../../components/Button/EndGameActions';
+import GameLayout from '../../components/Game/GameLayout';
+import { Box } from '@mui/material';
 
 function LocalGame() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const players = useSelector((state: Reducers) => state.players);
   const marks = useSelector((state: Reducers) => state.marks);
   const winner = useSelector((state: Reducers) => state.winner);
@@ -19,14 +28,14 @@ function LocalGame() {
   const buttonsRef = useRef<HTMLDivElement>(null);
   const [gameIsDraw, setGameIsDraw] = useState(false);
   const [borderColor, setBorderColor] = useState(
-    marks.starterMark === 'X' ? BLUE : RED
+    marks.starterMark === 'X' ? BLUE_BORDER : RED_BORDER
   );
 
   useEffect(() => {
     if (winner) {
-      setBorderColor(winner === 'X' ? BLUE : RED);
+      setBorderColor(winner === 'X' ? BLUE_BORDER : RED_BORDER);
     } else {
-      setBorderColor(marks.nextMark === 'X' ? BLUE : RED);
+      setBorderColor(marks.nextMark === 'X' ? BLUE_BORDER : RED_BORDER);
     }
   }, [winner, marks.nextMark]);
 
@@ -53,11 +62,32 @@ function LocalGame() {
     }
   }, [square]);
 
-  //  Reset winner and mark if RESTART button clicked
   const handleRestartClick = () => {
-    dispatch(setGridSize(8));
+    // Empty board (Redux version)
+    const emptyPositions = [];
+    for (let row = 0; row < gridSize; row++) {
+      for (let col = 0; col < gridSize; col++) {
+        emptyPositions.push({ row, col, value: '' });
+      }
+    }
+
+    // Proper hydrateBoard call
+    dispatch(hydrateBoard(gridSize, emptyPositions));
+
+    // Alternate starting player
+    const nextStarter = marks.starterMark === 'X' ? 'O' : 'X';
+    dispatch(selectStarterMark(nextStarter));
+    dispatch(resetNextMark(nextStarter));
+
+    // Reset UI state
     dispatch(setWinner(''));
-    dispatch(resetNextMark(marks.starterMark));
+    dispatch(setGridIsDisabled(false));
+    setGameIsDraw(false);
+    setBorderColor(nextStarter === 'X' ? BLUE_BORDER : RED_BORDER);
+  };
+
+  const handleLeaveGameClick = () => {
+    handleLeaveGame(dispatch, navigate, '');
   };
 
   const gameStatus = () => {
@@ -85,16 +115,21 @@ function LocalGame() {
   };
 
   return (
-    <>
+    <GameLayout onLeave={handleLeaveGameClick}>
       <div className="winner-container">{gameStatus()}</div>
 
-      <div
+      <Box
         ref={buttonsRef}
-        className="grid-border"
-        style={{
-          borderColor,
-          width: `${gridSize * 40 + 8}px`,
-          height: `${gridSize * 40 + 8}px`,
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: `repeat(${gridSize}, 1fr)`,
+          width: `min(90vw, ${gridSize * 40}px)`,
+          aspectRatio: '1 / 1',
+          gap: '1px',
+          margin: '20px auto',
+          border: borderColor,
+          borderRadius: '6px',
+          overflow: 'hidden',
         }}
       >
         {createMatrix(gridSize).map((item, index) => (
@@ -105,17 +140,20 @@ function LocalGame() {
             colindex={item.col}
           />
         ))}
-      </div>
+      </Box>
+
+      <EndGameActions
+        winner={winner}
+        gameIsDraw={gameIsDraw}
+        handleRestartClick={handleRestartClick}
+        handleLeaveGameClick={handleLeaveGameClick}
+      />
 
       <div className="players-container">
         <h3>{players.blue.name && `Player X: ${players.blue.name}`}</h3>
         <h3>{players.red.name && `Player O: ${players.red.name}`}</h3>
       </div>
-
-      {winner || gameIsDraw ? (
-        <Button linkTo="/" clickEvent={handleRestartClick} text="Restart" />
-      ) : null}
-    </>
+    </GameLayout>
   );
 }
 

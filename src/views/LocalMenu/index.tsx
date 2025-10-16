@@ -2,19 +2,20 @@ import SelectMark from '../../components/SelectMark';
 import GridSize from '../../components/GridSize';
 import PlayerInputs from './PlayerInputs';
 import Button from '../../components/Button/Button';
+import BoxWrapper from '../../components/BoxWrapper';
 
 function LocalMenu() {
   return (
-    <main>
+    <>
       <h1>Settings</h1>
       <PlayerInputs />
       <SelectMark label="Start game with:" whatMark="starterMark" />
       <GridSize />
-      <div className="button-group-center">
+      <BoxWrapper>
         <Button linkTo="/local/game" text="Start Game" />
         <Button linkTo="/" text="Back" />
-      </div>
-    </main>
+      </BoxWrapper>
+    </>
   );
 }
 

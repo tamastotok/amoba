@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
-import type { KeyboardEvent } from 'react';
+import { Box, Typography, TextField, Button, useTheme } from '@mui/material';
 import type { Reducers } from '../../types';
 import socket from '../../server';
 
@@ -11,6 +11,7 @@ interface ChatData {
 }
 
 function Chat() {
+  const theme = useTheme();
   const textRef = useRef<HTMLInputElement>(null);
   const chatWindowRef = useRef<HTMLDivElement>(null);
 
@@ -31,56 +32,123 @@ function Chat() {
   };
 
   const sendMessage = () => {
-    if (!textRef.current?.value) return;
-    sendChatDataToServer(textRef.current.value);
-    textRef.current.value = '';
+    const value = textRef.current?.value?.trim();
+    if (!value) return;
+    sendChatDataToServer(value);
+    textRef.current!.value = '';
   };
 
-  const sendMessageOnKey = (e: KeyboardEvent<HTMLInputElement>) => {
+  const sendMessageOnKey = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') sendMessage();
   };
 
   useEffect(() => {
     let isMounted = true;
-
     const updateMessagesHandler = `update-messages-${roomId}`;
+
     socket.on(updateMessagesHandler, (data: ChatData[]) => {
       if (isMounted) {
         setChatData(data);
-        if (chatWindowRef.current) {
-          chatWindowRef.current.scrollTo(0, chatWindowRef.current.scrollHeight);
-        }
+        chatWindowRef.current?.scrollTo(0, chatWindowRef.current.scrollHeight);
       }
     });
 
     return () => {
-      // Set the flag to false on component unmount
       isMounted = false;
     };
   }, [roomId]);
 
   return (
-    <div className="chat-window">
-      <div className="chat-window-textarea" ref={chatWindowRef}>
-        {chatData.map((item) => (
-          <p key={item._id}>
-            <b className={item.playerName === bluePlayerName ? 'blue' : 'red'}>
-              {item.playerName}:
-            </b>{' '}
-            {item.message}
-          </p>
-        ))}
-      </div>
+    <Box
+      sx={{
+        //width: { xs: '100%', md: 280 },
+        width: 280,
+        height: 300,
+        backgroundColor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#f9f9f9',
+        borderTop: { xs: `1px solid ${theme.palette.divider}`, md: 'none' },
+        border: { md: `1px solid ${theme.palette.divider}` },
+        borderRadius: { xs: '10px 10px 0 0', md: 2 },
+        boxShadow: theme.shadows[5],
+        display: 'flex',
+        flexDirection: 'column',
+        overflow: 'hidden',
+        zIndex: 1200,
+        margin: '0 1rem',
+      }}
+    >
+      {/* Header */}
+      <Box
+        sx={{
+          p: 1,
+          backgroundColor: theme.palette.primary.main,
+          color: theme.palette.primary.contrastText,
+          fontWeight: 600,
+          textAlign: 'center',
+        }}
+      >
+        <Typography variant="subtitle1">Chat</Typography>
+      </Box>
 
-      <input
-        onKeyDown={sendMessageOnKey}
-        ref={textRef}
-        type="text"
-        name=""
-        id=""
-      />
-      <button onClick={sendMessage}>Send</button>
-    </div>
+      {/* Messages */}
+      <Box
+        ref={chatWindowRef}
+        sx={{
+          flex: 1,
+          overflowY: 'auto',
+          px: 2,
+          py: 1,
+          fontSize: '0.9rem',
+        }}
+      >
+        {chatData.map((item) => (
+          <Typography key={item._id} sx={{ mb: 0.5, wordWrap: 'break-word' }}>
+            <Box
+              component="b"
+              sx={{
+                color:
+                  item.playerName === bluePlayerName
+                    ? theme.palette.info.main
+                    : theme.palette.error.main,
+              }}
+            >
+              {item.playerName}:
+            </Box>{' '}
+            {item.message}
+          </Typography>
+        ))}
+      </Box>
+
+      {/* Input Area */}
+      <Box
+        sx={{
+          display: 'flex',
+          gap: 1,
+          p: 1,
+          borderTop: `1px solid ${theme.palette.divider}`,
+          backgroundColor:
+            theme.palette.mode === 'dark'
+              ? '#222'
+              : theme.palette.background.paper,
+        }}
+      >
+        <TextField
+          inputRef={textRef}
+          variant="outlined"
+          size="small"
+          placeholder="Type a message..."
+          fullWidth
+          onKeyDown={sendMessageOnKey}
+        />
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={sendMessage}
+          sx={{ flexShrink: 0 }}
+        >
+          Send
+        </Button>
+      </Box>
+    </Box>
   );
 }
 

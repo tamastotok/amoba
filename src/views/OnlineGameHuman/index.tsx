@@ -1,9 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
-import type { CSSProperties } from 'react';
 import type { ContinuePayload, Reducers, Mark } from '../../types';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { setWinner } from '../../store/winner/winner.action';
 import { setBoardData, hydrateBoard } from '../../store/board/board.action';
 import { checkAndDispatchWinner } from '../../utils/helpers/checkWinningPatterns';
 import { setNextMark } from '../../store/marks/marks.action';
@@ -11,12 +9,13 @@ import { changeGridState } from '../../store/grid-disable/grid-disable.action';
 import GameStatus from '../../components/online/GameStatus';
 import SquareOnline from '../../components/online/SquareOnline';
 import Chat from '../../components/Chat/Chat';
-import Button from '../../components/Button/Button';
 import store from '../../store';
 import socket from '../../server';
-
-const blue = '2px solid #3f51b5';
-const red = '2px solid #f50057';
+import { handleLeaveGame } from '../../utils/helpers/handleLeaveGame';
+import EndGameActions from '../../components/Button/EndGameActions';
+import GameLayout from '../../components/Game/GameLayout';
+import { Box } from '@mui/material';
+import { BLUE, BLUE_BORDER, RED, RED_BORDER } from '../../utils/constants';
 
 interface OnlineGameProps {
   response: ContinuePayload | null;
@@ -42,35 +41,17 @@ function OnlineGame({
   const navigate = useNavigate();
   const [gameIsDraw, setGameIsDraw] = useState(false);
   const [borderColor, setBorderColor] = useState(
-    marks.starterMark === 'X' ? blue : red
+    marks.starterMark === 'X' ? BLUE_BORDER : RED_BORDER
   );
 
   // Update border color on winner/next mark
   useEffect(() => {
     if (winner) {
-      setBorderColor(winner === 'X' ? blue : red);
+      setBorderColor(winner === 'X' ? BLUE_BORDER : RED_BORDER);
     } else {
-      setBorderColor(marks.nextMark === 'X' ? blue : red);
+      setBorderColor(marks.nextMark === 'X' ? BLUE_BORDER : RED_BORDER);
     }
   }, [winner, marks.nextMark]);
-
-  const gridBorderStyle: CSSProperties = {
-    display: 'flex',
-    flexWrap: 'wrap',
-    width: `${gridSize * 40 + 8}px`,
-    height: `${gridSize * 40 + 8}px`,
-    margin: '20px auto',
-    padding: '2px',
-    border: borderColor,
-  };
-
-  const playerMarkStyle: CSSProperties = {
-    color: playerMark === 'X' ? '#3f51b5' : '#f50057',
-    margin: '10px auto',
-    width: `${gridSize * 40 + 8}px`,
-    textAlign: 'right',
-    paddingRight: '20px',
-  };
 
   // Disable buttons when gridIsDisabled
   useEffect(() => {
@@ -140,23 +121,32 @@ function OnlineGame({
     }
     // Winner '', 'X', 'O' vagy 'draw'
     socket.emit('restart-game', { id, lastWinner: winner || null });
+    navigate(location.pathname);
   };
 
   // Leave game button
   const handleLeaveGameClick = () => {
-    dispatch(setWinner(''));
-    socket.emit('leave-game', roomId);
-    navigate('/');
-    window.location.reload();
-    sessionStorage.removeItem('room');
-    localStorage.removeItem('room');
+    handleLeaveGame(dispatch, navigate, roomId);
   };
 
   return (
-    <div>
+    <GameLayout onLeave={handleLeaveGameClick} chat={<Chat />}>
       <GameStatus gameIsDraw={gameIsDraw} />
 
-      <div ref={buttonsRef} style={gridBorderStyle}>
+      <Box
+        ref={buttonsRef}
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: `repeat(${gridSize}, 1fr)`,
+          width: `min(90vw, ${gridSize * 40}px)`,
+          aspectRatio: '1 / 1',
+          gap: '1px',
+          margin: '20px auto',
+          border: borderColor,
+          borderRadius: '6px',
+          overflow: 'hidden',
+        }}
+      >
         {Array.from({ length: gridSize * gridSize }).map((_, index) => {
           const row = Math.floor(index / gridSize);
           const col = index % gridSize;
@@ -170,21 +160,26 @@ function OnlineGame({
             />
           );
         })}
-      </div>
+      </Box>
 
-      <h1 style={playerMarkStyle}> {playerMark} </h1>
+      <h1
+        style={{
+          color: playerMark === 'X' ? BLUE : RED,
+          marginTop: '1rem',
+          textAlign: 'center',
+          fontSize: 'clamp(1.5rem, 4vw, 3rem)',
+        }}
+      >
+        {playerMark}
+      </h1>
 
-      {winner || gameIsDraw ? (
-        <Button
-          linkTo={location.pathname}
-          clickEvent={handleRestartClick}
-          text="Restart"
-        />
-      ) : null}
-
-      <Button linkTo="/" clickEvent={handleLeaveGameClick} text="Leave" />
-      <Chat />
-    </div>
+      <EndGameActions
+        winner={winner}
+        gameIsDraw={gameIsDraw}
+        handleRestartClick={handleRestartClick}
+        handleLeaveGameClick={handleLeaveGameClick}
+      />
+    </GameLayout>
   );
 }
 

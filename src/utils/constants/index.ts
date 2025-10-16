@@ -24,6 +24,13 @@ export const SET_WINNER = 'SET_WINNER';
 export const DISABLE_GRID = 'DISABLE_GRID';
 export const CHANGE_GRID_STATE = 'CHANGE_GRID_STATE';
 
-//  Colors
+// Colors
 export const BLUE = '#3f51b5';
 export const RED = '#f50057';
+
+//  Borders
+export const BLUE_BORDER = '2px solid #3f51b5';
+export const RED_BORDER = '2px solid #f50057';
+
+// Reset game
+export const RESET_GAME_STATE = 'RESET_GAME_STATE';

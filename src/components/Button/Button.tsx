@@ -1,27 +1,42 @@
-import { Button as Btn } from '@mui/material';
 import { Link } from 'react-router-dom';
+import { Button as Btn } from '@mui/material';
 
 interface Props {
-  linkTo: string;
+  linkTo?: string; // optional now
   clickEvent?: () => void;
   text: string;
   isDisabled?: boolean;
 }
 
 function Button({ linkTo, clickEvent, text, isDisabled }: Props) {
+  // If `linkTo` is provided, wrap with <Link>; otherwise render plain button
+  if (linkTo) {
+    return (
+      <Link to={linkTo} style={{ textDecoration: 'none' }}>
+        <Btn
+          sx={{ width: '10rem', padding: '0.5rem 0', margin: '0.5rem 0' }}
+          color="primary"
+          variant="outlined"
+          onClick={clickEvent}
+          disabled={isDisabled}
+        >
+          {text}
+        </Btn>
+      </Link>
+    );
+  }
+
+  // No link? Just a plain button
   return (
-    <Link to={linkTo}>
-      <Btn
-        sx={{ width: '10rem', padding: '0.5rem 0', margin: '0.5rem 0' }}
-        className="button"
-        color="primary"
-        variant="outlined"
-        onClick={clickEvent}
-        disabled={isDisabled}
-      >
-        {text}
-      </Btn>
-    </Link>
+    <Btn
+      sx={{ width: '10rem', padding: '0.5rem 0', margin: '0.5rem 0' }}
+      color="primary"
+      variant="outlined"
+      onClick={clickEvent}
+      disabled={isDisabled}
+    >
+      {text}
+    </Btn>
   );
 }
 

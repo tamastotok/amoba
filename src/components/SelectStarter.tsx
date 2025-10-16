@@ -1,31 +1,29 @@
-import { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { setGridSize } from '../store/grid-size/grid-size.action';
+import React, { useEffect, useState } from 'react';
 import {
   Box,
   Typography,
-  ToggleButtonGroup,
   ToggleButton,
+  ToggleButtonGroup,
 } from '@mui/material';
+import { useDispatch } from 'react-redux';
+import { selectStarterMark } from '../store/marks/marks.action';
 
-const sessionStorage = window.sessionStorage;
-
-function GridSize() {
+function SelectStarter() {
   const dispatch = useDispatch();
-  const [size, setSize] = useState('8'); // store just the number
+  const [starter, setStarter] = useState<'you' | 'opponent'>('you');
 
   const handleChange = (
     _event: React.MouseEvent<HTMLElement>,
-    newValue: string | null
+    newValue: 'you' | 'opponent'
   ) => {
-    if (!newValue) return; // prevent deselection
-    setSize(newValue);
-    dispatch(setGridSize(parseInt(newValue)));
+    if (!newValue) return;
+    setStarter(newValue);
+    dispatch(selectStarterMark(newValue === 'you' ? 'player' : 'opponent'));
   };
 
   useEffect(() => {
-    sessionStorage.setItem('gridSize', size);
-  }, [size]);
+    sessionStorage.setItem('starter', starter);
+  }, [starter]);
 
   return (
     <Box
@@ -55,12 +53,12 @@ function GridSize() {
             ml: 1,
           }}
         >
-          Board size:
+          Who starts first:
         </Typography>
 
         <ToggleButtonGroup
           exclusive
-          value={size}
+          value={starter}
           onChange={handleChange}
           sx={{
             display: 'flex',
@@ -68,14 +66,23 @@ function GridSize() {
             mr: 1,
           }}
         >
-          <ToggleButton value="8" sx={{ minWidth: 80 }}>
-            8×8
+          <ToggleButton
+            value="you"
+            sx={{
+              minWidth: 90,
+              fontWeight: 600,
+            }}
+          >
+            You
           </ToggleButton>
-          <ToggleButton value="10" sx={{ minWidth: 80 }}>
-            10×10
-          </ToggleButton>
-          <ToggleButton value="12" sx={{ minWidth: 80 }}>
-            12×12
+          <ToggleButton
+            value="opponent"
+            sx={{
+              minWidth: 90,
+              fontWeight: 600,
+            }}
+          >
+            Opponent
           </ToggleButton>
         </ToggleButtonGroup>
       </Box>
@@ -83,4 +90,4 @@ function GridSize() {
   );
 }
 
-export default GridSize;
+export default SelectStarter;

@@ -21,7 +21,6 @@ import type {
   SearchingPayload,
   GameFoundPayload,
 } from './types';
-import MessageBoard from './components/MessageBoard/MessageBoard';
 import LocalGame from './views/LocalGame';
 import LocalMenu from './views/LocalMenu';
 import HomePage from './views/MainMenu';
@@ -29,39 +28,30 @@ import OnlineGameHuman from './views/OnlineGameHuman';
 import OnlineGameAI from './views/OnlineGameAI';
 import OnlineHumanMenu from './views/OnlineHumanMenu';
 import OnlineAIMenu from './views/OnlineAIMenu';
+import AIDashboard from './views/AIDashboard';
 import socket from './server';
+import SystemStatusBar from './components/SystemStatusBar';
+import SearchOverlay from './components/SearchOverlay';
 
 function App() {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const location = useLocation();
   const playerMark = useAppSelector(
     (state: RootState) => state.marks.playerMark
   );
 
   const [roomId, setRoomId] = useState('');
   const [statusMessage, setStatusMessage] = useState('');
-  const [onlineUserCount, setOnlineUserCount] = useState(0);
   const [response, setResponse] = useState<ContinuePayload | null>(null);
-  const [serverStatus, setServerStatus] = useState<boolean | null>(null);
   const [isDisabled, setIsDisabled] = useState(false);
   const [clientIsReloaded, setClientIsReloaded] = useState(false);
-  const [serverStatusMessage, setServerStatusMessage] = useState(
-    'Connecting to server...'
-  );
-
+  const [opponentLeft, setOpponentLeft] = useState(false);
   const mark = sessionStorage.getItem('playerMark');
   const pageIsReloaded = sessionStorage.getItem('reloaded');
 
-  const navigate = useNavigate();
-  const location = useLocation();
-
   // --- General socket handlers ---
   useSocketGame({
-    connect: () => setServerStatus(socket.connected),
-    disconnect: () => setServerStatus(socket.connected),
-    connect_error: () => setServerStatus(socket.connected),
-
-    'user-count': (count: unknown) => setOnlineUserCount(count as number),
-
     searching: (res: unknown) => {
       const payload = res as SearchingPayload;
       setStatusMessage('Waiting for another player...');
@@ -79,6 +69,11 @@ function App() {
         dispatch(setPlayerRedName(payload.playerData.redName));
         setStatusMessage('');
       }
+    },
+
+    'search-canceled': () => {
+      setStatusMessage('');
+      dispatch(setGridIsDisabled(false));
     },
 
     'ai-game-created': (res: unknown) => {
@@ -176,17 +171,6 @@ function App() {
     }
   }, [dispatch, location.pathname, mark, pageIsReloaded]);
 
-  // --- Server status message ---
-  useEffect(() => {
-    setServerStatusMessage(
-      serverStatus === false
-        ? 'Server is offline!'
-        : serverStatus
-        ? ''
-        : 'Connecting to server...'
-    );
-  }, [serverStatus]);
-
   // --- Redirect if invalid room ---
   useEffect(() => {
     if (
@@ -204,23 +188,10 @@ function App() {
 
   useEffect(() => {
     const onOpponentLeft = (data: { message: string; roomId: string }) => {
-      setStatusMessage(data.message);
       dispatch(setWinner(''));
       dispatch(setGridIsDisabled(true));
-    };
-
-    socket.on('opponent-left', onOpponentLeft);
-
-    return () => {
-      socket.off('opponent-left', onOpponentLeft);
-    };
-  }, [dispatch]);
-
-  useEffect(() => {
-    const onOpponentLeft = (data: { message: string; roomId: string }) => {
       setStatusMessage(data.message);
-      dispatch(setWinner(''));
-      dispatch(setGridIsDisabled(true));
+      setOpponentLeft(true);
     };
 
     socket.on('opponent-left', onOpponentLeft);
@@ -230,82 +201,49 @@ function App() {
   }, [dispatch]);
 
   return (
-    <Routes>
-      <Route
-        path="/"
-        element={
-          <HomePage
-            status={serverStatus ?? false}
-            serverStatusMessage={serverStatusMessage}
-          />
-        }
-      />
+    <>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/local" element={<LocalMenu />} />
+        <Route path="/local/game" element={<LocalGame />} />
+        <Route path="/online" element={<OnlineHumanMenu />} />
+        <Route path="/ai" element={<OnlineAIMenu />} />
 
-      <Route path="/local" element={<LocalMenu />} />
-      <Route path="/local/game" element={<LocalGame />} />
-
-      <Route
-        path="/online"
-        element={
-          <>
-            <OnlineHumanMenu />
-            <MessageBoard
-              onlineUserCount={onlineUserCount}
-              statusMessage={statusMessage}
-            />
-          </>
-        }
-      />
-
-      <Route
-        path="/ai"
-        element={
-          <>
-            <OnlineAIMenu />
-            <MessageBoard
-              onlineUserCount={onlineUserCount}
-              statusMessage={statusMessage}
-            />
-          </>
-        }
-      />
-
-      <Route
-        path="/online/game/:id"
-        element={
-          <>
+        <Route
+          path="/online/game/:id"
+          element={
             <OnlineGameHuman
               roomId={roomId}
               response={response}
               playerMark={playerMark as 'X' | 'O'}
               clientIsReloaded={clientIsReloaded}
             />
-            <MessageBoard
-              onlineUserCount={onlineUserCount}
-              statusMessage={statusMessage}
-            />
-          </>
-        }
-      />
+          }
+        />
 
-      <Route
-        path="/ai/game/:id"
-        element={
-          <>
+        <Route
+          path="/ai/game/:id"
+          element={
             <OnlineGameAI
               roomId={roomId}
               response={response}
               playerMark={playerMark as 'X' | 'O'}
               clientIsReloaded={clientIsReloaded}
             />
-            <MessageBoard
-              onlineUserCount={onlineUserCount}
-              statusMessage={statusMessage}
-            />
-          </>
-        }
-      />
-    </Routes>
+          }
+        />
+
+        <Route path="/ai-dashboard" element={<AIDashboard />} />
+      </Routes>
+      <SystemStatusBar statusMessage={statusMessage} />
+      {opponentLeft && (
+        <SearchOverlay
+          message="Opponent disconnected."
+          type="disconnected"
+          onCancel={() => setOpponentLeft(false)}
+        />
+      )}
+    </>
   );
 }
 

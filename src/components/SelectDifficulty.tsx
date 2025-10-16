@@ -1,6 +1,4 @@
-import { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { setGridSize } from '../store/grid-size/grid-size.action';
+import React from 'react';
 import {
   Box,
   Typography,
@@ -8,24 +6,18 @@ import {
   ToggleButton,
 } from '@mui/material';
 
-const sessionStorage = window.sessionStorage;
+interface SelectDifficultyProps {
+  difficulty: 'easy' | 'medium' | 'hard';
+  onChange: (difficulty: 'easy' | 'medium' | 'hard') => void;
+}
 
-function GridSize() {
-  const dispatch = useDispatch();
-  const [size, setSize] = useState('8'); // store just the number
-
+function SelectDifficulty({ difficulty, onChange }: SelectDifficultyProps) {
   const handleChange = (
-    _event: React.MouseEvent<HTMLElement>,
-    newValue: string | null
+    _e: React.MouseEvent<HTMLElement>,
+    newValue: 'easy' | 'medium' | 'hard' | null
   ) => {
-    if (!newValue) return; // prevent deselection
-    setSize(newValue);
-    dispatch(setGridSize(parseInt(newValue)));
+    if (newValue) onChange(newValue);
   };
-
-  useEffect(() => {
-    sessionStorage.setItem('gridSize', size);
-  }, [size]);
 
   return (
     <Box
@@ -55,12 +47,13 @@ function GridSize() {
             ml: 1,
           }}
         >
-          Board size:
+          Difficulty:
         </Typography>
 
         <ToggleButtonGroup
+          color="primary"
           exclusive
-          value={size}
+          value={difficulty}
           onChange={handleChange}
           sx={{
             display: 'flex',
@@ -68,14 +61,14 @@ function GridSize() {
             mr: 1,
           }}
         >
-          <ToggleButton value="8" sx={{ minWidth: 80 }}>
-            8×8
+          <ToggleButton value="easy" sx={{ minWidth: 90 }}>
+            Easy
           </ToggleButton>
-          <ToggleButton value="10" sx={{ minWidth: 80 }}>
-            10×10
+          <ToggleButton value="medium" sx={{ minWidth: 90 }}>
+            Medium
           </ToggleButton>
-          <ToggleButton value="12" sx={{ minWidth: 80 }}>
-            12×12
+          <ToggleButton value="hard" sx={{ minWidth: 90 }}>
+            Hard
           </ToggleButton>
         </ToggleButtonGroup>
       </Box>
@@ -83,4 +76,4 @@ function GridSize() {
   );
 }
 
-export default GridSize;
+export default SelectDifficulty;
