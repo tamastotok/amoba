@@ -55,3 +55,41 @@ export interface ContinuePayload {
   roomId: string;
   positions: Array<{ row: number; col: number; value: string }>;
 }
+
+// --- AI-related shared types ---
+
+// Possible result outcomes for a strategy
+export type Result = 'win' | 'loss' | 'draw';
+
+// A single AI strategy (from evolution population)
+export interface StrategySummary {
+  fitness: number;
+  result?: Result;
+}
+
+// Payload received from backend when a new generation evolves
+export interface GenerationUpdatePayload {
+  generation: number;
+  population: StrategySummary[];
+  timestamp: string;
+}
+
+// Socket.IO server → client events
+export interface ServerToClientEvents {
+  'ai-generation-update': (data: GenerationUpdatePayload) => void;
+}
+
+// A population structure fetched from the REST API
+export interface PopulationData {
+  generation: number;
+  population: StrategySummary[];
+}
+
+// Chart row structure (for Recharts)
+export interface ChartRow {
+  generation: number;
+  avgFitness: number;
+  bestFitness: number;
+  worstFitness: number;
+  winRate?: number;
+}
