@@ -56,6 +56,15 @@ export interface ContinuePayload {
   positions: Array<{ row: number; col: number; value: string }>;
 }
 
+export interface GameEndedPayload {
+  winner: string;
+}
+
+export interface OpponentLeftPayload {
+  message: string;
+  roomId: string;
+}
+
 // --- AI-related shared types ---
 
 // Possible result outcomes for a strategy

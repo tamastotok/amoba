@@ -61,7 +61,6 @@ function Chat() {
   return (
     <Box
       sx={{
-        //width: { xs: '100%', md: 280 },
         width: 280,
         height: 300,
         backgroundColor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#f9f9f9',
@@ -72,7 +71,6 @@ function Chat() {
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',
-        zIndex: 1200,
         margin: '0 1rem',
       }}
     >

@@ -10,14 +10,18 @@ import {
   Legend,
   ResponsiveContainer,
 } from 'recharts';
+import Button from '../../components/Button/Button';
+import { io, Socket } from 'socket.io-client';
+import {
+  formatPopulations,
+  formatGeneration,
+} from '../../utils/helpers/aiDashboard/formatters';
 import type {
   ChartRow,
   PopulationData,
   GenerationUpdatePayload,
   ServerToClientEvents,
 } from '../../types';
-import { io, Socket } from 'socket.io-client';
-import Button from '../../components/Button/Button';
 
 const socket: Socket<ServerToClientEvents> = io();
 
@@ -28,61 +32,39 @@ function AIDashboard() {
   const [customStart, setCustomStart] = useState<number | ''>('');
   const [customEnd, setCustomEnd] = useState<number | ''>('');
 
+  // Fetch data
   useEffect(() => {
-    // Initial fetch for full history
-    fetch('/api/ai/progress')
-      .then((res) => res.json())
-      .then((populations: PopulationData[]) => {
-        const formatted: ChartRow[] = populations.map((p) => {
-          const fitnessValues = p.population.map((s) => s.fitness);
-          const wins = p.population.filter((s) => s.result === 'win').length;
+    const fetchAIProgress = async () => {
+      try {
+        const res = await fetch(
+          `${import.meta.env.VITE_API_URL}/api/ai/progress`
+        );
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const populations: PopulationData[] = await res.json();
 
-          const avgFitness =
-            fitnessValues.reduce((a, b) => a + b, 0) /
-            Math.max(fitnessValues.length, 1);
-          const bestFitness = Math.max(...fitnessValues);
-          const worstFitness = Math.min(...fitnessValues);
-          const winRate = (wins / Math.max(p.population.length, 1)) * 100;
-
-          return {
-            generation: p.generation,
-            avgFitness,
-            bestFitness,
-            worstFitness,
-            winRate,
-          };
-        });
-
+        const formatted = formatPopulations(populations);
         setData(formatted);
         setFilteredData(formatted);
         setRange([1, formatted.length || 1]);
-      })
-      .catch((err) => console.error('Failed to load AI progress:', err));
+      } catch (err) {
+        console.error('Failed to load AI progress:', err);
+      }
+    };
 
-    // Realtime updates with strict typing
+    fetchAIProgress();
+  }, []);
+
+  // Update sockets
+  useEffect(() => {
     const onGenUpdate = (newGenData: GenerationUpdatePayload) => {
-      const fitnessValues = newGenData.population.map((s) => s.fitness);
-      const avgFitness =
-        fitnessValues.reduce((a, b) => a + b, 0) /
-        Math.max(fitnessValues.length, 1);
-      const bestFitness = Math.max(...fitnessValues);
-      const worstFitness = Math.min(...fitnessValues);
-      const wins = newGenData.population.filter(
-        (s) => s.result === 'win'
-      ).length;
-      const winRate = (wins / Math.max(newGenData.population.length, 1)) * 100;
-
-      const newEntry: ChartRow = {
-        generation: newGenData.generation,
-        avgFitness,
-        bestFitness,
-        worstFitness,
-        winRate,
-      };
-
-      setData((prev) => [...prev, newEntry]);
-      setFilteredData((prev) => [...prev, newEntry]);
-      setRange(([start, end]) => [start || 1, (end || 0) + 1]);
+      try {
+        const newEntry = formatGeneration(newGenData);
+        setData((prev) => [...prev, newEntry]);
+        setFilteredData((prev) => [...prev, newEntry]);
+        setRange(([start, end]) => [start || 1, (end || 0) + 1]);
+      } catch (err) {
+        console.error('Failed to process AI generation update:', err);
+      }
     };
 
     socket.on('ai-generation-update', onGenUpdate);
@@ -91,14 +73,13 @@ function AIDashboard() {
     };
   }, []);
 
-  // Update filtered data when slider changes
+  // Slider / filter update
   const handleRangeChange = (_: unknown, newValue: number | number[]) => {
     const [start, end] = newValue as number[];
     setRange([start, end]);
     setFilteredData(data.slice(start - 1, end));
   };
 
-  // Manual filter input (custom start/end)
   const applyCustomFilter = () => {
     if (customStart && customEnd) {
       setFilteredData(data.slice(customStart - 1, customEnd));
@@ -111,7 +92,6 @@ function AIDashboard() {
       <h1>AI Learning Progress</h1>
       <p>Generation-by-generation evolution of fitness values and win rates.</p>
 
-      {/* Slider for filtering generations */}
       {data.length > 0 && (
         <div style={{ width: '80%', margin: '0 auto' }}>
           <Slider

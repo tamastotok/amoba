@@ -3,13 +3,10 @@ import type { Reducers } from '../../types';
 import { useSelector } from 'react-redux';
 import { BLUE, RED } from '../../utils/constants';
 
-interface Draw {
-  gameIsDraw: boolean;
-}
-
-function GameStatus({ gameIsDraw }: Draw) {
+function GameStatus() {
   const marks = useSelector((state: Reducers) => state.marks);
   const winner = useSelector((state: Reducers) => state.winner);
+  const isDraw = useSelector((state: Reducers) => state.winner);
   const gridIsDisabled = useSelector((state: Reducers) => state.gridIsDisabled);
 
   const customH1Style = {
@@ -36,7 +33,7 @@ function GameStatus({ gameIsDraw }: Draw) {
       );
     }
 
-    if (gameIsDraw) {
+    if (isDraw) {
       return <h1 style={customH1Style}>Draw</h1>;
     }
 

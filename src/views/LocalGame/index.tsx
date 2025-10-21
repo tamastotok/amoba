@@ -11,11 +11,12 @@ import { createMatrix } from '../../utils/helpers/createMatrix';
 import { BLUE_BORDER, RED_BORDER } from '../../utils/constants';
 import type { Reducers } from '../../types';
 import SquareLocal from './SquareLocal';
-import { handleLeaveGame } from '../../utils/helpers/handleLeaveGame';
+import { handleLeaveGame } from '../../utils/helpers/gameActions';
 import { hydrateBoard } from '../../store/board/board.action';
 import EndGameActions from '../../components/Button/EndGameActions';
 import GameLayout from '../../components/Game/GameLayout';
 import { Box } from '@mui/material';
+import { setDraw } from '../../store/draw/draw.action';
 
 function LocalGame() {
   const dispatch = useDispatch();
@@ -26,7 +27,7 @@ function LocalGame() {
   const gridSize = useSelector((state: Reducers) => state.gridSize);
   const square = useSelector((state: Reducers) => state.square);
   const buttonsRef = useRef<HTMLDivElement>(null);
-  const [gameIsDraw, setGameIsDraw] = useState(false);
+  const isDraw = useSelector((state: Reducers) => state.winner);
   const [borderColor, setBorderColor] = useState(
     marks.starterMark === 'X' ? BLUE_BORDER : RED_BORDER
   );
@@ -57,10 +58,10 @@ function LocalGame() {
         (item) => (item as HTMLButtonElement).value
       );
       if (!buttonValues.includes('')) {
-        setGameIsDraw(true);
+        dispatch(setDraw(true));
       }
     }
-  }, [square]);
+  }, [dispatch, square]);
 
   const handleRestartClick = () => {
     // Empty board (Redux version)
@@ -82,12 +83,12 @@ function LocalGame() {
     // Reset UI state
     dispatch(setWinner(''));
     dispatch(setGridIsDisabled(false));
-    setGameIsDraw(false);
+    dispatch(setDraw(false));
     setBorderColor(nextStarter === 'X' ? BLUE_BORDER : RED_BORDER);
   };
 
   const handleLeaveGameClick = () => {
-    handleLeaveGame(dispatch, navigate, '');
+    handleLeaveGame(dispatch, navigate);
   };
 
   const gameStatus = () => {
@@ -100,7 +101,7 @@ function LocalGame() {
       );
     }
 
-    if (gameIsDraw) {
+    if (isDraw) {
       return <h1 className="ta-left grid-width">Draw</h1>;
     }
 
@@ -143,8 +144,6 @@ function LocalGame() {
       </Box>
 
       <EndGameActions
-        winner={winner}
-        gameIsDraw={gameIsDraw}
         handleRestartClick={handleRestartClick}
         handleLeaveGameClick={handleLeaveGameClick}
       />

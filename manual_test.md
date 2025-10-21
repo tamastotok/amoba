@@ -1,130 +1,191 @@
-# 🎮 Manual Test Plan – AI Tic-Tac-Toe Game
+# 🎮 Manual Test Plan – Gomoku (AI & Online)
 
 ---
 
 ## 🏠 Main Menu
 
 - [ ] The main menu displays all options:  
-      **Local**, **Online vs Human**, **Online vs AI**, **AI Dashboard**
-- [ ] Clicking each button navigates to the correct menu.
-- [ ] The “Back” button on each submenu returns to the main menu.
+       **Local**, **Online vs Human**, **Online vs AI**, **AI Dashboard**
+- [ ] Buttons are styled consistently and centered.
+- [ ] Disabled state visible when backend is offline (Online buttons greyed out).
+- [ ] Clicking each button navigates to the correct route.
+- [ ] “Back” buttons on submenus always return to Main Menu.
 
 ---
 
-## 👥 Local Game Menu
+## 👥 Local Game
 
-- [ ] Player X and Player O name inputs accept any string (optional fields).
-  - [ ] Leaving both empty still starts a valid game.
-- [ ] “Who starts?” radio buttons work correctly (`X` or `O`).
-  - [ ] Default is `X`.
-- [ ] Board size radio buttons set 8×8, 10×10, 12×12 correctly.
-  - [ ] Default is 8×8.
-- [ ] Pressing “Start Game” loads the board with the selected size.
+### Setup
 
-### Gameplay checks
+- [ ] Optional name inputs for both players work (can be empty).
+- [ ] “Who starts?” selector works — defaults to **X**.
+- [ ] Board size (8×8 / 10×10 / 12×12) changes grid properly.
+- [ ] Clicking “Start Game” loads the board.
 
-- [ ] The starting player’s board is active.
-- [ ] Turns alternate correctly between X and O.
-- [ ] The winner is displayed when 5 in a row is reached.
-- [ ] “Draw” message appears if the board fills up.
-- [ ] “Restart” button resets the board to empty.
-- [ ] “Leave” button returns to main menu and clears game state.
+### Gameplay
+
+- [ ] Board interaction works — X and O alternate correctly.
+- [ ] Winner is detected at 5 in a row.
+- [ ] “Draw!” appears when board fills with no winner.
+- [ ] `EndGameActions` popup appears centered with **Restart** and **Leave**.
+- [ ] **Scroll lock** works — background cannot scroll during popup.
+- [ ] “Restart” resets the board cleanly.
+- [ ] “Leave” returns to main menu and clears Redux + localStorage.
 
 ---
 
-## 🌐 Online vs Human Menu
+## 🌐 Online vs Human
 
-- [ ] The “Your name” field is optional.
-- [ ] Player mark selection (`X` or `O`) works correctly. Default is `X`.
-- [ ] “Who starts?” radio buttons correctly define starting player.
-- [ ] Board size (8×8 / 10×10 / 12×12) selection works.
-- [ ] Clicking “Create Game”:
-  - [ ] Creates or joins a room with matching settings.
-  - [ ] Displays “Searching for opponent…” message.
+### Matchmaking
 
-### Gameplay checks
+- [ ] Optional name field works.
+- [ ] Player mark (`X` / `O`) selection works, default **X**.
+- [ ] Board size selector works.
+- [ ] Clicking “Create Game” shows **Searching for opponent...** overlay.
+- [ ] Cancel search works both via **ESC** key and **Cancel** button (mobile).
+- [ ] When a second player joins:
+  - [ ] Both boards load instantly.
+  - [ ] Socket IDs sync — same room confirmed in backend logs.
 
-- [ ] Once opponent found:
-  - [ ] The game board loads for both players.
-  - [ ] Each player can see the other’s moves in real time.
-  - [ ] The correct player starts (based on menu selection).
-- [ ] Winner is displayed on both screens.
-- [ ] “Restart” starts a new round in the same room.
+### Gameplay
+
+- [ ] Both clients see each other’s moves in real time.
+- [ ] Turn order follows “Who starts?” selection.
+- [ ] Winner and “Draw” states sync on both clients.
+- [ ] “Restart” restarts game in same room.
 - [ ] If one player leaves:
-  - [ ] The other sees an “Opponent left the game” message.
-- [ ] “Leave” returns to main menu and resets state.
+  - [ ] The other gets “Opponent left the game” message / popup.
+- [ ] “Leave” returns both players to main menu safely.
+- [ ] No ghost sockets remain on server (check console).
 
 ---
 
-## 🤖 Online vs AI Menu
+## 🤖 Online vs AI
 
-- [ ] The “Your name” field is optional.
-- [ ] Player mark selection (`X` or `O`) works correctly.
-- [ ] “Who starts?” radio buttons correctly determine who moves first.
-- [ ] Board size (8×8 / 10×10 / 12×12) selection works.
-- [ ] Difficulty dropdown:
-  - [ ] **Easy** → uses random/simple AI
-  - [ ] **Medium** → uses heuristic AI
-  - [ ] **Hard** → uses learning AI
-- [ ] “Start Game” creates an AI match.
+### Setup
 
-### Gameplay checks
+- [ ] Optional player name works.
+- [ ] Mark (`X` / `O`) selection and “Who starts?” radio function correctly.
+- [ ] Board size options work.
+- [ ] Difficulty dropdown sets AI type:
+  - [ ] **Easy** → simple random AI
+  - [ ] **Medium** → heuristic AI
+  - [ ] **Hard** → genetic (learning) AI
 
-- [ ] If player starts, AI responds 0.8–1.3s delay after move.
-- [ ] AI moves alternate with player correctly.
-- [ ] Restart button resets the board and alternates the starting player (loser starts next).
-- [ ] “Leave” returns to main menu and clears room data.
-- [ ] No server crash or hang after AI match ends.
+### Gameplay
 
----
-
-## 🧠 AI Dashboard
-
-- [ ] When clicking “AI Dashboard” from main menu:
-  - [ ] A password input popup appears.
-  - [ ] Correct password allows access; wrong one shows an error message.
-- [ ] Once inside:
-  - [ ] Current AI generation number is displayed.
-  - [ ] Average win rate statistic visible.
-  - [ ] Chart updates in real time when new generations evolve.
-  - [ ] The “Last updated” timestamp changes on new data.
-- [ ] If connection to server drops:
-  - [ ] The dashboard shows a reconnection or error message.
+- [ ] If player starts, AI moves ~0.8–1.2 s later.
+- [ ] AI moves alternate correctly with player.
+- [ ] **Hard mode** learns over generations (confirmed by dashboard).
+- [ ] “Draw” message works, consistent with local mode.
+- [ ] “Leave” returns to main menu, socket session cleared.
+- [ ] No server crash after match end.
 
 ---
 
-## ⚙️ Global Checks
+## 🧠 AI Dashboard (Admin Mode)
 
-- [ ] “Leave” button works in every game mode (returns to main menu, clears Redux).
-- [ ] “Restart” button resets board without reloading the page.
-- [ ] No console errors appear during normal gameplay.
-- [ ] All socket events log properly in server console.
-- [ ] Database clears old rooms automatically after timeout (TTL works).
+### Access Control
+
+- [ ] Clicking “AI Dashboard” opens password popup.
+- [ ] Wrong password → “Invalid admin password”.
+- [ ] Correct password → navigates to `/ai-dashboard`.
+- [ ] Direct navigation to `/ai-dashboard` without auth → redirected to `/admin-login`.
+
+### Functionality
+
+- [ ] Chart loads past generations via `GET /api/ai/progress`.
+- [ ] Data formatted (generation, avg/best/worst fitness, winRate).
+- [ ] Real-time updates received through `ai-generation-update` socket event.
+- [ ] Slider filters visible range correctly.
+- [ ] Manual range input fields update chart.
+- [ ] “Back to Main Menu” works.
+- [ ] If backend unavailable, error logged gracefully.
 
 ---
 
-## 🧩 Optional Visual/UI
+## ⚙️ Backend & Socket Tests
 
-- [ ] Blue border when it’s X’s turn, red border when it’s O’s.
-- [ ] The “Next: You / Opponent” text updates correctly.
-- [ ] When game ends, buttons (“Restart”, “Leave”) appear visibly centered.
+- [ ] `Connected to database!` appears on backend start.
+- [ ] `/api/ai/progress` returns valid JSON (not HTML).
+- [ ] No `Unexpected token '<'` errors in frontend console.
+- [ ] Socket events handled correctly:
+  - [ ] `search-game`
+  - [ ] `cancel-search`
+  - [ ] `game-end`
+  - [ ] `player-left`
+  - [ ] `ai-generation-update`
+- [ ] Cancelling matchmaking correctly emits `cancel-search`.
+- [ ] `disconnect` and `reconnect` logs behave as expected.
+
+---
+
+## 🔒 Admin & Security
+
+- [ ] `.env` file contains:  
+      `VITE_API_URL`, `ADMIN_PASSWORD`, `ORIGIN`, `URI`
+- [ ] Backend reads `ADMIN_PASSWORD` from `.env`.
+- [ ] CORS config allows frontend origin only.
+- [ ] SessionStorage key `ai_dashboard_auth` set to `"true"` after login.
+- [ ] No unauthorized dashboard access possible.
+
+---
+
+## 📱 Mobile Responsiveness
+
+- [ ] Main menu buttons display stacked and centered.
+- [ ] SearchOverlay “Cancel Search” button visible and tappable.
+- [ ] EndGame popup centered, readable on small screens.
+- [ ] No horizontal scrolling on any page.
+- [ ] Body scroll disabled during popups (works on touch screens).
+
+---
+
+## 🧩 UI / UX Consistency
+
+- [ ] Blue border = X’s turn; Red = O’s turn.
+- [ ] “Next: You / Opponent” updates correctly.
+- [ ] Popup transitions (Framer Motion) animate smoothly.
+- [ ] Fonts, button styles, and spacing consistent across screens.
+- [ ] No visible flicker during route transitions.
+
+---
+
+## 🧼 Stability & Cleanup
+
+- [ ] No unhandled promise rejections in console.
+- [ ] No `console.log` left in production build.
+- [ ] AI Dashboard handles empty DB gracefully.
+- [ ] Game reset removes any stale socket rooms.
+- [ ] Build passes (`npm run build` successful).
+- [ ] Backend start (`node index.js`) without errors.
 
 ---
 
 ## ✅ Test Outcome Summary
 
-| Category       | Status       | Notes |
-| -------------- | ------------ | ----- |
-| Local Game     | ☐ OK / ☐ Bug |       |
-| Online Human   | ☐ OK / ☐ Bug |       |
-| Online AI      | ☐ OK / ☐ Bug |       |
-| AI Dashboard   | ☐ OK / ☐ Bug |       |
-| UI/Performance | ☐ OK / ☐ Bug |       |
+| Category          | Status       | Notes |
+| ----------------- | ------------ | ----- |
+| Local Game        | ☐ OK / ☐ Bug |       |
+| Online Human      | ☐ OK / ☐ Bug |       |
+| Online AI         | ☐ OK / ☐ Bug |       |
+| AI Dashboard      | ☐ OK / ☐ Bug |       |
+| Backend / Sockets | ☐ OK / ☐ Bug |       |
+| UI / Performance  | ☐ OK / ☐ Bug |       |
+| Mobile            | ☐ OK / ☐ Bug |       |
 
 ---
 
-### 💡 Testing Recommendations
+### 💡 Testing Tips
 
-- Test **online modes** in two separate browser tabs (or Chrome + Edge).
-- Keep the browser **Console** and **Network** tabs open.
-- For each bug found, record the console log and note it in the table above.
+- For **online modes**, use two separate browsers or incognito windows.
+- Keep **Console** and **Network** tabs open during testing.
+- For each bug, record:
+  - Expected vs actual behavior
+  - Console / network log
+  - Reproduction steps
+
+---
+
+**Last updated:** October 2025  
+**Project stack:** React + Redux + MUI + Socket.io + Node/Express + MongoDB + Recharts

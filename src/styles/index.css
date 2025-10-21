@@ -108,7 +108,7 @@ h1 {
   aspect-ratio: 1 / 1;
   background-color: var(--grey-200);
   border: 1px solid var(--grey-400);
-  font-size: clamp(1rem, 2.5vw, 2rem);
+  font-size: clamp(0.8rem, 2.5vw, 1.5rem);
   font-weight: 600;
   display: flex;
   justify-content: center;

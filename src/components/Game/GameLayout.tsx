@@ -12,12 +12,12 @@ function GameLayout({ children, onLeave, chat }: GameLayoutProps) {
   return (
     <Box
       sx={{
-        position: 'relative',
+        //position: 'relative',
         minHeight: '100vh',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        overflowX: 'hidden',
+        overflow: 'hidden',
       }}
     >
       {/* Close (Leave) button */}

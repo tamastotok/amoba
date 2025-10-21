@@ -15,12 +15,10 @@ import BoxWrapper from '../../components/BoxWrapper';
 
 function OnlineAIMenu() {
   const dispatch = useDispatch();
-
   const [playerName, setPlayerName] = useState('');
   const [difficulty, setDifficulty] = useState<'easy' | 'medium' | 'hard'>(
     'easy'
   );
-
   const playerMark = useSelector((state: Reducers) => state.marks.playerMark);
   const starterMark = useSelector((state: Reducers) => state.marks.starterMark);
   const gridSize = useSelector((state: Reducers) => state.gridSize);

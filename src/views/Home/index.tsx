@@ -10,14 +10,14 @@ import {
 import Button from '../../components/Button/Button';
 import socket from '../../server';
 
-function MainMenu() {
+function Home() {
   const navigate = useNavigate();
   const [isConnected, setIsConnected] = useState(socket.connected);
   const [open, setOpen] = useState(false);
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
-  // Track socket connection state (replaces old "status" prop)
+  // Track socket connection state
   useEffect(() => {
     const handleConnect = () => setIsConnected(true);
     const handleDisconnect = () => setIsConnected(false);
@@ -44,11 +44,14 @@ function MainMenu() {
 
   const handleSubmit = async () => {
     try {
-      const res = await fetch('/api/admin/auth', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password }),
-      });
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/admin/auth`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password }),
+        }
+      );
       const data = await res.json();
 
       if (data.success) {
@@ -104,15 +107,16 @@ function MainMenu() {
             margin="normal"
             error={!!error}
             helperText={error}
+            onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
           />
         </DialogContent>
         <DialogActions>
-          <Button linkTo="" text="Cancel" clickEvent={handleClose} />
           <Button linkTo="" text="Enter" clickEvent={handleSubmit} />
+          <Button linkTo="" text="Cancel" clickEvent={handleClose} />
         </DialogActions>
       </Dialog>
     </>
   );
 }
 
-export default MainMenu;
+export default Home;

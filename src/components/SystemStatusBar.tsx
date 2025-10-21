@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type JSX } from 'react';
+import { useAppSelector } from '../store/hooks';
 import socket from '../server';
 
 interface SystemStatusBarProps {
@@ -11,7 +12,23 @@ function SystemStatusBar({ statusMessage }: SystemStatusBarProps) {
     'connecting' | 'connected' | 'disconnected'
   >('connecting');
   const [internalMessage, setInternalMessage] = useState('');
-  const [dots, setDots] = useState('.'); // for animated loading dots
+  const [dots, setDots] = useState('.');
+
+  // Redux: get player names and marks
+  const players = useAppSelector((state) => state.players);
+
+  // Construct player display text
+  const blueName =
+    players.blue.name?.trim() || `Player ${players.blue.mark || 'X'}`;
+  const redName =
+    players.red.name?.trim() || `Player ${players.red.mark || 'O'}`;
+  const playerDisplay = (
+    <>
+      <span style={{ color: '#3f51b5', fontWeight: 600 }}>{blueName}</span>{' '}
+      <span style={{ color: '#ccc' }}>vs.</span>{' '}
+      <span style={{ color: '#f50057', fontWeight: 600 }}>{redName}</span>
+    </>
+  );
 
   // Animate "..." for external waiting messages
   useEffect(() => {
@@ -68,16 +85,18 @@ function SystemStatusBar({ statusMessage }: SystemStatusBarProps) {
       : '#F44336';
 
   // Choose displayed message
-  const displayMessage = statusMessage
-    ? `${statusMessage}${dots}`
-    : internalMessage ||
-      (status === 'connected'
-        ? 'Ready'
-        : status === 'connecting'
-        ? 'Connecting...'
-        : 'Disconnected');
+  let displayMessage: string | JSX.Element = internalMessage;
 
-  // Apply special animation if it's an external message (matchmaking)
+  if (statusMessage) {
+    displayMessage = `${statusMessage}${dots}`;
+  } else if (status === 'connected') {
+    displayMessage = playerDisplay;
+  } else if (status === 'connecting') {
+    displayMessage = 'Connecting...';
+  } else if (status === 'disconnected') {
+    displayMessage = 'Disconnected';
+  }
+
   const isExternal = Boolean(statusMessage);
 
   return (
@@ -116,7 +135,7 @@ function SystemStatusBar({ statusMessage }: SystemStatusBarProps) {
         </span>
       </div>
 
-      {/* Center: message (animated if waiting) */}
+      {/* Center: message or player display */}
       <div
         style={{
           flex: 1,
@@ -135,7 +154,6 @@ function SystemStatusBar({ statusMessage }: SystemStatusBarProps) {
         {userOnline} user{userOnline !== 1 ? 's' : ''} online
       </div>
 
-      {/* Inline keyframes for pulse effect */}
       <style>
         {`
           @keyframes pulse {

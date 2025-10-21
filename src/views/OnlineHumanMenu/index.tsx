@@ -14,7 +14,6 @@ import BoxWrapper from '../../components/BoxWrapper';
 
 function OnlineHumanMenu() {
   const dispatch = useDispatch();
-
   const [playerName, setPlayerName] = useState('');
   const playerMark = useSelector((state: Reducers) => state.marks.playerMark);
   const starterMark = useSelector((state: Reducers) => state.marks.starterMark);
@@ -23,6 +22,7 @@ function OnlineHumanMenu() {
 
   const handleCancel = () => {
     setIsSearching(false);
+    socket.emit('search-canceled');
   };
 
   const handleNameChange = (e: ChangeEvent<{ value: unknown }>) => {

@@ -4,6 +4,7 @@ import playersReducer from './players/players.reducer';
 import boardReducer from './board/board.reducer';
 import marksReducer from './marks/marks.reducer';
 import winnerReducer from './winner/winner.reducer';
+import drawReducer from './draw/draw.reducer';
 import gridSizeReducer from './grid-size/grid-size.reducer';
 import gridIsDisabledReducer from './grid-disable/grid-disable.reducer';
 import type { Action } from '../types';
@@ -14,6 +15,7 @@ const appReducer = combineReducers({
   board: boardReducer,
   marks: marksReducer,
   winner: winnerReducer,
+  isDraw: drawReducer,
   gridIsDisabled: gridIsDisabledReducer,
 });
 

@@ -1,11 +1,12 @@
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import socket from '../server';
+import { Box, Typography, Button } from '@mui/material';
 
 interface SearchOverlayProps {
   message: string;
-  type: 'search' | 'disconnected'; // context type
-  onCancel?: () => void; // optional callback
+  type: 'search' | 'disconnected';
+  onCancel?: () => void;
 }
 
 export default function SearchOverlay({
@@ -15,43 +16,64 @@ export default function SearchOverlay({
 }: SearchOverlayProps) {
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        if (type === 'search') socket.emit('cancel-search');
-        if (type === 'disconnected') socket.emit('leave-game');
-        if (onCancel) onCancel();
-        navigate('/online');
-      }
-    };
-
-    window.addEventListener('keydown', handleEsc);
-    return () => window.removeEventListener('keydown', handleEsc);
+  const handleCancel = useCallback(() => {
+    if (type === 'search') socket.emit('cancel-search');
+    if (type === 'disconnected') socket.emit('leave-game');
+    if (onCancel) onCancel();
+    navigate('/online');
   }, [type, navigate, onCancel]);
 
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') handleCancel();
+    };
+    window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, [handleCancel]);
+
   return (
-    <div
-      style={{
+    <Box
+      sx={{
         position: 'fixed',
-        top: 0,
-        left: 0,
-        width: '100%',
-        height: '100%',
-        background: 'rgba(0,0,0,0.75)',
+        inset: 0,
+        bgcolor: 'rgba(0, 0, 0, 0.75)',
         color: '#fff',
         display: 'flex',
         flexDirection: 'column',
-        justifyContent: 'center',
+        justifyContent: { xs: 'flex-end', sm: 'center' },
         alignItems: 'center',
+        textAlign: 'center',
         fontFamily: 'monospace',
         zIndex: 9999,
-        animation: 'fadeIn 0.4s ease-in',
+        p: 2,
+        pb: { xs: 4, sm: 0 },
       }}
     >
-      <h2 style={{ fontSize: '1.4rem', marginBottom: '10px' }}>{message}</h2>
-      <p style={{ fontSize: '1rem', opacity: 0.8 }}>
+      <Typography variant="h5" sx={{ mb: 1 }}>
+        {message}
+      </Typography>
+
+      <Typography variant="body2" sx={{ opacity: 0.8, mb: 3 }}>
         Press <b>ESC</b> to {type === 'search' ? 'cancel search' : 'exit'}
-      </p>
-    </div>
+      </Typography>
+
+      <Button
+        variant="contained"
+        color="error"
+        onClick={handleCancel}
+        sx={{
+          px: 3,
+          py: 1,
+          fontWeight: 'bold',
+          borderRadius: 2,
+          boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+          '&:hover': {
+            backgroundColor: '#ff6666',
+          },
+        }}
+      >
+        {type === 'search' ? 'Cancel Search' : 'Exit'}
+      </Button>
+    </Box>
   );
 }

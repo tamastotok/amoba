@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import type { ContinuePayload, Reducers, Mark } from '../../types';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { setBoardData, hydrateBoard } from '../../store/board/board.action';
 import { checkAndDispatchWinner } from '../../utils/helpers/checkWinningPatterns';
@@ -10,11 +10,12 @@ import GameStatus from '../../components/online/GameStatus';
 import SquareOnline from '../../components/online/SquareOnline';
 import store from '../../store';
 import socket from '../../server';
-import { handleLeaveGame } from '../../utils/helpers/handleLeaveGame';
+import { handleLeaveGame } from '../../utils/helpers/gameActions';
 import EndGameActions from '../../components/Button/EndGameActions';
 import GameLayout from '../../components/Game/GameLayout';
 import { Box } from '@mui/material';
 import { BLUE, BLUE_BORDER, RED, RED_BORDER } from '../../utils/constants';
+import { setDraw } from '../../store/draw/draw.action';
 
 interface OnlineGameProps {
   response: ContinuePayload | null;
@@ -30,7 +31,7 @@ function OnlineGameAI({
   clientIsReloaded,
 }: OnlineGameProps) {
   const dispatch = useDispatch();
-  const location = useLocation();
+
   const navigate = useNavigate();
   const sessionSize = sessionStorage.getItem('gridSize') as string;
   const gridSize = parseInt(sessionSize, 10);
@@ -38,7 +39,6 @@ function OnlineGameAI({
   const winner = useSelector((state: Reducers) => state.winner);
   const gridIsDisabled = useSelector((state: Reducers) => state.gridIsDisabled);
   const buttonsRef = useRef<HTMLDivElement>(null);
-  const [gameIsDraw, setGameIsDraw] = useState(false);
   const [borderColor, setBorderColor] = useState(
     marks.starterMark === 'X' ? BLUE_BORDER : RED_BORDER
   );
@@ -86,7 +86,7 @@ function OnlineGameAI({
 
       // Check draw
       if (!currentBoard.flat().includes('')) {
-        setGameIsDraw(true);
+        dispatch(setDraw(true));
         return;
       }
 
@@ -109,7 +109,7 @@ function OnlineGameAI({
       const boardAfter = store.getState().board;
       checkAndDispatchWinner(data.row, data.col, boardAfter);
 
-      if (!boardAfter.flat().includes('')) setGameIsDraw(true);
+      if (!boardAfter.flat().includes('')) dispatch(setDraw(true));
     };
 
     socket.on(`square-btn-click-${roomId}`, onSquareClick);
@@ -137,29 +137,12 @@ function OnlineGameAI({
     dispatch(hydrateBoard(response.boardSize, response.positions));
   }, [clientIsReloaded, response, dispatch]);
 
-  // Restart & Leave
-  const resolveRoomId = () => {
-    return (
-      roomId ||
-      localStorage.getItem('room') ||
-      sessionStorage.getItem('room') ||
-      window.location.pathname.split('/').pop() ||
-      ''
-    );
-  };
-
   const handleRestartClick = () => {
-    const id = resolveRoomId();
-    if (!id) {
-      console.warn('No roomId available for restart');
-      return;
-    }
-    socket.emit('restart-game', { id, lastWinner: winner || null });
-    navigate(location.pathname);
+    navigate('/ai');
   };
 
   const handleLeaveGameClick = () => {
-    handleLeaveGame(dispatch, navigate, roomId);
+    handleLeaveGame(dispatch, navigate, roomId, winner);
   };
 
   // AI’s mark is always opposite of player’s
@@ -167,7 +150,7 @@ function OnlineGameAI({
 
   return (
     <GameLayout onLeave={handleLeaveGameClick}>
-      <GameStatus gameIsDraw={gameIsDraw} />
+      <GameStatus />
 
       <Box
         ref={buttonsRef}
@@ -212,8 +195,6 @@ function OnlineGameAI({
       </h1>
 
       <EndGameActions
-        winner={winner}
-        gameIsDraw={gameIsDraw}
         handleRestartClick={handleRestartClick}
         handleLeaveGameClick={handleLeaveGameClick}
       />

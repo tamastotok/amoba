@@ -12,7 +12,6 @@ interface BoardProps {
 
 function SquareLocal({ id, rowindex, colindex }: BoardProps) {
   const dispatch = useAppDispatch();
-
   const value = useAppSelector((s) => s.board[rowindex][colindex]); // '' | 'X' | 'O'
   const nextMark = useAppSelector((s) => s.marks.nextMark);
   const gridDisabled = useAppSelector((s) => s.gridIsDisabled);

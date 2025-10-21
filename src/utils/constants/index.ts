@@ -20,6 +20,9 @@ export const SELECT_PLAYER_MARK = 'SELECT_PLAYER_MARK';
 // Winner
 export const SET_WINNER = 'SET_WINNER';
 
+// Draw
+export const SET_DRAW = 'SET_DRAW';
+
 //  Grid
 export const DISABLE_GRID = 'DISABLE_GRID';
 export const CHANGE_GRID_STATE = 'CHANGE_GRID_STATE';

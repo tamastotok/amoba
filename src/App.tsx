@@ -4,11 +4,7 @@ import { useAppDispatch, useAppSelector } from './store/hooks';
 import { useSocketGame } from './hooks/useSocketGame';
 import { setGridIsDisabled } from './store/grid-disable/grid-disable.action';
 import { setGridSize } from './store/grid-size/grid-size.action';
-import {
-  selectPlayerMark,
-  resetNextMark,
-  selectStarterMark,
-} from './store/marks/marks.action';
+import { resetNextMark, selectStarterMark } from './store/marks/marks.action';
 import {
   setPlayerBlueName,
   setPlayerRedName,
@@ -20,10 +16,13 @@ import type {
   ContinuePayload,
   SearchingPayload,
   GameFoundPayload,
+  OpponentLeftPayload,
+  GameEndedPayload,
+  Reducers,
 } from './types';
 import LocalGame from './views/LocalGame';
 import LocalMenu from './views/LocalMenu';
-import HomePage from './views/MainMenu';
+import Home from './views/Home';
 import OnlineGameHuman from './views/OnlineGameHuman';
 import OnlineGameAI from './views/OnlineGameAI';
 import OnlineHumanMenu from './views/OnlineHumanMenu';
@@ -32,6 +31,9 @@ import AIDashboard from './views/AIDashboard';
 import socket from './server';
 import SystemStatusBar from './components/SystemStatusBar';
 import SearchOverlay from './components/SearchOverlay';
+import { resetGameState } from './store/game/game.action';
+import { useBodyScrollLock } from './hooks/useBodyScrollLock';
+import { useSelector } from 'react-redux';
 
 function App() {
   const dispatch = useAppDispatch();
@@ -48,7 +50,10 @@ function App() {
   const [clientIsReloaded, setClientIsReloaded] = useState(false);
   const [opponentLeft, setOpponentLeft] = useState(false);
   const mark = sessionStorage.getItem('playerMark');
-  const pageIsReloaded = sessionStorage.getItem('reloaded');
+  const winner = useSelector((state: Reducers) => state.winner);
+  const isDraw = useSelector((state: Reducers) => state.winner);
+
+  useBodyScrollLock(!!(winner || isDraw));
 
   // --- General socket handlers ---
   useSocketGame({
@@ -89,87 +94,91 @@ function App() {
       }
     },
 
-    'leave-game': () => {
+    'game-ended': (res?: unknown) => {
+      const payload = res as GameEndedPayload;
+      const winner = payload.winner;
+      console.log(`Game ended. Winner: ${winner}`);
+
+      // Reset Redux + navigate only now (confirmed end)
+      dispatch(resetGameState());
       setRoomId('');
       setResponse(null);
+      setOpponentLeft(false);
+      setStatusMessage('');
+      dispatch(setGridIsDisabled(true));
+
+      navigate('/'); // ✅ most már biztonságos
+    },
+
+    'opponent-left': (res?: unknown) => {
+      //if (winner) return;
+      const payload = res as OpponentLeftPayload;
+      console.warn('Your opponent has left the game');
+
+      // Show status message
+      setStatusMessage(payload.message);
+
+      // Disable board
+      dispatch(setGridIsDisabled(true));
+
+      // Handle overlay
+      setOpponentLeft(true);
     },
   });
 
-  // --- Restart game ---
-  type Mark = 'X' | 'O' | '';
-
-  type GameRestartedPayload = {
-    roomId: string;
-    boardSize: number;
-    positions: Array<{ row: number; col: number; value: Mark }>;
-    whoIsNext: 'X' | 'O';
-    bluePlayer: { name: string; mark: 'X' };
-    redPlayer: { name: string; mark: 'O' };
-  };
-
-  useEffect(() => {
-    const onRestarted = (data: GameRestartedPayload) => {
-      dispatch(setGridSize(data.boardSize));
-      dispatch(hydrateBoard(data.boardSize, data.positions));
-      dispatch(resetNextMark(data.whoIsNext));
-      dispatch(selectStarterMark(data.whoIsNext));
-      dispatch(setPlayerBlueName(data.bluePlayer.name));
-      dispatch(setPlayerRedName(data.redPlayer.name));
-      dispatch(setWinner(''));
-      setStatusMessage('Game restarted');
-
-      if (mark) {
-        dispatch(setGridIsDisabled(mark !== data.whoIsNext));
-      }
-    };
-
-    socket.on('game-restarted', onRestarted);
-    return () => {
-      socket.off('game-restarted', onRestarted);
-    };
-  }, [dispatch, mark]);
-
   // --- Handle refresh reconnection ---
   useEffect(() => {
-    if (
-      pageIsReloaded === 'true' &&
-      location.pathname.startsWith('/online/game/')
-    ) {
-      let idFromUrl = location.pathname.split('/').pop();
-      if (!idFromUrl) return;
+    const idFromUrl = location.pathname.split('/').pop();
+    if (!idFromUrl) return;
+    if (!location.pathname.startsWith('/online/game/')) return;
 
-      if (!idFromUrl) {
-        idFromUrl = localStorage.getItem('room') || '';
+    // Get data from localStorage-ból if needed
+    const storedId = localStorage.getItem('room');
+    const roomId = idFromUrl || storedId;
+    if (!roomId) return;
+
+    console.log('🔄 Reconnecting with roomId:', roomId);
+
+    socket.emit('join-lobby');
+    socket.emit('reconnect', roomId);
+
+    const onContinue = (data: ContinuePayload) => {
+      if (!data) return;
+
+      console.log('✅ Reconnected data:', data);
+
+      // Redux state reload
+      dispatch(setGridSize(data.boardSize));
+      dispatch(hydrateBoard(data.boardSize, data.positions));
+      dispatch(setPlayerBlueName(data.bluePlayer.name));
+      dispatch(setPlayerRedName(data.redPlayer.name));
+
+      // Who is next
+      dispatch(resetNextMark(data.whoIsNext));
+      dispatch(selectStarterMark(data.whoIsNext));
+
+      // Reset UI
+      dispatch(setWinner(''));
+      dispatch(setGridIsDisabled(false));
+
+      // Session restore
+      setResponse(data);
+      setRoomId(data.roomId);
+      localStorage.setItem('room', data.roomId);
+      setClientIsReloaded(true);
+
+      // Disable board if the other player is next
+      if (mark && mark !== data.whoIsNext) {
+        dispatch(setGridIsDisabled(true));
       }
-      if (!idFromUrl) return;
+    };
 
-      socket.emit('join-lobby');
-      socket.emit('reconnect', idFromUrl);
+    socket.on(`continue-${roomId}`, onContinue);
 
-      const onContinue = (data: ContinuePayload) => {
-        if (mark) dispatch(selectPlayerMark(mark as 'X' | 'O'));
-        dispatch(setGridSize(data.boardSize));
-        dispatch(setPlayerBlueName(data.bluePlayer.name));
-        dispatch(setPlayerRedName(data.redPlayer.name));
-        dispatch(resetNextMark(data.whoIsNext));
-
-        // Hydrate the board with all positions from server
-        dispatch(hydrateBoard(data.boardSize, data.positions));
-
-        setResponse(data);
-        setRoomId(data.roomId);
-        localStorage.setItem('room', data.roomId);
-        setClientIsReloaded(true);
-
-        if (mark !== data.whoIsNext) dispatch(setGridIsDisabled(true));
-      };
-
-      socket.on(`continue-${idFromUrl}`, onContinue);
-      return () => {
-        socket.off(`continue-${idFromUrl}`, onContinue);
-      };
-    }
-  }, [dispatch, location.pathname, mark, pageIsReloaded]);
+    return () => {
+      socket.off(`continue-${roomId}`, onContinue);
+    };
+  }, [dispatch, location.pathname, mark]);
 
   // --- Redirect if invalid room ---
   useEffect(() => {
@@ -186,24 +195,15 @@ function App() {
     if (isDisabled) alert('Invalid room.');
   }, [isDisabled]);
 
-  useEffect(() => {
-    const onOpponentLeft = (data: { message: string; roomId: string }) => {
-      dispatch(setWinner(''));
-      dispatch(setGridIsDisabled(true));
-      setStatusMessage(data.message);
-      setOpponentLeft(true);
-    };
-
-    socket.on('opponent-left', onOpponentLeft);
-    return () => {
-      socket.off('opponent-left', onOpponentLeft);
-    };
-  }, [dispatch]);
+  const handleOnCancel = () => {
+    setOpponentLeft(false);
+    setStatusMessage('');
+  };
 
   return (
     <>
       <Routes>
-        <Route path="/" element={<HomePage />} />
+        <Route path="/" element={<Home />} />
         <Route path="/local" element={<LocalMenu />} />
         <Route path="/local/game" element={<LocalGame />} />
         <Route path="/online" element={<OnlineHumanMenu />} />
@@ -238,9 +238,9 @@ function App() {
       <SystemStatusBar statusMessage={statusMessage} />
       {opponentLeft && (
         <SearchOverlay
-          message="Opponent disconnected."
+          message={statusMessage || 'Opponent disconnected.'}
           type="disconnected"
-          onCancel={() => setOpponentLeft(false)}
+          onCancel={handleOnCancel}
         />
       )}
     </>
