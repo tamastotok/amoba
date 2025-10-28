@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import type { ChangeEvent } from 'react';
 import type { Reducers } from '../../types';
-import { useDispatch, useSelector } from 'react-redux';
-import { setGridSize } from '../../store/grid-size/grid-size.action';
+import { useSelector } from 'react-redux';
 import { Box, TextField } from '@mui/material';
 import Button from '../../components/Button/Button';
 import GridSize from '../../components/GridSize';
@@ -13,7 +12,6 @@ import SelectStarter from '../../components/SelectStarter';
 import BoxWrapper from '../../components/BoxWrapper';
 
 function OnlineHumanMenu() {
-  const dispatch = useDispatch();
   const [playerName, setPlayerName] = useState('');
   const playerMark = useSelector((state: Reducers) => state.marks.playerMark);
   const starterMark = useSelector((state: Reducers) => state.marks.starterMark);
@@ -30,15 +28,12 @@ function OnlineHumanMenu() {
   };
 
   const handleCreateGameButtonClick = () => {
-    if (gridSize === 0) {
-      dispatch(setGridSize(8));
-    }
     //  Send data to server
     socket.emit('search-game', {
       playerName,
       playerMark,
       starterMark,
-      gridSize: gridSize === 0 ? 8 : gridSize,
+      gridSize,
     });
     setIsSearching(true);
   };
@@ -52,7 +47,7 @@ function OnlineHumanMenu() {
           onCancel={handleCancel}
         />
       )}
-      <h1>Settings</h1>
+      <h1>Game Setup</h1>
       <Box
         component="form"
         noValidate

@@ -15,7 +15,7 @@ const appReducer = combineReducers({
   board: boardReducer,
   marks: marksReducer,
   winner: winnerReducer,
-  isDraw: drawReducer,
+  gameIsDraw: drawReducer,
   gridIsDisabled: gridIsDisabledReducer,
 });
 

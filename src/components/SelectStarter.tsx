@@ -5,12 +5,14 @@ import {
   ToggleButton,
   ToggleButtonGroup,
 } from '@mui/material';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { selectStarterMark } from '../store/marks/marks.action';
+import type { Reducers } from '../types';
 
 function SelectStarter() {
   const dispatch = useDispatch();
   const [starter, setStarter] = useState<'you' | 'opponent'>('you');
+  const playerMark = useSelector((state: Reducers) => state.marks.playerMark);
 
   const handleChange = (
     _event: React.MouseEvent<HTMLElement>,
@@ -18,8 +20,20 @@ function SelectStarter() {
   ) => {
     if (!newValue) return;
     setStarter(newValue);
-    dispatch(selectStarterMark(newValue === 'you' ? 'player' : 'opponent'));
+
+    const starterMark =
+      newValue === 'you' ? playerMark : playerMark === 'X' ? 'O' : 'X';
+
+    dispatch(selectStarterMark(starterMark));
   };
+
+  // Refresh starterMark
+  useEffect(() => {
+    const starterMark =
+      starter === 'you' ? playerMark : playerMark === 'X' ? 'O' : 'X';
+
+    dispatch(selectStarterMark(starterMark));
+  }, [playerMark, starter, dispatch]);
 
   useEffect(() => {
     sessionStorage.setItem('starter', starter);

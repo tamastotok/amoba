@@ -28,10 +28,11 @@ export interface Action<T = unknown> {
 export interface Reducers {
   players: Players;
   marks: Marks;
-  square: Board;
+  board: Board;
   gridSize: number;
   winner: string;
   gridIsDisabled: boolean;
+  gameIsDraw: boolean;
 }
 
 export interface SearchingPayload {
@@ -41,6 +42,8 @@ export interface SearchingPayload {
 
 export interface GameFoundPayload {
   roomId: string;
+  boardSize: number;
+  starterMark: string;
   playerData: {
     blueName: string;
     redName: string;
@@ -63,6 +66,14 @@ export interface GameEndedPayload {
 export interface OpponentLeftPayload {
   message: string;
   roomId: string;
+}
+
+// --- Props ---
+export interface OnlineGameProps {
+  response: ContinuePayload | null;
+  playerMark: 'X' | 'O';
+  roomId: string;
+  clientIsReloaded: boolean;
 }
 
 // --- AI-related shared types ---

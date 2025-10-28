@@ -13,21 +13,20 @@ import type { Reducers } from '../../types';
 import SquareLocal from './SquareLocal';
 import { handleLeaveGame } from '../../utils/helpers/gameActions';
 import { hydrateBoard } from '../../store/board/board.action';
-import EndGameActions from '../../components/Button/EndGameActions';
 import GameLayout from '../../components/Game/GameLayout';
 import { Box } from '@mui/material';
 import { setDraw } from '../../store/draw/draw.action';
+import GameStatusLocal from './GameStatusLocal';
 
 function LocalGame() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const players = useSelector((state: Reducers) => state.players);
   const marks = useSelector((state: Reducers) => state.marks);
   const winner = useSelector((state: Reducers) => state.winner);
   const gridSize = useSelector((state: Reducers) => state.gridSize);
-  const square = useSelector((state: Reducers) => state.square);
+  const board = useSelector((state: Reducers) => state.board);
   const buttonsRef = useRef<HTMLDivElement>(null);
-  const isDraw = useSelector((state: Reducers) => state.winner);
+
   const [borderColor, setBorderColor] = useState(
     marks.starterMark === 'X' ? BLUE_BORDER : RED_BORDER
   );
@@ -59,9 +58,10 @@ function LocalGame() {
       );
       if (!buttonValues.includes('')) {
         dispatch(setDraw(true));
+        dispatch(setGridIsDisabled(true));
       }
     }
-  }, [dispatch, square]);
+  }, [dispatch, board]);
 
   const handleRestartClick = () => {
     // Empty board (Redux version)
@@ -87,37 +87,14 @@ function LocalGame() {
     setBorderColor(nextStarter === 'X' ? BLUE_BORDER : RED_BORDER);
   };
 
-  const handleLeaveGameClick = () => {
-    handleLeaveGame(dispatch, navigate);
-  };
-
-  const gameStatus = () => {
-    if (winner) {
-      return (
-        <h1 className="ta-left grid-width">
-          Winner:{' '}
-          <span className={winner === 'X' ? 'blue' : 'red'}>{winner}</span>
-        </h1>
-      );
-    }
-
-    if (isDraw) {
-      return <h1 className="ta-left grid-width">Draw</h1>;
-    }
-
-    return (
-      <h1 className="ta-left grid-width">
-        Next:{' '}
-        <span className={marks.nextMark === 'X' ? 'blue' : 'red'}>
-          {marks.nextMark}
-        </span>
-      </h1>
-    );
-  };
-
   return (
-    <GameLayout onLeave={handleLeaveGameClick}>
-      <div className="winner-container">{gameStatus()}</div>
+    <GameLayout
+      onGameEndRestart={handleRestartClick}
+      onGameEndLeave={() => handleLeaveGame(dispatch, navigate)}
+      onLeave={() => handleLeaveGame(dispatch, navigate)}
+      gameMode="local"
+    >
+      <GameStatusLocal />
 
       <Box
         ref={buttonsRef}
@@ -142,16 +119,6 @@ function LocalGame() {
           />
         ))}
       </Box>
-
-      <EndGameActions
-        handleRestartClick={handleRestartClick}
-        handleLeaveGameClick={handleLeaveGameClick}
-      />
-
-      <div className="players-container">
-        <h3>{players.blue.name && `Player X: ${players.blue.name}`}</h3>
-        <h3>{players.red.name && `Player O: ${players.red.name}`}</h3>
-      </div>
     </GameLayout>
   );
 }

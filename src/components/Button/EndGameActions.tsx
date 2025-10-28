@@ -1,6 +1,7 @@
 import { useSelector } from 'react-redux';
-import Button from './Button';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Box } from '@mui/material';
+import Button from '../Button/Button';
 import type { Reducers } from '../../types';
 
 interface EndGameActionsProps {
@@ -13,38 +14,33 @@ const EndGameActions = ({
   handleLeaveGameClick,
 }: EndGameActionsProps) => {
   const winner = useSelector((state: Reducers) => state.winner);
-  const isDraw = useSelector((state: Reducers) => state.winner);
-  const isVisible = !!winner || isDraw;
+  const gameIsDraw = useSelector((state: Reducers) => state.gameIsDraw);
+  const isVisible = !!winner || gameIsDraw;
 
   return (
     <AnimatePresence>
       {isVisible && (
-        <>
-          {/* Background */}
-          <motion.div
-            key="overlay"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.25 }}
-            style={{
-              position: 'fixed',
-              top: 0,
-              left: 0,
-              width: '100vw',
-              height: '100vh',
-              backgroundColor: 'rgba(0, 0, 0, 0.5)',
-              backdropFilter: 'blur(4px)',
-              zIndex: 999,
-            }}
-          />
-
+        <Box
+          sx={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100vw',
+            height: '100vh',
+            background: 'rgba(0,0,0,0.5)',
+            backdropFilter: 'blur(4px)',
+            zIndex: 2000,
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
           {/* Popup */}
           <motion.div
             key="popup"
-            initial={{ opacity: 0, scale: 0.9, y: -20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.9, y: -20 }}
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
             transition={{ duration: 0.25 }}
             style={{
               display: 'flex',
@@ -60,17 +56,13 @@ const EndGameActions = ({
               minWidth: '250px',
             }}
           >
-            <h2 style={{ marginBottom: '0.5rem', color: '#333' }}>
-              {isDraw ? 'Draw!' : `Winner: ${winner}`}
+            <h2 style={{ color: '#333', marginBottom: '0.5rem' }}>
+              {gameIsDraw ? 'Draw!' : `Winner: ${winner}`}
             </h2>
-            <Button
-              linkTo=""
-              clickEvent={handleRestartClick}
-              text="Play again"
-            />
-            <Button linkTo="" clickEvent={handleLeaveGameClick} text="Leave" />
+            <Button text="Play again" clickEvent={handleRestartClick} />
+            <Button text="Leave" clickEvent={handleLeaveGameClick} />
           </motion.div>
-        </>
+        </Box>
       )}
     </AnimatePresence>
   );

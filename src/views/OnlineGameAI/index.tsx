@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import type { ContinuePayload, Reducers, Mark } from '../../types';
+import type { OnlineGameProps, Reducers, Mark } from '../../types';
 import { useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { setBoardData, hydrateBoard } from '../../store/board/board.action';
@@ -11,18 +11,11 @@ import SquareOnline from '../../components/online/SquareOnline';
 import store from '../../store';
 import socket from '../../server';
 import { handleLeaveGame } from '../../utils/helpers/gameActions';
-import EndGameActions from '../../components/Button/EndGameActions';
 import GameLayout from '../../components/Game/GameLayout';
 import { Box } from '@mui/material';
-import { BLUE, BLUE_BORDER, RED, RED_BORDER } from '../../utils/constants';
+import { BLUE_BORDER, RED_BORDER } from '../../utils/constants';
 import { setDraw } from '../../store/draw/draw.action';
-
-interface OnlineGameProps {
-  response: ContinuePayload | null;
-  playerMark: 'X' | 'O';
-  roomId: string;
-  clientIsReloaded: boolean;
-}
+import { resetGameState } from '../../store/game/game.action';
 
 function OnlineGameAI({
   response,
@@ -121,16 +114,6 @@ function OnlineGameAI({
     };
   }, [roomId, dispatch, playerMark]);
 
-  useEffect(() => {
-    if (winner) {
-      socket.emit('game-result', {
-        roomId,
-        result: winner === playerMark ? 'loss' : 'win',
-      });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [winner]);
-
   // Handle reconnect
   useEffect(() => {
     if (!clientIsReloaded || !response) return;
@@ -139,17 +122,22 @@ function OnlineGameAI({
 
   const handleRestartClick = () => {
     navigate('/ai');
-  };
-
-  const handleLeaveGameClick = () => {
-    handleLeaveGame(dispatch, navigate, roomId, winner);
+    dispatch(resetGameState());
+    sessionStorage.removeItem('room');
+    localStorage.removeItem('room');
   };
 
   // AI’s mark is always opposite of player’s
   const aiMark = playerMark === 'X' ? 'O' : 'X';
 
   return (
-    <GameLayout onLeave={handleLeaveGameClick}>
+    <GameLayout
+      onGameEndRestart={handleRestartClick}
+      onGameEndLeave={() => handleLeaveGame(dispatch, navigate, roomId, winner)}
+      onLeave={() => handleLeaveGame(dispatch, navigate, roomId, winner)}
+      gameMode="online"
+      playerMark={playerMark}
+    >
       <GameStatus />
 
       <Box
@@ -183,7 +171,7 @@ function OnlineGameAI({
         })}
       </Box>
 
-      <h1
+      {/*<h1
         style={{
           color: playerMark === 'X' ? BLUE : RED,
           marginTop: '1rem',
@@ -192,12 +180,7 @@ function OnlineGameAI({
         }}
       >
         {playerMark}
-      </h1>
-
-      <EndGameActions
-        handleRestartClick={handleRestartClick}
-        handleLeaveGameClick={handleLeaveGameClick}
-      />
+      </h1>*/}
     </GameLayout>
   );
 }

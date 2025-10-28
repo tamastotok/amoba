@@ -1,18 +1,31 @@
 import { Box } from '@mui/material';
 import React from 'react';
 import CloseButton from '../Button/CloseButton';
+import EndGameActions from '../Button/EndGameActions';
+import PlayerMarks from './PlayerMarks';
 
 interface GameLayoutProps {
   children: React.ReactNode;
-  onLeave?: () => void;
+  onLeave: () => void;
+  onGameEndRestart: () => void;
+  onGameEndLeave: () => void;
   chat?: React.ReactNode; // optional Chat component
+  gameMode: 'local' | 'online';
+  playerMark?: 'X' | 'O';
 }
 
-function GameLayout({ children, onLeave, chat }: GameLayoutProps) {
+function GameLayout({
+  children,
+  onLeave,
+  onGameEndRestart,
+  onGameEndLeave,
+  chat,
+  gameMode,
+  playerMark,
+}: GameLayoutProps) {
   return (
     <Box
       sx={{
-        //position: 'relative',
         minHeight: '100vh',
         display: 'flex',
         flexDirection: 'column',
@@ -51,6 +64,11 @@ function GameLayout({ children, onLeave, chat }: GameLayoutProps) {
         {/* Optional Chat (right side on desktop, below on mobile) */}
         {chat && chat}
       </Box>
+      <PlayerMarks gameMode={gameMode} playerMark={playerMark} />
+      <EndGameActions
+        handleRestartClick={onGameEndRestart}
+        handleLeaveGameClick={onGameEndLeave}
+      />
     </Box>
   );
 }

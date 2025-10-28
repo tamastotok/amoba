@@ -18,15 +18,15 @@ export const handleLeaveGame = (
       } else {
         console.log('Emitting player-left...');
         socket.emit('player-left', { roomId });
-        navigate('/');
       }
-    } else {
-      // Offline mode (local game)
-      dispatch(resetGameState());
-      sessionStorage.removeItem('room');
-      localStorage.removeItem('room');
-      navigate('/');
     }
+
+    console.log('reset game state');
+    // Client side cleanup
+    dispatch(resetGameState());
+    sessionStorage.removeItem('room');
+    localStorage.removeItem('room');
+    navigate('/');
   } catch (e) {
     console.error('leave error', e);
   }

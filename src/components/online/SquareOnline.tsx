@@ -11,11 +11,17 @@ interface SquareProps {
 }
 
 function SquareOnline({ id, rowindex, colindex, roomId }: SquareProps) {
-  const value = useAppSelector((s) => s.board[rowindex][colindex]);
+  const board = useAppSelector((s) => s.board);
+  const value = board?.[rowindex]?.[colindex] ?? '';
   const nextMark = useAppSelector((s) => s.marks.nextMark);
   const gridIsDisabled = useAppSelector((s) => s.gridIsDisabled);
 
   const handleClick = () => {
+    if (!roomId) {
+      console.warn('⚠️ No roomId found — cannot emit move');
+      return;
+    }
+
     if (gridIsDisabled || value) return;
 
     // Human vs human

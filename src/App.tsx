@@ -34,6 +34,7 @@ import SearchOverlay from './components/SearchOverlay';
 import { resetGameState } from './store/game/game.action';
 import { useBodyScrollLock } from './hooks/useBodyScrollLock';
 import { useSelector } from 'react-redux';
+import store from './store';
 
 function App() {
   const dispatch = useAppDispatch();
@@ -64,14 +65,31 @@ function App() {
     },
 
     'game-found': (res: unknown) => {
+      console.log('game-found');
       const payload = res as GameFoundPayload;
+
       if (payload.roomId) {
         navigate(`/online/game/${payload.roomId}`);
         sessionStorage.setItem('room', payload.roomId);
         localStorage.setItem('room', payload.roomId);
         setRoomId(payload.roomId);
+
         dispatch(setPlayerBlueName(payload.playerData.blueName));
         dispatch(setPlayerRedName(payload.playerData.redName));
+        dispatch(setGridSize(payload.boardSize));
+        dispatch(selectStarterMark(payload.starterMark));
+        dispatch(resetNextMark(payload.starterMark));
+
+        // Board initialization
+        const emptyPositions = [];
+        for (let row = 0; row < payload.boardSize; row++) {
+          for (let col = 0; col < payload.boardSize; col++) {
+            emptyPositions.push({ row, col, value: '' });
+          }
+        }
+        dispatch(hydrateBoard(payload.boardSize, emptyPositions));
+        dispatch(setGridIsDisabled(payload.starterMark !== playerMark));
+
         setStatusMessage('');
       }
     },
@@ -83,15 +101,32 @@ function App() {
 
     'ai-game-created': (res: unknown) => {
       const payload = res as GameFoundPayload;
-      if (payload.roomId) {
-        navigate(`/ai/game/${payload.roomId}`);
-        sessionStorage.setItem('room', payload.roomId);
-        localStorage.setItem('room', payload.roomId);
-        setRoomId(payload.roomId);
-        dispatch(setPlayerBlueName(payload.playerData.blueName || ''));
-        dispatch(setPlayerRedName(payload.playerData.redName || ''));
-        setStatusMessage('');
+
+      if (!payload.roomId) return;
+
+      navigate(`/ai/game/${payload.roomId}`);
+      sessionStorage.setItem('room', payload.roomId);
+      localStorage.setItem('room', payload.roomId);
+      setRoomId(payload.roomId);
+
+      dispatch(setPlayerBlueName(payload.playerData.blueName || ''));
+      dispatch(setPlayerRedName(payload.playerData.redName || ''));
+
+      dispatch(setGridSize(payload.boardSize));
+
+      // Board initialization
+      const emptyMatrix: { row: number; col: number; value: string }[] = [];
+      for (let row = 0; row < payload.boardSize; row++) {
+        for (let col = 0; col < payload.boardSize; col++) {
+          emptyMatrix.push({ row, col, value: '' });
+        }
       }
+      dispatch(hydrateBoard(payload.boardSize, emptyMatrix));
+
+      console.log('🧩 Hydrated empty board:', store.getState().board);
+      dispatch(setGridIsDisabled(false));
+
+      setStatusMessage('');
     },
 
     'game-ended': (res?: unknown) => {
@@ -105,13 +140,9 @@ function App() {
       setResponse(null);
       setOpponentLeft(false);
       setStatusMessage('');
-      dispatch(setGridIsDisabled(true));
-
-      navigate('/'); // ✅ most már biztonságos
     },
 
     'opponent-left': (res?: unknown) => {
-      //if (winner) return;
       const payload = res as OpponentLeftPayload;
       console.warn('Your opponent has left the game');
 
@@ -149,7 +180,7 @@ function App() {
 
       // Redux state reload
       dispatch(setGridSize(data.boardSize));
-      dispatch(hydrateBoard(data.boardSize, data.positions));
+      dispatch(hydrateBoard(data.boardSize, data.positions || []));
       dispatch(setPlayerBlueName(data.bluePlayer.name));
       dispatch(setPlayerRedName(data.redPlayer.name));
 

@@ -2,6 +2,8 @@ import { useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import socket from '../server';
 import { Box, Typography, Button } from '@mui/material';
+import { useDispatch } from 'react-redux';
+import { resetGameState } from '../store/game/game.action';
 
 interface SearchOverlayProps {
   message: string;
@@ -15,13 +17,20 @@ export default function SearchOverlay({
   onCancel,
 }: SearchOverlayProps) {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleCancel = useCallback(() => {
-    if (type === 'search') socket.emit('cancel-search');
-    if (type === 'disconnected') socket.emit('leave-game');
+    if (type === 'search') {
+      navigate('/online');
+      socket.emit('cancel-search');
+    }
+    if (type === 'disconnected') {
+      dispatch(resetGameState());
+      navigate('/');
+      socket.emit('leave-game');
+    }
     if (onCancel) onCancel();
-    navigate('/online');
-  }, [type, navigate, onCancel]);
+  }, [type, dispatch, navigate, onCancel]);
 
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {

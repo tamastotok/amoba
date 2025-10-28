@@ -1,9 +1,8 @@
 import { useState } from 'react';
 import type { ChangeEvent } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { TextField } from '@mui/material';
 import type { Reducers } from '../../types';
-import { setGridSize } from '../../store/grid-size/grid-size.action';
 import Button from '../../components/Button/Button';
 import GridSize from '../../components/GridSize';
 import SelectMark from '../../components/SelectMark';
@@ -14,7 +13,6 @@ import SelectDifficulty from '../../components/SelectDifficulty';
 import BoxWrapper from '../../components/BoxWrapper';
 
 function OnlineAIMenu() {
-  const dispatch = useDispatch();
   const [playerName, setPlayerName] = useState('');
   const [difficulty, setDifficulty] = useState<'easy' | 'medium' | 'hard'>(
     'easy'
@@ -34,22 +32,19 @@ function OnlineAIMenu() {
   };
 
   const handleStartAIGame = () => {
-    const size = gridSize === 0 ? 8 : gridSize;
-    dispatch(setGridSize(size));
-
     // Make a room for play
     socket.emit('create-ai-game', {
       playerName,
       playerMark,
       starterMark,
-      gridSize: size,
+      gridSize,
       difficulty,
     });
   };
 
   return (
     <>
-      <h1>Play vs AI</h1>
+      <h1>Game Setup</h1>
 
       <Box
         component="form"

@@ -1,36 +1,60 @@
-## Tic-tac-toe game
+🎮 Project: Gomoku with Learning AI
+🧠 Overview
 
-Deployment: [link](https://amoba-5a136.web.app)
+This project is a full-stack, real-time Gomoku (Five in a Row) game featuring multiple play modes and a self-learning AI opponent.
+Players can compete locally, online versus other players, or against an AI that adapts its strategy through generations using a genetic algorithm.
+The system demonstrates real-time multiplayer communication, AI-driven gameplay, and data visualization in a unified architecture.
 
-## Description:
+⚙️ Tech Stack
 
-Tic-tac-toe game in a 8x8, 10x10 or 12x12 grid. Players may add their names and select what mark is going to be the first ("X" by default).
+Frontend: React (TypeScript), Redux, MUI (Emotion), Socket.io, Recharts
+Backend: Node.js, Express, MongoDB, Socket.io
+Architecture: Full MERN stack with WebSocket communication and persistent AI state.
 
-Next mark (X or O) and players name are shown.
+🤖 AI Component
 
-The player who succeeds in placing five of their marks in a diagonal, horizontal, or vertical row is the winner.
+The AI module includes three difficulty levels:
 
-When the game ends, players can restart the game. They will return to the "start page" where their names and the starter mark can be changed (names will be the same if previously added).
+Easy: Random-based decision-making.
 
-Tested in Chrome.
+Medium: Heuristic-based evaluation of board positions.
 
-## Usage:
+Hard: A Genetic Algorithm that evolves strategies by simulating populations, crossover, and mutation.
+Each generation’s fitness scores, win rates, and performance metrics are stored in a MongoDB database and visualized in real time on an AI Dashboard built with Recharts.
 
-```
-git clone "repository url"
-cd "repository folder"
-npm i
-npm start
-```
+🌐 Features
 
-## Server:
+Real-time online multiplayer powered by Socket.io
 
-Live server deployed on heroku. If it has any error, the code can be found here: [amoba-server](https://github.com/Yhunie-the-cat/amoba-server)
+AI learning process visualization via AI Dashboard
 
-## How to calculate win:
+Admin authentication for accessing training statistics
 
-With every click on the board, the game will check every square value around the clicked position in a 9\*9 field and put their values in a 2d array (let's call it matrix). If this field is out of the board, the game fill the matrix with 'null' values.
+Smooth animations and modern UI using MUI + Framer Motion
 
-Next, the game will check patterns in the matrix (row, column, diagonal) and put these patterns into different arrays (9 values in each array).
+Redux-based global state management for gameplay and session control
 
-Finally these arrays are checked from position 0 to 4. If all this position has the same value the game will end and the winner is shown. If not, the game will change the position +1 and check again (from 0-4, to 1-5).
+Scroll-lock and overlay control for enhanced UX
+
+Responsive design optimized for desktop and mobile devices
+
+📊 AI Dashboard
+
+The AI Dashboard provides real-time monitoring of the learning process.
+Each generation is plotted dynamically, showing average, best, and worst fitness values, as well as win rate trends over time.
+Updates are pushed live from the backend using WebSocket events, allowing users to visualize how the AI evolves and improves.
+
+🏁 Outcome
+
+This project was originally developed as a university assignment for Artificial Intelligence, later extended into a portfolio-level full-stack application.
+It showcases strong practical understanding of real-time systems, AI integration, and full-stack architecture, making it both a technical achievement and a visually engaging interactive experience.
+
+🚀 Live Demo / Repository
+
+(You can add links here once deployed)
+
+Frontend: [your-frontend-link-here]
+
+Backend: [your-backend-link-here]
+
+GitHub: [repo-link-here]

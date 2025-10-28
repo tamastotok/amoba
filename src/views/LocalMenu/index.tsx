@@ -7,7 +7,7 @@ import BoxWrapper from '../../components/BoxWrapper';
 function LocalMenu() {
   return (
     <>
-      <h1>Settings</h1>
+      <h1>Game Setup</h1>
       <PlayerInputs />
       <SelectMark label="Start game with:" whatMark="starterMark" />
       <GridSize />

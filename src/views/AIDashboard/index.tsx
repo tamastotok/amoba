@@ -175,7 +175,7 @@ function AIDashboard() {
       </ResponsiveContainer>
 
       <div style={{ marginTop: '30px' }}>
-        <Button linkTo="/" text="Back to Main Menu" />
+        <Button linkTo="/" text="Back" />
       </div>
     </main>
   );

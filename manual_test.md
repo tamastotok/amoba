@@ -4,12 +4,12 @@
 
 ## 🏠 Main Menu
 
-- [ ] The main menu displays all options:  
-       **Local**, **Online vs Human**, **Online vs AI**, **AI Dashboard**
-- [ ] Buttons are styled consistently and centered.
-- [ ] Disabled state visible when backend is offline (Online buttons greyed out).
-- [ ] Clicking each button navigates to the correct route.
-- [ ] “Back” buttons on submenus always return to Main Menu.
+- [✔] The main menu displays all options:  
+   **Local**, **Online vs Human**, **Online vs AI**, **AI Dashboard**
+- [✔] Buttons are styled consistently and centered.
+- [✔] Disabled state visible when backend is offline (Online buttons greyed out).
+- [✔] Clicking each button navigates to the correct route.
+- [✔] “Back” buttons on submenus always return to Main Menu.
 
 ---
 
@@ -17,20 +17,21 @@
 
 ### Setup
 
-- [ ] Optional name inputs for both players work (can be empty).
-- [ ] “Who starts?” selector works — defaults to **X**.
-- [ ] Board size (8×8 / 10×10 / 12×12) changes grid properly.
-- [ ] Clicking “Start Game” loads the board.
+- [✔] Optional name inputs for both players work (can be empty).
+- [✔] “Who starts?” selector works — defaults to **X**.
+- [✔] Board size (8×8 / 10×10 / 12×12) changes grid properly.
+- [✔] Clicking “Start Game” loads the board.
 
 ### Gameplay
 
-- [ ] Board interaction works — X and O alternate correctly.
-- [ ] Winner is detected at 5 in a row.
-- [ ] “Draw!” appears when board fills with no winner.
-- [ ] `EndGameActions` popup appears centered with **Restart** and **Leave**.
-- [ ] **Scroll lock** works — background cannot scroll during popup.
-- [ ] “Restart” resets the board cleanly.
-- [ ] “Leave” returns to main menu and clears Redux + localStorage.
+- [✔] Player names are shown or "Player X vs. Player O"
+- [✔] Board interaction works — X and O alternate correctly.
+- [✔] Winner is detected at 5 in a row.
+- [✖] “Draw!” appears when board fills with no winner.
+- [✖] `EndGameActions` popup appears centered with **Play again** and **Leave**.
+- [✔] **Scroll lock** works — background cannot scroll during popup.
+- [✔] “Restart” resets the board cleanly.
+- [✔] “Leave” returns to main menu and clears Redux + localStorage.
 
 ---
 
@@ -38,25 +39,29 @@
 
 ### Matchmaking
 
-- [ ] Optional name field works.
-- [ ] Player mark (`X` / `O`) selection works, default **X**.
-- [ ] Board size selector works.
-- [ ] Clicking “Create Game” shows **Searching for opponent...** overlay.
-- [ ] Cancel search works both via **ESC** key and **Cancel** button (mobile).
-- [ ] When a second player joins:
-  - [ ] Both boards load instantly.
-  - [ ] Socket IDs sync — same room confirmed in backend logs.
+- [✔] Optional name field works.
+- [✔] Player mark (`X` / `O`) selection works, default **X**.
+- [✖] Who starts first selection works, default **X**.
+- [✔] Board size selector works.
+- [✔] Clicking “Create Game” shows **Searching for opponent...** overlay.
+- [✔] Cancel search works both via **ESC** key and **Cancel** button (mobile).
+- [✔] When a second player joins:
+  - [✔] Both boards load instantly.
+  - [✔] Socket IDs sync — same room confirmed in backend logs.
 
 ### Gameplay
 
-- [ ] Both clients see each other’s moves in real time.
-- [ ] Turn order follows “Who starts?” selection.
-- [ ] Winner and “Draw” states sync on both clients.
-- [ ] “Restart” restarts game in same room.
-- [ ] If one player leaves:
-  - [ ] The other gets “Opponent left the game” message / popup.
-- [ ] “Leave” returns both players to main menu safely.
-- [ ] No ghost sockets remain on server (check console).
+- [✔] Both clients see each other’s moves in real time.
+- [✔] Turn order follows “Who starts?” selection.
+- [✔] Winner and “Draw” states sync on both clients.
+- [✔] “Play again” redirects to '/online'.
+- [✔] If one player leaves:
+  - [✔] The other gets “Opponent left the game” message / popup.
+- [✔] “Leave” returns both players to main menu safely.
+- [?] No ghost sockets remain on server (check console).
+- [✖] Chat section:
+  - [?] Player names are shown or "Player X, Player O
+  - [✖] Messages can be sent in real time.
 
 ---
 
@@ -64,22 +69,23 @@
 
 ### Setup
 
-- [ ] Optional player name works.
-- [ ] Mark (`X` / `O`) selection and “Who starts?” radio function correctly.
-- [ ] Board size options work.
-- [ ] Difficulty dropdown sets AI type:
-  - [ ] **Easy** → simple random AI
-  - [ ] **Medium** → heuristic AI
-  - [ ] **Hard** → genetic (learning) AI
+- [✔] Optional player name works.
+- [✖] Mark (`X` / `O`) selection radio function correctly.
+- [✖] Who starts first selection works, default **X**.
+- [✔] Board size options work.
+- [✔] Difficulty dropdown sets AI type:
+  - [✔] **Easy** → simple random AI
+  - [✔] **Medium** → heuristic AI
+  - [✔] **Hard** → genetic (learning) AI
 
 ### Gameplay
 
-- [ ] If player starts, AI moves ~0.8–1.2 s later.
-- [ ] AI moves alternate correctly with player.
-- [ ] **Hard mode** learns over generations (confirmed by dashboard).
-- [ ] “Draw” message works, consistent with local mode.
-- [ ] “Leave” returns to main menu, socket session cleared.
-- [ ] No server crash after match end.
+- [✔] If player starts, AI moves ~0.8–1.2 s later.
+- [✔] AI moves alternate correctly with player.
+- [?] **Hard mode** learns over generations (confirmed by dashboard).
+- [?] “Draw” message works, consistent with local mode.
+- [✔] “Leave” returns to main menu, socket session cleared.
+- [✔] No server crash after match end.
 
 ---
 
@@ -87,10 +93,10 @@
 
 ### Access Control
 
-- [ ] Clicking “AI Dashboard” opens password popup.
-- [ ] Wrong password → “Invalid admin password”.
-- [ ] Correct password → navigates to `/ai-dashboard`.
-- [ ] Direct navigation to `/ai-dashboard` without auth → redirected to `/admin-login`.
+- [✔] Clicking “AI Dashboard” opens password popup.
+- [✔] Wrong password → “Invalid admin password”.
+- [✔] Correct password → navigates to `/ai-dashboard`.
+- [✖] Direct navigation to `/ai-dashboard` without auth → redirected to `/admin-login`.
 
 ### Functionality
 
@@ -122,12 +128,12 @@
 
 ## 🔒 Admin & Security
 
-- [ ] `.env` file contains:  
-      `VITE_API_URL`, `ADMIN_PASSWORD`, `ORIGIN`, `URI`
-- [ ] Backend reads `ADMIN_PASSWORD` from `.env`.
-- [ ] CORS config allows frontend origin only.
-- [ ] SessionStorage key `ai_dashboard_auth` set to `"true"` after login.
-- [ ] No unauthorized dashboard access possible.
+- [✔] `.env` files contains:
+  `VITE_API_URL`, `ADMIN_PASSWORD`, `ORIGIN`, `URI`
+- [✔] Backend reads `ADMIN_PASSWORD` from `.env`.
+- [✔] CORS config allows frontend origin only.
+- [✔] SessionStorage key `ai_dashboard_auth` set to `"true"` after login.
+- [✖] No unauthorized dashboard access possible.
 
 ---
 
@@ -143,11 +149,11 @@
 
 ## 🧩 UI / UX Consistency
 
-- [ ] Blue border = X’s turn; Red = O’s turn.
-- [ ] “Next: You / Opponent” updates correctly.
-- [ ] Popup transitions (Framer Motion) animate smoothly.
-- [ ] Fonts, button styles, and spacing consistent across screens.
-- [ ] No visible flicker during route transitions.
+- [✔] Blue border = X’s turn; Red = O’s turn.
+- [✔] “Next: You / Opponent” updates correctly.
+- [✔] Popup transitions (Framer Motion) animate smoothly.
+- [✔] Fonts, button styles, and spacing consistent across screens.
+- [✔] No visible flicker during route transitions.
 
 ---
 

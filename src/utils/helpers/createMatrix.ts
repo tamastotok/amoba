@@ -4,6 +4,7 @@ export interface Sqr {
   value: string;
 }
 
+// Render board in local game mode
 export const createMatrix = (size: number): Sqr[] => {
   const grid: Sqr[] = [];
 
