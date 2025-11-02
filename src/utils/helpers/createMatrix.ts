@@ -1,8 +1,4 @@
-export interface Sqr {
-  row: number;
-  col: number;
-  value: string;
-}
+import type { Sqr } from '@/types';
 
 // Render board in local game mode
 export const createMatrix = (size: number): Sqr[] => {

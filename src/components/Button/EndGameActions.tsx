@@ -2,7 +2,7 @@ import { useSelector } from 'react-redux';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Box } from '@mui/material';
 import Button from '../Button/Button';
-import type { Reducers } from '../../types';
+import type { Reducers } from '@/types';
 
 interface EndGameActionsProps {
   handleRestartClick: () => void;

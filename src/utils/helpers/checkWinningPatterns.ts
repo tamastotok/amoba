@@ -1,9 +1,7 @@
 import store from '../../store';
 import { setWinner } from '../../store/winner/winner.action';
 import { setGridIsDisabled } from '../../store/grid-disable/grid-disable.action';
-
-export type Mark = 'X' | 'O';
-export type Board = (Mark | '')[][];
+import type { Mark, Board } from '@/types';
 
 const isMark = (x: string): x is Mark => x === 'X' || x === 'O';
 
@@ -63,7 +61,6 @@ const countMatches = (
   return matches;
 };
 
-// Helper if you still want to keep old behavior here:
 export const checkAndDispatchWinner = (
   row: number,
   col: number,

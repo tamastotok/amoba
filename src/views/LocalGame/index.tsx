@@ -9,7 +9,7 @@ import { setWinner } from '../../store/winner/winner.action';
 import { setGridIsDisabled } from '../../store/grid-disable/grid-disable.action';
 import { createMatrix } from '../../utils/helpers/createMatrix';
 import { BLUE_BORDER, RED_BORDER } from '../../utils/constants';
-import type { Reducers } from '../../types';
+import type { Reducers, Sqr } from '../../types';
 import SquareLocal from './SquareLocal';
 import { handleLeaveGame } from '../../utils/helpers/gameActions';
 import { hydrateBoard } from '../../store/board/board.action';
@@ -65,7 +65,7 @@ function LocalGame() {
 
   const handleRestartClick = () => {
     // Empty board (Redux version)
-    const emptyPositions = [];
+    const emptyPositions: Sqr[] = [];
     for (let row = 0; row < gridSize; row++) {
       for (let col = 0; col < gridSize; col++) {
         emptyPositions.push({ row, col, value: '' });
@@ -114,8 +114,8 @@ function LocalGame() {
           <SquareLocal
             key={index}
             id={`${item.row}/${item.col}`}
-            rowindex={item.row}
-            colindex={item.col}
+            row={item.row}
+            col={item.col}
           />
         ))}
       </Box>

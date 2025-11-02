@@ -1,5 +1,4 @@
 import { Box } from '@mui/material';
-import React from 'react';
 import CloseButton from '../Button/CloseButton';
 import EndGameActions from '../Button/EndGameActions';
 import PlayerMarks from './PlayerMarks';

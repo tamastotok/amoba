@@ -1,10 +1,10 @@
 import { Box } from '@mui/system';
 
-interface ButtonProps {
+interface CloseButtonProps {
   onClick: React.MouseEventHandler<HTMLButtonElement>;
 }
 
-function CloseButton({ onClick }: ButtonProps) {
+function CloseButton({ onClick }: CloseButtonProps) {
   return (
     <Box
       component="button"

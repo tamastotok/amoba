@@ -9,7 +9,7 @@ function LocalMenu() {
     <>
       <h1>Game Setup</h1>
       <PlayerInputs />
-      <SelectMark label="Start game with:" whatMark="starterMark" />
+      <SelectMark label="Start game with:" mark="starterMark" />
       <GridSize />
       <BoxWrapper>
         <Button linkTo="/local/game" text="Start Game" />

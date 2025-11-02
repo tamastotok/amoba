@@ -1,11 +1,11 @@
 import { useSelector } from 'react-redux';
 import { BLUE, RED } from '../../utils/constants';
-import type { Reducers } from '../../types';
+import type { Reducers, Mark } from '@/types';
 import { Box } from '@mui/material';
 
 interface PlayerMarkProps {
   gameMode: 'local' | 'online';
-  playerMark?: 'X' | 'O';
+  playerMark?: Mark;
 }
 
 function PlayerMarks({ gameMode, playerMark }: PlayerMarkProps) {

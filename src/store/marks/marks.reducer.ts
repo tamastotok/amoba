@@ -4,15 +4,15 @@ import {
   RESET_NEXT_MARK,
   SELECT_PLAYER_MARK,
 } from '../../utils/constants';
-import type { Marks, Action, DefaultMark } from '../../types';
+import type { PlayerMarks, Action } from '@/types';
 
-const initialState: Marks = {
+const initialState: PlayerMarks = {
   starterMark: 'X',
   nextMark: 'X',
   playerMark: 'X',
 };
 
-const marksReducer = (state = initialState, action: Action<DefaultMark>) => {
+const marksReducer = (state = initialState, action: Action<PlayerMarks>) => {
   switch (action.type) {
     case SELECT_STARTER_MARK:
       return {

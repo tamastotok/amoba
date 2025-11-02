@@ -17,8 +17,8 @@ import type {
   SearchingPayload,
   GameFoundPayload,
   OpponentLeftPayload,
-  GameEndedPayload,
   Reducers,
+  Sqr,
 } from './types';
 import LocalGame from './views/LocalGame';
 import LocalMenu from './views/LocalMenu';
@@ -34,7 +34,6 @@ import SearchOverlay from './components/SearchOverlay';
 import { resetGameState } from './store/game/game.action';
 import { useBodyScrollLock } from './hooks/useBodyScrollLock';
 import { useSelector } from 'react-redux';
-import store from './store';
 
 function App() {
   const dispatch = useAppDispatch();
@@ -65,7 +64,6 @@ function App() {
     },
 
     'game-found': (res: unknown) => {
-      console.log('game-found');
       const payload = res as GameFoundPayload;
 
       if (payload.roomId) {
@@ -81,7 +79,7 @@ function App() {
         dispatch(resetNextMark(payload.starterMark));
 
         // Board initialization
-        const emptyPositions = [];
+        const emptyPositions: Sqr[] = [];
         for (let row = 0; row < payload.boardSize; row++) {
           for (let col = 0; col < payload.boardSize; col++) {
             emptyPositions.push({ row, col, value: '' });
@@ -115,44 +113,36 @@ function App() {
       dispatch(setGridSize(payload.boardSize));
 
       // Board initialization
-      const emptyMatrix: { row: number; col: number; value: string }[] = [];
+      const emptyMatrix: Sqr[] = [];
       for (let row = 0; row < payload.boardSize; row++) {
         for (let col = 0; col < payload.boardSize; col++) {
           emptyMatrix.push({ row, col, value: '' });
         }
       }
+
       dispatch(hydrateBoard(payload.boardSize, emptyMatrix));
-
-      console.log('🧩 Hydrated empty board:', store.getState().board);
       dispatch(setGridIsDisabled(false));
-
       setStatusMessage('');
     },
 
-    'game-ended': (res?: unknown) => {
-      const payload = res as GameEndedPayload;
-      const winner = payload.winner;
-      console.log(`Game ended. Winner: ${winner}`);
-
+    'game-ended': () => {
       // Reset Redux + navigate only now (confirmed end)
       dispatch(resetGameState());
       setRoomId('');
       setResponse(null);
       setOpponentLeft(false);
       setStatusMessage('');
+      sessionStorage.removeItem('room');
+      localStorage.removeItem('room');
+      navigate('/');
     },
 
     'opponent-left': (res?: unknown) => {
       const payload = res as OpponentLeftPayload;
       console.warn('Your opponent has left the game');
 
-      // Show status message
       setStatusMessage(payload.message);
-
-      // Disable board
       dispatch(setGridIsDisabled(true));
-
-      // Handle overlay
       setOpponentLeft(true);
     },
   });

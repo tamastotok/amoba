@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Box, Typography, TextField, Button, useTheme } from '@mui/material';
-import type { Reducers } from '../../types';
+import type { Reducers } from '@/types';
 import socket from '../../server';
 
 interface ChatData {
@@ -44,9 +44,8 @@ function Chat() {
 
   useEffect(() => {
     let isMounted = true;
-    const updateMessagesHandler = `update-messages-${roomId}`;
 
-    socket.on(updateMessagesHandler, (data: ChatData[]) => {
+    socket.on(`update-messages-${roomId}`, (data: ChatData[]) => {
       if (isMounted) {
         setChatData(data);
         chatWindowRef.current?.scrollTo(0, chatWindowRef.current.scrollHeight);

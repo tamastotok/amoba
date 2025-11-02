@@ -1,8 +1,8 @@
 import type {
   ChartRow,
-  PopulationData,
   GenerationUpdatePayload,
-} from '../../../types';
+  PopulationData,
+} from '@/types';
 
 export const formatPopulations = (populations: PopulationData[]): ChartRow[] =>
   populations.map((p) => {

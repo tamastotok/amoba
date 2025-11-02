@@ -1,14 +1,14 @@
 import { Link } from 'react-router-dom';
 import { Button as Btn } from '@mui/material';
 
-interface Props {
+interface ButtonProps {
   linkTo?: string; // optional now
   clickEvent?: () => void;
   text: string;
   isDisabled?: boolean;
 }
 
-function Button({ linkTo, clickEvent, text, isDisabled }: Props) {
+function Button({ linkTo, clickEvent, text, isDisabled }: ButtonProps) {
   // If `linkTo` is provided, wrap with <Link>; otherwise render plain button
   if (linkTo) {
     return (

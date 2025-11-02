@@ -1,5 +1,5 @@
 import type { CSSProperties } from 'react';
-import type { Reducers } from '../../types';
+import type { Reducers } from '@/types';
 import { useSelector } from 'react-redux';
 import { BLUE, RED } from '../../utils/constants';
 

@@ -5,15 +5,15 @@ import { checkAndDispatchWinner } from '../../utils/helpers/checkWinningPatterns
 import type { Mark, Reducers } from '../../types';
 import { useSelector } from 'react-redux';
 
-interface BoardProps {
+interface SquareLocalProps {
   id: string;
-  rowindex: number;
-  colindex: number;
+  row: number;
+  col: number;
 }
 
-function SquareLocal({ id, rowindex, colindex }: BoardProps) {
+function SquareLocal({ id, row, col }: SquareLocalProps) {
   const dispatch = useAppDispatch();
-  const value = useAppSelector((s) => s.board[rowindex][colindex]); // '' | 'X' | 'O'
+  const value = useAppSelector((s) => s.board[row][col]); // '' | 'X' | 'O'
   const nextMark = useAppSelector((s) => s.marks.nextMark);
   const gridDisabled = useAppSelector((s) => s.gridIsDisabled);
   const board = useAppSelector((s) => s.board);
@@ -25,20 +25,20 @@ function SquareLocal({ id, rowindex, colindex }: BoardProps) {
 
     // clone board
     const nextBoard = board.map((r) => r.slice());
-    nextBoard[rowindex][colindex] = nextMark as Mark;
+    nextBoard[row][col] = nextMark as Mark;
 
-    dispatch(setBoardData(rowindex, colindex, nextMark as Mark));
+    dispatch(setBoardData({ row, col, value: nextMark as Mark }));
     dispatch(setNextMark());
 
-    checkAndDispatchWinner(rowindex, colindex, nextBoard);
+    checkAndDispatchWinner(row, col, nextBoard);
   };
 
   return (
     <button
       className="square-button"
       id={id}
-      data-row={rowindex}
-      data-col={colindex}
+      data-row={row}
+      data-col={col}
       value={value}
       onClick={handleClick}
       disabled={gridDisabled || !!value}

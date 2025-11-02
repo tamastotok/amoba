@@ -4,6 +4,8 @@
 
 ---
 
+- [ ] System bar and chat names change to Player X/Y
+
 ---
 
 ### Gameplay (Online vs Human)
@@ -17,4 +19,9 @@
 ### Future plans
 
 - [ ] Change folder structure
-- [ ] Refactor and make proper interfaces, types
+
+---
+
+### Socket
+
+- [ ] player-left event is a mess

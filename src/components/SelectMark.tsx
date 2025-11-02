@@ -14,11 +14,11 @@ import {
 const sessionStorage = window.sessionStorage;
 
 interface SelectMarkProps {
-  whatMark: string;
+  mark: string;
   label: string;
 }
 
-function SelectMark({ whatMark, label }: SelectMarkProps) {
+function SelectMark({ mark, label }: SelectMarkProps) {
   const dispatch = useDispatch();
   const [value, setValue] = useState<'X' | 'O'>('X');
 
@@ -29,19 +29,19 @@ function SelectMark({ whatMark, label }: SelectMarkProps) {
     if (!newValue) return;
     setValue(newValue);
 
-    if (whatMark === 'starterMark') {
+    if (mark === 'starterMark') {
       dispatch(selectStarterMark(newValue));
-    } else if (whatMark === 'playerMark') {
+    } else if (mark === 'playerMark') {
       dispatch(selectPlayerMark(newValue));
     }
   };
 
   useEffect(() => {
-    if (whatMark === 'playerMark') {
+    if (mark === 'playerMark') {
       sessionStorage.setItem('playerMark', value);
       sessionStorage.setItem('reloaded', 'false');
     }
-  }, [value, whatMark]);
+  }, [value, mark]);
 
   return (
     <Box

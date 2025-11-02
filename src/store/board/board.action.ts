@@ -1,21 +1,12 @@
 import { SET_BOARD_DATA, HYDRATE_BOARD } from '../../utils/constants';
-import type { Mark } from '../../types';
+import type { Sqr } from '@/types';
 
-export const setBoardData = (row: number, col: number, value: Mark) => ({
-  type: SET_BOARD_DATA,
-  payload: { row, col, value },
+export const setBoardData = (square: Sqr) => ({
+  type: SET_BOARD_DATA as typeof SET_BOARD_DATA,
+  payload: square,
 });
 
-export const hydrateBoard = (
-  size: number,
-  positions: Array<{ row: number; col: number; value: string }>
-) => ({
-  type: HYDRATE_BOARD,
-  payload: {
-    size,
-    positions: positions.map((p) => ({
-      ...p,
-      value: (p.value === 'X' || p.value === 'O' ? p.value : '') as Mark,
-    })),
-  },
+export const hydrateBoard = (size: number, positions: Sqr[]) => ({
+  type: HYDRATE_BOARD as typeof HYDRATE_BOARD,
+  payload: { size, positions },
 });

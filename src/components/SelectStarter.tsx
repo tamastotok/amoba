@@ -7,7 +7,7 @@ import {
 } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectStarterMark } from '../store/marks/marks.action';
-import type { Reducers } from '../types';
+import type { Reducers } from '@/types';
 
 function SelectStarter() {
   const dispatch = useDispatch();

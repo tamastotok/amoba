@@ -1,4 +1,4 @@
-import type { Board } from '../../types';
+import type { Board } from '@/types';
 
 export const makeBoard = (size: number): Board =>
   Array.from({ length: size }, () =>

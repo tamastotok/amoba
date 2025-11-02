@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import type { OnlineGameProps, Reducers, Mark } from '../../types';
+import type { OnlineGameProps, Reducers, Sqr } from '@/types';
 import { useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { setBoardData, hydrateBoard } from '../../store/board/board.action';
@@ -64,13 +64,11 @@ function OnlineGameAI({
     if (!roomId) return;
 
     // After human player step, the server broadcast square-btn... event
-    const onSquareClick = (data: {
-      positions: Array<{ row: number; col: number; value: Mark }>;
-    }) => {
+    const onSquareClick = (data: { positions: Sqr[] }) => {
       const last = data.positions[data.positions.length - 1];
 
       // Refresh board
-      dispatch(setBoardData(last.row, last.col, last.value));
+      dispatch(setBoardData(last));
       dispatch(setNextMark());
       dispatch(changeGridState());
 
@@ -92,10 +90,10 @@ function OnlineGameAI({
     };
 
     // Receive Ai step data from the server
-    const onAiMove = (data: { row: number; col: number; value: Mark }) => {
+    const onAiMove = (data: Sqr) => {
       if (!data) return;
       // Refresh board
-      dispatch(setBoardData(data.row, data.col, data.value));
+      dispatch(setBoardData(data));
       dispatch(setNextMark());
       dispatch(changeGridState());
 
@@ -170,17 +168,6 @@ function OnlineGameAI({
           );
         })}
       </Box>
-
-      {/*<h1
-        style={{
-          color: playerMark === 'X' ? BLUE : RED,
-          marginTop: '1rem',
-          textAlign: 'center',
-          fontSize: 'clamp(1.5rem, 4vw, 3rem)',
-        }}
-      >
-        {playerMark}
-      </h1>*/}
     </GameLayout>
   );
 }

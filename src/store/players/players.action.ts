@@ -5,14 +5,14 @@ import {
 
 export const setPlayerBlueName = (name: string) => {
   return {
-    type: SET_PLAYER_BLUE_NAME,
+    type: SET_PLAYER_BLUE_NAME as typeof SET_PLAYER_BLUE_NAME,
     payload: name,
   };
 };
 
 export const setPlayerRedName = (name: string) => {
   return {
-    type: SET_PLAYER_RED_NAME,
+    type: SET_PLAYER_RED_NAME as typeof SET_PLAYER_RED_NAME,
     payload: name,
   };
 };

@@ -12,17 +12,16 @@ export const handleLeaveGame = (
 ) => {
   try {
     if (roomId) {
+      // Online modes
       if (winner) {
-        console.log('Emitting game-end...');
         socket.emit('game-end', { roomId, winner });
       } else {
-        console.log('Emitting player-left...');
         socket.emit('player-left', { roomId });
       }
+      return;
     }
 
-    console.log('reset game state');
-    // Client side cleanup
+    // Offline mode cleanup
     dispatch(resetGameState());
     sessionStorage.removeItem('room');
     localStorage.removeItem('room');

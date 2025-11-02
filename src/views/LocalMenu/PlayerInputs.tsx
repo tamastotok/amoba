@@ -1,4 +1,3 @@
-import type { ChangeEvent } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Box, TextField } from '@mui/material';
 import {
@@ -11,7 +10,7 @@ function PlayerInputs() {
   const dispatch = useDispatch();
   const players = useSelector((state: Reducers) => state.players);
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     if (name === '1') {
       dispatch(setPlayerBlueName(value));

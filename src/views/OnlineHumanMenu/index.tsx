@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import type { ChangeEvent } from 'react';
 import type { Reducers } from '../../types';
 import { useSelector } from 'react-redux';
 import { Box, TextField } from '@mui/material';
@@ -23,7 +22,7 @@ function OnlineHumanMenu() {
     socket.emit('search-canceled');
   };
 
-  const handleNameChange = (e: ChangeEvent<{ value: unknown }>) => {
+  const handleNameChange = (e: React.ChangeEvent<{ value: unknown }>) => {
     setPlayerName(e.target.value as string);
   };
 
@@ -76,7 +75,7 @@ function OnlineHumanMenu() {
         />
       </Box>
 
-      <SelectMark label="Select your mark:" whatMark="playerMark" />
+      <SelectMark label="Select your mark:" mark="playerMark" />
       <SelectStarter />
       <GridSize />
 

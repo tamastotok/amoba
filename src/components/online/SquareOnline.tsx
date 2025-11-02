@@ -1,16 +1,17 @@
 import { useAppSelector } from '../../store/hooks';
 import socket from '../../server';
+import type { Mark } from '@/types';
 
-interface SquareProps {
+interface SquareOnlineProps {
   id: string;
   rowindex: number;
   colindex: number;
   roomId: string;
   isAIGame?: boolean;
-  aiMark?: 'X' | 'O'; // Optional
+  aiMark?: Mark; // Optional
 }
 
-function SquareOnline({ id, rowindex, colindex, roomId }: SquareProps) {
+function SquareOnline({ id, rowindex, colindex, roomId }: SquareOnlineProps) {
   const board = useAppSelector((s) => s.board);
   const value = board?.[rowindex]?.[colindex] ?? '';
   const nextMark = useAppSelector((s) => s.marks.nextMark);

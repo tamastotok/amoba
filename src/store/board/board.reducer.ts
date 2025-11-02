@@ -1,27 +1,31 @@
 import { makeBoard } from '../../utils/helpers/board';
-import type { Action, Board, Mark } from '../../types';
+import type { Action, Board, Sqr } from '@/types';
 import {
   SET_GRID_SIZE,
   SET_BOARD_DATA,
   HYDRATE_BOARD,
 } from '../../utils/constants';
 
-type SetBoardPayload = { row: number; col: number; value: Mark };
 type HydratePayload = {
-  positions: Array<{ row: number; col: number; value: Mark }>;
   size: number;
+  positions: Sqr[];
 };
+
 type SetGridSizeAction = Action<number> & { type: typeof SET_GRID_SIZE };
-type SetBoardDataAction = Action<{ row: number; col: number; value: Mark }> & {
+
+type SetBoardDataAction = Action<Sqr> & {
   type: typeof SET_BOARD_DATA;
 };
+
 type HydrateBoardAction = Action<{
   size: number;
-  positions: Array<{ row: number; col: number; value: Mark }>;
+  positions: Sqr[];
 }> & {
   type: typeof HYDRATE_BOARD;
 };
+
 type BoardAction = SetGridSizeAction | SetBoardDataAction | HydrateBoardAction;
+
 // pick an initial size (e.g., from sessionStorage or 8)
 const initialSize = Number(sessionStorage.getItem('gridSize') || 8);
 const initialState: Board = makeBoard(initialSize);
@@ -33,7 +37,7 @@ const boardReducer = (state = initialState, action: BoardAction): Board => {
       return makeBoard(size);
     }
     case SET_BOARD_DATA: {
-      const { row, col, value } = action.payload as SetBoardPayload;
+      const { row, col, value } = action.payload as Sqr;
       // immutable update
       if (state[row]?.[col] === undefined) return state;
       if (state[row][col] !== '') return state; // ignore overwrites

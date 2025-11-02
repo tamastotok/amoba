@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import type { Reducers, Mark, OnlineGameProps } from '../../types';
+import type { Reducers, OnlineGameProps, Sqr } from '../../types';
 import { useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { setBoardData, hydrateBoard } from '../../store/board/board.action';
@@ -65,13 +65,11 @@ function OnlineGameHuman({
     if (!roomId) return;
 
     // Player move
-    const onSquareClick = (data: {
-      positions: Array<{ row: number; col: number; value: Mark }>;
-    }) => {
+    const onSquareClick = (data: { positions: Sqr[] }) => {
       const last = data.positions[data.positions.length - 1];
 
       // Table refresh
-      dispatch(setBoardData(last.row, last.col, last.value));
+      dispatch(setBoardData(last));
       dispatch(setNextMark());
       dispatch(changeGridState());
 
@@ -143,19 +141,6 @@ function OnlineGameHuman({
           );
         })}
       </Box>
-
-      {/*
-      <h1
-        style={{
-          color: playerMark === 'X' ? BLUE : RED,
-          marginTop: '1rem',
-          textAlign: 'center',
-          fontSize: 'clamp(1.5rem, 4vw, 3rem)',
-        }}
-      >
-        {playerMark}
-      </h1>
-      */}
     </GameLayout>
   );
 }

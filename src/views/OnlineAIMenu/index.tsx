@@ -1,13 +1,11 @@
 import { useState } from 'react';
-import type { ChangeEvent } from 'react';
 import { useSelector } from 'react-redux';
-import { TextField } from '@mui/material';
+import { Box, TextField } from '@mui/material';
 import type { Reducers } from '../../types';
 import Button from '../../components/Button/Button';
 import GridSize from '../../components/GridSize';
 import SelectMark from '../../components/SelectMark';
 import socket from '../../server';
-import { Box } from '@mui/material';
 import SelectStarter from '../../components/SelectStarter';
 import SelectDifficulty from '../../components/SelectDifficulty';
 import BoxWrapper from '../../components/BoxWrapper';
@@ -21,7 +19,7 @@ function OnlineAIMenu() {
   const starterMark = useSelector((state: Reducers) => state.marks.starterMark);
   const gridSize = useSelector((state: Reducers) => state.gridSize);
 
-  const handleNameChange = (e: ChangeEvent<{ value: unknown }>) => {
+  const handleNameChange = (e: React.ChangeEvent<{ value: unknown }>) => {
     setPlayerName(e.target.value as string);
   };
 
@@ -71,7 +69,7 @@ function OnlineAIMenu() {
         />
       </Box>
 
-      <SelectMark label="Select your mark:" whatMark="playerMark" />
+      <SelectMark label="Select your mark:" mark="playerMark" />
       <SelectStarter />
       <GridSize />
       <SelectDifficulty
