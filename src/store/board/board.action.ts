@@ -1,4 +1,4 @@
-import { SET_BOARD_DATA, HYDRATE_BOARD } from '../../utils/constants';
+import { SET_BOARD_DATA, HYDRATE_BOARD } from '@/utils/constants';
 import type { Sqr } from '@/types';
 
 export const setBoardData = (square: Sqr) => ({

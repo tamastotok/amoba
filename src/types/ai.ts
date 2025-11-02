@@ -1,4 +1,3 @@
-// Result of a strategy
 export type Result = 'win' | 'loss' | 'draw';
 
 export interface StrategySummary {

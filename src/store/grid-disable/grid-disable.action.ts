@@ -1,4 +1,4 @@
-import { DISABLE_GRID, CHANGE_GRID_STATE } from '../../utils/constants';
+import { DISABLE_GRID, CHANGE_GRID_STATE } from '@/utils/constants';
 
 export const setGridIsDisabled = (bool: boolean) => {
   return {

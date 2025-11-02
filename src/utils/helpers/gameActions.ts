@@ -1,7 +1,7 @@
 import type { NavigateFunction } from 'react-router-dom';
-import type { AppDispatch } from '../../store';
-import { resetGameState } from '../../store/game/game.action';
-import socket from '../../server';
+import type { AppDispatch } from '@/store';
+import { resetGameState } from '@/store/game/game.action';
+import socket from '@/server';
 
 // Leave game (for all modes)
 export const handleLeaveGame = (
@@ -14,9 +14,11 @@ export const handleLeaveGame = (
     if (roomId) {
       // Online modes
       if (winner) {
+        // When the game ended
         socket.emit('game-end', { roomId, winner });
       } else {
-        socket.emit('player-left', { roomId });
+        // When player leave/disconnect mid game
+        socket.emit('midgame-left', { roomId });
       }
       return;
     }

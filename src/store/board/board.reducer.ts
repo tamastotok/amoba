@@ -1,10 +1,10 @@
-import { makeBoard } from '../../utils/helpers/board';
 import type { Action, Board, Sqr } from '@/types';
 import {
-  SET_GRID_SIZE,
-  SET_BOARD_DATA,
   HYDRATE_BOARD,
-} from '../../utils/constants';
+  SET_BOARD_DATA,
+  SET_GRID_SIZE,
+} from '@/utils/constants';
+import { makeBoard } from '@/utils/helpers/board';
 
 type HydratePayload = {
   size: number;

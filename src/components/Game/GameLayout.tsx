@@ -1,7 +1,7 @@
 import { Box } from '@mui/material';
-import CloseButton from '../Button/CloseButton';
-import EndGameActions from '../Button/EndGameActions';
+import CloseButton from '../ui/CloseButton';
 import PlayerMarks from './PlayerMarks';
+import EndGameActions from '../overlays/EndGameActions';
 
 interface GameLayoutProps {
   children: React.ReactNode;

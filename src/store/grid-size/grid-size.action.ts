@@ -1,4 +1,4 @@
-import { SET_GRID_SIZE } from '../../utils/constants';
+import { SET_GRID_SIZE } from '@/utils/constants';
 
 export const setGridSize = (size: number) => {
   return {

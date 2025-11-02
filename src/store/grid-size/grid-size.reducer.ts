@@ -1,5 +1,5 @@
-import { RESET_GAME_STATE, SET_GRID_SIZE } from '../../utils/constants';
-import type { Action } from '../../types';
+import { RESET_GAME_STATE, SET_GRID_SIZE } from '@/utils/constants';
+import type { Action } from '@/types';
 
 const initialState = 8;
 

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
+import { Routes, Route, useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from './store/hooks';
 import { useSocketGame } from './hooks/useSocketGame';
 import { setGridIsDisabled } from './store/grid-disable/grid-disable.action';
@@ -20,25 +20,26 @@ import type {
   Reducers,
   Sqr,
 } from './types';
-import LocalGame from './views/LocalGame';
-import LocalMenu from './views/LocalMenu';
-import Home from './views/Home';
-import OnlineGameHuman from './views/OnlineGameHuman';
-import OnlineGameAI from './views/OnlineGameAI';
-import OnlineHumanMenu from './views/OnlineHumanMenu';
-import OnlineAIMenu from './views/OnlineAIMenu';
-import AIDashboard from './views/AIDashboard';
+import LocalGame from './features/local/game/LocalGame';
+import OnlineGameHuman from './features/online/human/OnlineHumanGame';
+import OnlineGameAI from './features/online/ai/OnlineAIGame';
+import OnlineHumanMenu from './features/online/human/OnlineHumanMenu';
+import OnlineAIMenu from './features/online/ai/OnlineAIMenu';
+import AIDashboard from './features/ai-dashboard/AIDashboard';
 import socket from './server';
-import SystemStatusBar from './components/SystemStatusBar';
-import SearchOverlay from './components/SearchOverlay';
+import SearchOverlay from './components/overlays/SearchOverlay';
 import { resetGameState } from './store/game/game.action';
 import { useBodyScrollLock } from './hooks/useBodyScrollLock';
 import { useSelector } from 'react-redux';
+import ReconnectModal from './components/overlays/ReconnectModal';
+import SystemStatusBar from './components/ui/SystemStatusBar';
+import { LocalMenu } from './features/local/menu';
+import Home from './pages/Home';
 
 function App() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const location = useLocation();
+
   const playerMark = useAppSelector(
     (state: RootState) => state.marks.playerMark
   );
@@ -46,9 +47,10 @@ function App() {
   const [roomId, setRoomId] = useState('');
   const [statusMessage, setStatusMessage] = useState('');
   const [response, setResponse] = useState<ContinuePayload | null>(null);
-  const [isDisabled, setIsDisabled] = useState(false);
   const [clientIsReloaded, setClientIsReloaded] = useState(false);
   const [opponentLeft, setOpponentLeft] = useState(false);
+  const [showReconnect, setShowReconnect] = useState(false);
+  const [disconnectedRoom, setDisconnectedRoom] = useState<string | null>(null);
   const mark = sessionStorage.getItem('playerMark');
   const winner = useSelector((state: Reducers) => state.winner);
   const isDraw = useSelector((state: Reducers) => state.winner);
@@ -139,82 +141,82 @@ function App() {
 
     'opponent-left': (res?: unknown) => {
       const payload = res as OpponentLeftPayload;
-      console.warn('Your opponent has left the game');
+      console.warn('Opponent disconnected, waiting for possible reconnect…');
 
-      setStatusMessage(payload.message);
+      // Store roomId so the player can reconnect
+      if (payload.roomId) {
+        sessionStorage.setItem('pendingRoom', payload.roomId);
+      }
+
+      // Disable board and send a status message
+      setStatusMessage(payload.message || 'Your opponent has disconnected.');
       dispatch(setGridIsDisabled(true));
+
+      // Opponent left statust (UI)
       setOpponentLeft(true);
+      setDisconnectedRoom(payload.roomId);
+      setShowReconnect(true);
     },
   });
 
-  // --- Handle refresh reconnection ---
+  // --- Handle refresh or reconnect after disconnect ---
   useEffect(() => {
-    const idFromUrl = location.pathname.split('/').pop();
-    if (!idFromUrl) return;
-    if (!location.pathname.startsWith('/online/game/')) return;
-
-    // Get data from localStorage-ból if needed
-    const storedId = localStorage.getItem('room');
-    const roomId = idFromUrl || storedId;
+    // Check if we have pending room (open for 60sec)
+    const roomId = sessionStorage.getItem('room');
     if (!roomId) return;
 
-    console.log('🔄 Reconnecting with roomId:', roomId);
+    console.log('Attempting to reconnect to saved room:', roomId);
 
-    socket.emit('join-lobby');
-    socket.emit('reconnect', roomId);
+    // Attempt reconnecting
+    socket.emit('reconnect-room', roomId);
 
-    const onContinue = (data: ContinuePayload) => {
-      if (!data) return;
+    // Reconnect successfulled
+    const onReconnectSuccess = (data: ContinuePayload) => {
+      console.log('Successfully reconnected to room:', data.roomId);
 
-      console.log('✅ Reconnected data:', data);
-
-      // Redux state reload
+      // Redux state restore
       dispatch(setGridSize(data.boardSize));
       dispatch(hydrateBoard(data.boardSize, data.positions || []));
       dispatch(setPlayerBlueName(data.bluePlayer.name));
       dispatch(setPlayerRedName(data.redPlayer.name));
-
-      // Who is next
       dispatch(resetNextMark(data.whoIsNext));
       dispatch(selectStarterMark(data.whoIsNext));
 
-      // Reset UI
+      // UI reset
       dispatch(setWinner(''));
       dispatch(setGridIsDisabled(false));
 
       // Session restore
       setResponse(data);
       setRoomId(data.roomId);
-      localStorage.setItem('room', data.roomId);
       setClientIsReloaded(true);
 
-      // Disable board if the other player is next
+      navigate(`/online/game/${data.roomId}`);
+
+      // Disable board if the enemy comes next
       if (mark && mark !== data.whoIsNext) {
         dispatch(setGridIsDisabled(true));
       }
     };
 
-    socket.on(`continue-${roomId}`, onContinue);
-
-    return () => {
-      socket.off(`continue-${roomId}`, onContinue);
+    // Reconnect failed
+    const onReconnectFailed = (payload: { message: string }) => {
+      console.warn('Reconnect failed:', payload.message);
+      sessionStorage.removeItem('room');
+      dispatch(resetGameState());
+      navigate('/online');
     };
-  }, [dispatch, location.pathname, mark]);
 
-  // --- Redirect if invalid room ---
-  useEffect(() => {
-    if (
-      !sessionStorage.getItem('room') &&
-      location.pathname.startsWith('/online/game/')
-    ) {
-      navigate('/');
-      setIsDisabled(true);
-    }
-  }, [location.pathname, navigate]);
+    // Event listeners
+    socket.on('reconnect-success', onReconnectSuccess);
+    socket.on('reconnect-failed', onReconnectFailed);
 
-  useEffect(() => {
-    if (isDisabled) alert('Invalid room.');
-  }, [isDisabled]);
+    // Cleanup
+    return () => {
+      socket.off('reconnect-success', onReconnectSuccess);
+      socket.off('reconnect-failed', onReconnectFailed);
+    };
+  }, [dispatch, navigate, mark]);
 
   const handleOnCancel = () => {
     setOpponentLeft(false);
@@ -262,6 +264,12 @@ function App() {
           message={statusMessage || 'Opponent disconnected.'}
           type="disconnected"
           onCancel={handleOnCancel}
+        />
+      )}
+      {showReconnect && disconnectedRoom && (
+        <ReconnectModal
+          roomId={disconnectedRoom}
+          onClose={() => setShowReconnect(false)}
         />
       )}
     </>

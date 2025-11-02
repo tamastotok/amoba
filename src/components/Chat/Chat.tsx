@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Box, Typography, TextField, Button, useTheme } from '@mui/material';
 import type { Reducers } from '@/types';
-import socket from '../../server';
+import socket from '@/server';
 
 interface ChatData {
   _id: string;

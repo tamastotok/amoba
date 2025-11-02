@@ -3,7 +3,7 @@ import {
   SET_NEXT_MARK,
   RESET_NEXT_MARK,
   SELECT_PLAYER_MARK,
-} from '../../utils/constants';
+} from '@/utils/constants';
 
 export const selectStarterMark = (value: string) => {
   return {

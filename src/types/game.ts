@@ -24,3 +24,18 @@ export interface OnlineGameProps {
   roomId: string;
   clientIsReloaded: boolean;
 }
+
+export interface Coord {
+  row: number;
+  col: number;
+}
+
+export interface Direction {
+  dRow: number;
+  dCol: number;
+}
+
+export interface MoveContext extends Coord, Direction {
+  board: Board;
+  mark: Mark;
+}

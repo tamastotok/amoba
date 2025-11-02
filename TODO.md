@@ -16,12 +16,12 @@
 
 ---
 
-### Future plans
-
-- [ ] Change folder structure
+### Socket
 
 ---
 
-### Socket
+### Future plans
 
-- [ ] player-left event is a mess
+- [ ] Change console.logs using prefixes or emojis
+
+---

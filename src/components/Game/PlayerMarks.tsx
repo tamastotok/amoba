@@ -1,7 +1,7 @@
 import { useSelector } from 'react-redux';
-import { BLUE, RED } from '../../utils/constants';
-import type { Reducers, Mark } from '@/types';
 import { Box } from '@mui/material';
+import { BLUE, RED } from '@/utils/constants';
+import type { Reducers, Mark } from '@/types';
 
 interface PlayerMarkProps {
   gameMode: 'local' | 'online';

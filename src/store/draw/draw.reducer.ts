@@ -1,5 +1,5 @@
-import { SET_DRAW } from '../../utils/constants';
-import type { Action } from '../../types';
+import { SET_DRAW } from '@/utils/constants';
+import type { Action } from '@/types';
 
 const drawReducer = (state = false, action: Action<boolean>) => {
   switch (action.type) {

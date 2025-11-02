@@ -1,4 +1,4 @@
-import { SET_WINNER } from '../../utils/constants';
+import { SET_WINNER } from '@/utils/constants';
 
 export const setWinner = (winner: string) => {
   return {
