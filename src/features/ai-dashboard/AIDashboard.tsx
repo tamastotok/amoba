@@ -151,7 +151,7 @@ function AIDashboard() {
             type="monotone"
             dataKey="avgFitness"
             stroke="#8884d8"
-            name="Average Fitness"
+            name="Avg. Fitness"
           />
           <Line
             type="monotone"
@@ -169,7 +169,7 @@ function AIDashboard() {
             type="monotone"
             dataKey="winRate"
             stroke="#f0a500"
-            name="Average Win Rate (%)"
+            name="Avg. Win Rate (%)"
           />
         </LineChart>
       </ResponsiveContainer>

@@ -23,7 +23,7 @@ function SquareLocal({ id, row, col }: SquareLocalProps) {
   const handleClick = () => {
     if (gridDisabled || value || gameIsDraw || winner) return;
 
-    // clone board
+    // Clone board
     const nextBoard = board.map((r) => r.slice());
     nextBoard[row][col] = nextMark as Mark;
 

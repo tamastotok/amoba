@@ -10,28 +10,27 @@ import {
   ToggleButton,
   ToggleButtonGroup,
 } from '@mui/material';
-
-const sessionStorage = window.sessionStorage;
+import type { Mark } from '@/types';
 
 interface SelectMarkProps {
-  mark: string;
+  mark: 'starterMark' | 'playerMark';
   label: string;
 }
 
 function SelectMark({ mark, label }: SelectMarkProps) {
   const dispatch = useDispatch();
-  const [value, setValue] = useState<'X' | 'O'>('X');
+  const [value, setValue] = useState<Mark>('X');
 
   const handleChange = (
     _event: React.MouseEvent<HTMLElement>,
-    newValue: 'X' | 'O' | null
+    newValue: Mark
   ) => {
     if (!newValue) return;
     setValue(newValue);
 
     if (mark === 'starterMark') {
       dispatch(selectStarterMark(newValue));
-    } else if (mark === 'playerMark') {
+    } else {
       dispatch(selectPlayerMark(newValue));
     }
   };

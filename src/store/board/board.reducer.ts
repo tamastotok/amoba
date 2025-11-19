@@ -26,7 +26,6 @@ type HydrateBoardAction = Action<{
 
 type BoardAction = SetGridSizeAction | SetBoardDataAction | HydrateBoardAction;
 
-// pick an initial size (e.g., from sessionStorage or 8)
 const initialSize = Number(sessionStorage.getItem('gridSize') || 8);
 const initialState: Board = makeBoard(initialSize);
 
@@ -38,9 +37,9 @@ const boardReducer = (state = initialState, action: BoardAction): Board => {
     }
     case SET_BOARD_DATA: {
       const { row, col, value } = action.payload as Sqr;
-      // immutable update
+
       if (state[row]?.[col] === undefined) return state;
-      if (state[row][col] !== '') return state; // ignore overwrites
+      if (state[row][col] !== '') return state;
       const next = state.map((r) => r.slice());
       next[row][col] = value;
       return next;

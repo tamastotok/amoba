@@ -4,33 +4,31 @@ import { useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import GameLayout from '@/components/game/GameLayout';
 import { GameStatusOnline, SquareOnline } from '@/features/online/common';
-import { setBoardData, hydrateBoard } from '@/store/board/board.action';
+import { setBoardData } from '@/store/board/board.action';
 import { setNextMark } from '@/store/marks/marks.action';
 import { changeGridState } from '@/store/grid-disable/grid-disable.action';
-import { resetGameState } from '@/store/game/game.action';
 import { setDraw } from '@/store/draw/draw.action';
 import { checkAndDispatchWinner } from '@/utils/helpers/checkWinningPatterns';
-import { handleLeaveGame } from '@/utils/helpers/gameActions';
+import {
+  handleLeaveGame,
+  handleRestartClick,
+} from '@/utils/helpers/gameActions';
 import { BLUE_BORDER, RED_BORDER } from '@/utils/constants';
 import store from '@/store';
 import socket from '@/server';
 import type { OnlineGameProps, Reducers, Sqr } from '@/types';
 
-function OnlineAIGame({
-  response,
-  playerMark,
-  roomId,
-  clientIsReloaded,
-}: OnlineGameProps) {
+function OnlineAIGame({ playerMark, roomId }: OnlineGameProps) {
   const dispatch = useDispatch();
-
   const navigate = useNavigate();
+
   const sessionSize = sessionStorage.getItem('gridSize') as string;
   const gridSize = parseInt(sessionSize, 10);
   const marks = useSelector((state: Reducers) => state.marks);
   const winner = useSelector((state: Reducers) => state.winner);
   const gridIsDisabled = useSelector((state: Reducers) => state.gridIsDisabled);
   const buttonsRef = useRef<HTMLDivElement>(null);
+
   const [borderColor, setBorderColor] = useState(
     marks.starterMark === 'X' ? BLUE_BORDER : RED_BORDER
   );
@@ -62,11 +60,9 @@ function OnlineAIGame({
   useEffect(() => {
     if (!roomId) return;
 
-    // After human player step, the server broadcast square-btn... event
     const onSquareClick = (data: { positions: Sqr[] }) => {
       const last = data.positions[data.positions.length - 1];
 
-      // Refresh board
       dispatch(setBoardData(last));
       dispatch(setNextMark());
       dispatch(changeGridState());
@@ -74,24 +70,26 @@ function OnlineAIGame({
       const currentBoard = store.getState().board;
       checkAndDispatchWinner(last.row, last.col, currentBoard);
 
-      // Check draw
+      // Draw
       if (!currentBoard.flat().includes('')) {
         dispatch(setDraw(true));
         return;
       }
 
-      // If we have a winner, we don't trigger ai anymore
+      // Winner -> AI stops
       const w = store.getState().winner;
       if (w) return;
 
-      // After human player step, we trigger ai to move (by roomid)
-      socket.emit('request-ai-move', { roomId, playerMark });
+      // Trigger AI
+      socket.emit('request-ai-move', {
+        roomId,
+        playerMark,
+      });
     };
 
-    // Receive Ai step data from the server
     const onAiMove = (data: Sqr) => {
       if (!data) return;
-      // Refresh board
+
       dispatch(setBoardData(data));
       dispatch(setNextMark());
       dispatch(changeGridState());
@@ -111,25 +109,12 @@ function OnlineAIGame({
     };
   }, [roomId, dispatch, playerMark]);
 
-  // Handle reconnect
-  useEffect(() => {
-    if (!clientIsReloaded || !response) return;
-    dispatch(hydrateBoard(response.boardSize, response.positions));
-  }, [clientIsReloaded, response, dispatch]);
-
-  const handleRestartClick = () => {
-    navigate('/ai');
-    dispatch(resetGameState());
-    sessionStorage.removeItem('room');
-    localStorage.removeItem('room');
-  };
-
   // AI’s mark is always opposite of player’s
   const aiMark = playerMark === 'X' ? 'O' : 'X';
 
   return (
     <GameLayout
-      onGameEndRestart={handleRestartClick}
+      onGameEndRestart={() => handleRestartClick(dispatch, navigate, '/ai')}
       onGameEndLeave={() => handleLeaveGame(dispatch, navigate, roomId, winner)}
       onLeave={() => handleLeaveGame(dispatch, navigate, roomId, winner)}
       gameMode="online"

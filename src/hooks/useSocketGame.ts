@@ -15,7 +15,7 @@ export function useSocketGame(
       socket.on(event, handler);
     }
 
-    // Handle connect/disconnect events because these happen faster than React render
+    // Handle connect/disconnect events
     const onConnect = () => handlers.connect?.();
     const onDisconnect = () => handlers.disconnect?.();
     const onError = () => handlers.connect_error?.();

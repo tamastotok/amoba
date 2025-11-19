@@ -17,7 +17,7 @@ function Home() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
-  // Track socket connection state
+  // Track socket connection state for change button states (disable if offline)
   useEffect(() => {
     const handleConnect = () => setIsConnected(true);
     const handleDisconnect = () => setIsConnected(false);
@@ -79,7 +79,7 @@ function Home() {
         <Button
           linkTo={isConnected ? '/online' : '/'}
           clickEvent={handleClick}
-          text="Online vs Human"
+          text="Online vs Player"
           isDisabled={!isConnected}
         />
 

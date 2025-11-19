@@ -27,11 +27,12 @@
 - [✔] Player names are shown or "Player X vs. Player O"
 - [✔] Board interaction works — X and O alternate correctly.
 - [✔] Winner is detected at 5 in a row.
-- [✖] “Draw!” appears when board fills with no winner.
-- [✖] `EndGameActions` popup appears centered with **Play again** and **Leave**.
+- [✔] “Draw!” appears when board fills with no winner.
+- [✔] `EndGameActions` popup appears centered with **Play again** and **Leave**.
 - [✔] **Scroll lock** works — background cannot scroll during popup.
 - [✔] “Restart” resets the board cleanly.
 - [✔] “Leave” returns to main menu and clears Redux + localStorage.
+- [✖] Board stays the same after reloading the page
 
 ---
 
@@ -41,7 +42,7 @@
 
 - [✔] Optional name field works.
 - [✔] Player mark (`X` / `O`) selection works, default **X**.
-- [✖] Who starts first selection works, default **X**.
+- [✔] Who starts first selection works, default **X**.
 - [✔] Board size selector works.
 - [✔] Clicking “Create Game” shows **Searching for opponent...** overlay.
 - [✔] Cancel search works both via **ESC** key and **Cancel** button (mobile).
@@ -58,10 +59,12 @@
 - [✔] If one player leaves:
   - [✔] The other gets “Opponent left the game” message / popup.
 - [✔] “Leave” returns both players to main menu safely.
-- [?] No ghost sockets remain on server (check console).
-- [✖] Chat section:
-  - [?] Player names are shown or "Player X, Player O
-  - [✖] Messages can be sent in real time.
+- [✔] No ghost sockets remain on server (check console).
+- [✔] Chat section:
+  - [✔] Player names are shown or "Player X, Player O
+  - [✔] Messages can be sent in real time.
+- [✔] Board stays the same after reloading the page
+- [✖] Chat stays the same after reloading the page
 
 ---
 
@@ -70,8 +73,8 @@
 ### Setup
 
 - [✔] Optional player name works.
-- [✖] Mark (`X` / `O`) selection radio function correctly.
-- [✖] Who starts first selection works, default **X**.
+- [✔] Mark (`X` / `O`) selection radio function correctly.
+- [✔] Who starts first selection works, default **X**.
 - [✔] Board size options work.
 - [✔] Difficulty dropdown sets AI type:
   - [✔] **Easy** → simple random AI
@@ -112,17 +115,17 @@
 
 ## ⚙️ Backend & Socket Tests
 
-- [ ] `Connected to database!` appears on backend start.
+- [✔] `Connected to database!` appears on backend start.
 - [ ] `/api/ai/progress` returns valid JSON (not HTML).
 - [ ] No `Unexpected token '<'` errors in frontend console.
 - [ ] Socket events handled correctly:
-  - [ ] `search-game`
-  - [ ] `cancel-search`
-  - [ ] `game-end`
-  - [ ] `player-left`
+  - [✔] `search-game`
+  - [✔] `cancel-search`
+  - [✔] `game-end`
+  - [✔] `player-left`
   - [ ] `ai-generation-update`
-- [ ] Cancelling matchmaking correctly emits `cancel-search`.
-- [ ] `disconnect` and `reconnect` logs behave as expected.
+- [✔] Cancelling matchmaking correctly emits `cancel-search`.
+- [✔] `disconnect` and `reconnect` logs behave as expected.
 
 ---
 
@@ -140,7 +143,7 @@
 ## 📱 Mobile Responsiveness
 
 - [ ] Main menu buttons display stacked and centered.
-- [ ] SearchOverlay “Cancel Search” button visible and tappable.
+- [ ] GameOverlay “Cancel Search” button visible and tappable.
 - [ ] EndGame popup centered, readable on small screens.
 - [ ] No horizontal scrolling on any page.
 - [ ] Body scroll disabled during popups (works on touch screens).

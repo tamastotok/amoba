@@ -3,6 +3,12 @@ import type { AppDispatch } from '@/store';
 import { resetGameState } from '@/store/game/game.action';
 import socket from '@/server';
 
+const getMode = (): 'human' | 'ai' | null => {
+  const mode = sessionStorage.getItem('mode');
+  if (mode === 'human' || mode === 'ai') return mode;
+  return null;
+};
+
 // Leave game (for all modes)
 export const handleLeaveGame = (
   dispatch: AppDispatch,
@@ -12,18 +18,24 @@ export const handleLeaveGame = (
 ) => {
   try {
     if (roomId) {
-      // Online modes
+      // If the game ends normally
       if (winner) {
-        // When the game ended
         socket.emit('game-end', { roomId, winner });
+        return;
+      }
+
+      // Leave mid game → different events based on game mode
+      const mode = getMode();
+      if (mode === 'ai') {
+        socket.emit('midgame-left-ai', { roomId });
       } else {
-        // When player leave/disconnect mid game
-        socket.emit('midgame-left', { roomId });
+        // Default: human
+        socket.emit('midgame-left-human', { roomId });
       }
       return;
     }
 
-    // Offline mode cleanup
+    // Offline / local mode
     dispatch(resetGameState());
     sessionStorage.removeItem('room');
     localStorage.removeItem('room');
@@ -31,4 +43,15 @@ export const handleLeaveGame = (
   } catch (e) {
     console.error('leave error', e);
   }
+};
+
+// Restart game button
+export const handleRestartClick = (
+  dispatch: AppDispatch,
+  navigate: NavigateFunction,
+  route: string
+) => {
+  sessionStorage.removeItem('room');
+  dispatch(resetGameState());
+  navigate(route);
 };

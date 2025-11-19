@@ -4,13 +4,16 @@ import { useAppDispatch, useAppSelector } from './store/hooks';
 import { useSocketGame } from './hooks/useSocketGame';
 import { setGridIsDisabled } from './store/grid-disable/grid-disable.action';
 import { setGridSize } from './store/grid-size/grid-size.action';
-import { resetNextMark, selectStarterMark } from './store/marks/marks.action';
+import {
+  resetNextMark,
+  selectPlayerMark,
+  selectStarterMark,
+} from './store/marks/marks.action';
 import {
   setPlayerBlueName,
   setPlayerRedName,
 } from './store/players/players.action';
 import { hydrateBoard } from './store/board/board.action';
-import { setWinner } from './store/winner/winner.action';
 import type { RootState } from './store';
 import type {
   ContinuePayload,
@@ -18,83 +21,132 @@ import type {
   GameFoundPayload,
   OpponentLeftPayload,
   Reducers,
-  Sqr,
+  Mark,
 } from './types';
 import LocalGame from './features/local/game/LocalGame';
-import OnlineGameHuman from './features/online/human/OnlineHumanGame';
-import OnlineGameAI from './features/online/ai/OnlineAIGame';
+import OnlineHumanGame from './features/online/human/OnlineHumanGame';
+import OnlineAIGame from './features/online/ai/OnlineAIGame';
 import OnlineHumanMenu from './features/online/human/OnlineHumanMenu';
 import OnlineAIMenu from './features/online/ai/OnlineAIMenu';
 import AIDashboard from './features/ai-dashboard/AIDashboard';
 import socket from './server';
-import SearchOverlay from './components/overlays/SearchOverlay';
+import GameOverlay from './components/overlays/GameOverlay';
 import { resetGameState } from './store/game/game.action';
 import { useBodyScrollLock } from './hooks/useBodyScrollLock';
 import { useSelector } from 'react-redux';
-import ReconnectModal from './components/overlays/ReconnectModal';
 import SystemStatusBar from './components/ui/SystemStatusBar';
 import { LocalMenu } from './features/local/menu';
 import Home from './pages/Home';
+import { useOverlayActions, type OverlayType } from './hooks/useOverlayActions';
 
 function App() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
+  const mark = sessionStorage.getItem('playerMark');
+  const mode = sessionStorage.getItem('mode');
+
+  const winner = useSelector((state: Reducers) => state.winner);
+  const isDraw = useSelector((state: Reducers) => state.winner);
   const playerMark = useAppSelector(
     (state: RootState) => state.marks.playerMark
   );
 
   const [roomId, setRoomId] = useState('');
   const [statusMessage, setStatusMessage] = useState('');
-  const [response, setResponse] = useState<ContinuePayload | null>(null);
-  const [clientIsReloaded, setClientIsReloaded] = useState(false);
-  const [opponentLeft, setOpponentLeft] = useState(false);
-  const [showReconnect, setShowReconnect] = useState(false);
-  const [disconnectedRoom, setDisconnectedRoom] = useState<string | null>(null);
-  const mark = sessionStorage.getItem('playerMark');
-  const winner = useSelector((state: Reducers) => state.winner);
-  const isDraw = useSelector((state: Reducers) => state.winner);
+  const [reconnectTime, setReconnectTime] = useState(0);
+  const [overlayType, setOverlayType] = useState<OverlayType>(null);
 
+  // Disable scroll
   useBodyScrollLock(!!(winner || isDraw));
+
+  // GameOverlay button actions
+  const { handleCancel, handleReconnect } = useOverlayActions({
+    overlayType,
+    setOverlayType,
+  });
+
+  // --- Reload (F5) handler ---
+  useEffect(() => {
+    const path = window.location.pathname;
+    const isGameScreen =
+      path.startsWith('/online/game/') || path.startsWith('/ai/game/');
+
+    if (!isGameScreen) {
+      console.log('🔁 Reload skipped: not on a game screen');
+      return;
+    }
+
+    const roomId = sessionStorage.getItem('room');
+    const gameMode = sessionStorage.getItem('mode');
+    const isReconnect = Boolean(sessionStorage.getItem('isReconnect'));
+
+    if (!isReconnect) {
+      console.log('🔁 Reload skipped: reconnect is ', isReconnect);
+      return;
+    }
+
+    if (!roomId || !gameMode) {
+      console.log('🔁 Reload skipped: missing room or mode');
+      return;
+    }
+
+    console.log(
+      '🔁 Attempting reload reconnect for room:',
+      roomId,
+      'mode:',
+      gameMode
+    );
+
+    if (gameMode === 'human') {
+      socket.emit('reload-human', { roomId });
+    } else if (gameMode === 'ai') {
+      socket.emit('reload-ai', { roomId });
+    }
+  }, []);
 
   // --- General socket handlers ---
   useSocketGame({
     searching: (res: unknown) => {
       const payload = res as SearchingPayload;
-      setStatusMessage('Waiting for another player...');
+      setOverlayType('search');
+      setStatusMessage('Searching for opponent...');
       dispatch(setGridIsDisabled(payload.starterMark !== payload.playerMark));
     },
 
     'game-found': (res: unknown) => {
       const payload = res as GameFoundPayload;
+      console.log('🎯 game-found fired for client', socket.id);
 
-      if (payload.roomId) {
-        navigate(`/online/game/${payload.roomId}`);
-        sessionStorage.setItem('room', payload.roomId);
-        localStorage.setItem('room', payload.roomId);
-        setRoomId(payload.roomId);
+      sessionStorage.removeItem('reconnectRoomId');
+      sessionStorage.removeItem('reconnectTime');
 
-        dispatch(setPlayerBlueName(payload.playerData.blueName));
-        dispatch(setPlayerRedName(payload.playerData.redName));
-        dispatch(setGridSize(payload.boardSize));
-        dispatch(selectStarterMark(payload.starterMark));
-        dispatch(resetNextMark(payload.starterMark));
+      if (!payload.roomId) return;
+      sessionStorage.setItem('mode', 'human');
 
-        // Board initialization
-        const emptyPositions: Sqr[] = [];
-        for (let row = 0; row < payload.boardSize; row++) {
-          for (let col = 0; col < payload.boardSize; col++) {
-            emptyPositions.push({ row, col, value: '' });
-          }
-        }
-        dispatch(hydrateBoard(payload.boardSize, emptyPositions));
-        dispatch(setGridIsDisabled(payload.starterMark !== playerMark));
+      navigate(`/online/game/${payload.roomId}`);
+      sessionStorage.setItem('room', payload.roomId);
 
-        setStatusMessage('');
-      }
+      setRoomId(payload.roomId);
+
+      sessionStorage.setItem('isReconnect', 'false');
+
+      dispatch(setPlayerBlueName(payload.playerData.bluePlayer.name));
+      dispatch(setPlayerRedName(payload.playerData.redPlayer.name));
+      dispatch(setGridSize(payload.boardSize));
+      dispatch(selectStarterMark(payload.starterMark));
+      dispatch(resetNextMark(payload.starterMark));
+
+      dispatch(
+        setGridIsDisabled(payload.starterMark !== playerMark ? true : false)
+      );
+
+      setStatusMessage('');
+      setOverlayType(null);
     },
 
     'search-canceled': () => {
+      setOverlayType(null);
       setStatusMessage('');
       dispatch(setGridIsDisabled(false));
     },
@@ -104,39 +156,38 @@ function App() {
 
       if (!payload.roomId) return;
 
+      sessionStorage.setItem('mode', 'ai');
       navigate(`/ai/game/${payload.roomId}`);
       sessionStorage.setItem('room', payload.roomId);
       localStorage.setItem('room', payload.roomId);
       setRoomId(payload.roomId);
 
-      dispatch(setPlayerBlueName(payload.playerData.blueName || ''));
-      dispatch(setPlayerRedName(payload.playerData.redName || ''));
-
+      sessionStorage.setItem('isReconnect', 'false');
+      dispatch(setPlayerBlueName(payload.playerData.bluePlayer.name || ''));
+      dispatch(setPlayerRedName(payload.playerData.redPlayer.name || ''));
       dispatch(setGridSize(payload.boardSize));
-
-      // Board initialization
-      const emptyMatrix: Sqr[] = [];
-      for (let row = 0; row < payload.boardSize; row++) {
-        for (let col = 0; col < payload.boardSize; col++) {
-          emptyMatrix.push({ row, col, value: '' });
-        }
-      }
-
-      dispatch(hydrateBoard(payload.boardSize, emptyMatrix));
-      dispatch(setGridIsDisabled(false));
+      dispatch(setGridIsDisabled(payload.starterMark !== payload.playerMark));
       setStatusMessage('');
     },
 
     'game-ended': () => {
-      // Reset Redux + navigate only now (confirmed end)
       dispatch(resetGameState());
       setRoomId('');
-      setResponse(null);
-      setOpponentLeft(false);
+
       setStatusMessage('');
       sessionStorage.removeItem('room');
       localStorage.removeItem('room');
       navigate('/');
+    },
+
+    'left-game-perma': (res?: unknown) => {
+      const payload = res as OpponentLeftPayload;
+      console.warn('Opponent has left the game permanently.');
+
+      dispatch(resetGameState());
+
+      setStatusMessage(payload.message || 'Your opponent has left the game');
+      setOverlayType('left-game-perma');
     },
 
     'opponent-left': (res?: unknown) => {
@@ -150,78 +201,121 @@ function App() {
 
       // Disable board and send a status message
       setStatusMessage(payload.message || 'Your opponent has disconnected.');
-      dispatch(setGridIsDisabled(true));
+      setReconnectTime(payload.reconnectWindow || 30);
 
       // Opponent left statust (UI)
-      setOpponentLeft(true);
-      setDisconnectedRoom(payload.roomId);
-      setShowReconnect(true);
+      setOverlayType('opponent-left');
+    },
+
+    'you-left': (res?: unknown) => {
+      const payload = res as OpponentLeftPayload;
+      console.log('You left the game:', payload);
+
+      // Save data for reconnect
+      sessionStorage.setItem('reconnectRoomId', payload.roomId);
+
+      // Reset state and redirect
+      dispatch(resetGameState());
+      setOverlayType('you-left');
+      setStatusMessage(
+        payload.message || 'You left the game. Want to reconnect?'
+      );
+      setReconnectTime(payload.reconnectWindow || 30);
+    },
+
+    // Opponent reconnected event
+    'opponent-reconnected': (res?: unknown) => {
+      console.log('Opponent reconnected:', res);
+      setOverlayType(null);
+
+      // Close any "waiting for opponent" UI
+      setStatusMessage('Opponent reconnected.');
     },
   });
 
-  // --- Handle refresh or reconnect after disconnect ---
+  // --- Handle reconnect success/fail (self reconnect only) ---
   useEffect(() => {
-    // Check if we have pending room (open for 60sec)
-    const roomId = sessionStorage.getItem('room');
-    if (!roomId) return;
+    const onReconnectSuccess = (payload: ContinuePayload) => {
+      console.log(
+        'Successfully reconnected to room:',
+        payload.roomId,
+        'isReconnect:',
+        payload.isReconnect
+      );
 
-    console.log('Attempting to reconnect to saved room:', roomId);
+      if (!payload.isReconnect) return;
 
-    // Attempt reconnecting
-    socket.emit('reconnect-room', roomId);
+      dispatch(setGridSize(payload.boardSize));
+      dispatch(hydrateBoard(payload.boardSize, payload.positions));
+      dispatch(setPlayerBlueName(payload.playerData.bluePlayer.name));
+      dispatch(setPlayerRedName(payload.playerData.redPlayer.name));
 
-    // Reconnect successfulled
-    const onReconnectSuccess = (data: ContinuePayload) => {
-      console.log('Successfully reconnected to room:', data.roomId);
+      // Restore player's own mark from sessionStorage
+      const storedPlayerMark = sessionStorage.getItem(
+        'playerMark'
+      ) as Mark | null;
 
-      // Redux state restore
-      dispatch(setGridSize(data.boardSize));
-      dispatch(hydrateBoard(data.boardSize, data.positions || []));
-      dispatch(setPlayerBlueName(data.bluePlayer.name));
-      dispatch(setPlayerRedName(data.redPlayer.name));
-      dispatch(resetNextMark(data.whoIsNext));
-      dispatch(selectStarterMark(data.whoIsNext));
+      dispatch(selectPlayerMark(storedPlayerMark === 'X' ? 'X' : 'O'));
 
-      // UI reset
-      dispatch(setWinner(''));
-      dispatch(setGridIsDisabled(false));
+      console.log(
+        'restore: nextMark=',
+        payload.nextMark,
+        'playerMark=',
+        storedPlayerMark
+      );
 
-      // Session restore
-      setResponse(data);
-      setRoomId(data.roomId);
-      setClientIsReloaded(true);
+      // Restore nextMark from server
+      dispatch(resetNextMark(payload.nextMark));
+      dispatch(selectStarterMark(payload.nextMark));
 
-      navigate(`/online/game/${data.roomId}`);
+      // Enable / disable grid
+      if (storedPlayerMark) {
+        dispatch(setGridIsDisabled(payload.nextMark !== storedPlayerMark));
+      }
 
-      // Disable board if the enemy comes next
-      if (mark && mark !== data.whoIsNext) {
-        dispatch(setGridIsDisabled(true));
+      setRoomId(payload.roomId);
+      setOverlayType(null);
+
+      // Navigation based on game mode
+      const mode = sessionStorage.getItem('mode') || 'human';
+
+      if (mode === 'ai') {
+        navigate(`/ai/game/${payload.roomId}`);
+      } else {
+        navigate(`/online/game/${payload.roomId}`);
+      }
+
+      console.log('Reconnect restored state:', {
+        storedPlayerMark,
+        nextMark: payload.nextMark,
+      });
+    };
+
+    const onReconnectFailed = (payload: { message: string }) => {
+      console.warn('Reconnect failed:', payload.message);
+      sessionStorage.removeItem('reconnectRoomId');
+      sessionStorage.removeItem('reconnectTime');
+      setRoomId('');
+      dispatch(resetGameState());
+
+      setOverlayType('reconnect-failed');
+      setStatusMessage('Your opponent has left the game.');
+
+      if (mode === 'ai') {
+        navigate('/ai');
+      } else {
+        navigate('/online');
       }
     };
 
-    // Reconnect failed
-    const onReconnectFailed = (payload: { message: string }) => {
-      console.warn('Reconnect failed:', payload.message);
-      sessionStorage.removeItem('room');
-      dispatch(resetGameState());
-      navigate('/online');
-    };
-
-    // Event listeners
     socket.on('reconnect-success', onReconnectSuccess);
     socket.on('reconnect-failed', onReconnectFailed);
 
-    // Cleanup
     return () => {
       socket.off('reconnect-success', onReconnectSuccess);
       socket.off('reconnect-failed', onReconnectFailed);
     };
-  }, [dispatch, navigate, mark]);
-
-  const handleOnCancel = () => {
-    setOpponentLeft(false);
-    setStatusMessage('');
-  };
+  }, [dispatch, navigate, mark, mode]);
 
   return (
     <>
@@ -235,41 +329,32 @@ function App() {
         <Route
           path="/online/game/:id"
           element={
-            <OnlineGameHuman
-              roomId={roomId}
-              response={response}
-              playerMark={playerMark as 'X' | 'O'}
-              clientIsReloaded={clientIsReloaded}
-            />
+            <OnlineHumanGame roomId={roomId} playerMark={playerMark as Mark} />
           }
         />
 
         <Route
           path="/ai/game/:id"
           element={
-            <OnlineGameAI
-              roomId={roomId}
-              response={response}
-              playerMark={playerMark as 'X' | 'O'}
-              clientIsReloaded={clientIsReloaded}
-            />
+            <OnlineAIGame roomId={roomId} playerMark={playerMark as Mark} />
           }
         />
 
         <Route path="/ai-dashboard" element={<AIDashboard />} />
       </Routes>
-      <SystemStatusBar statusMessage={statusMessage} />
-      {opponentLeft && (
-        <SearchOverlay
-          message={statusMessage || 'Opponent disconnected.'}
-          type="disconnected"
-          onCancel={handleOnCancel}
-        />
-      )}
-      {showReconnect && disconnectedRoom && (
-        <ReconnectModal
-          roomId={disconnectedRoom}
-          onClose={() => setShowReconnect(false)}
+
+      <SystemStatusBar />
+
+      {overlayType && (
+        <GameOverlay
+          message={statusMessage}
+          type={overlayType}
+          onCancel={() => {
+            if (overlayType === 'search') setStatusMessage('');
+            handleCancel();
+          }}
+          onReconnect={handleReconnect}
+          reconnectTime={reconnectTime}
         />
       )}
     </>

@@ -5,26 +5,24 @@ import { Box } from '@mui/material';
 import Chat from '@/components/chat/Chat';
 import GameLayout from '@/components/game/GameLayout';
 import { GameStatusOnline, SquareOnline } from '@/features/online/common';
-import { setBoardData, hydrateBoard } from '@/store/board/board.action';
+import { setBoardData } from '@/store/board/board.action';
 import { setNextMark } from '@/store/marks/marks.action';
 import { changeGridState } from '@/store/grid-disable/grid-disable.action';
 import { setDraw } from '@/store/draw/draw.action';
-import { resetGameState } from '@/store/game/game.action';
-import { handleLeaveGame } from '@/utils/helpers/gameActions';
+import {
+  handleLeaveGame,
+  handleRestartClick,
+} from '@/utils/helpers/gameActions';
 import { checkAndDispatchWinner } from '@/utils/helpers/checkWinningPatterns';
 import { BLUE_BORDER, RED_BORDER } from '@/utils/constants';
 import store from '@/store';
 import socket from '@/server';
 import type { Reducers, OnlineGameProps, Sqr } from '@/types';
 
-function OnlineHumanGame({
-  response,
-  playerMark,
-  roomId,
-  clientIsReloaded,
-}: OnlineGameProps) {
+function OnlineHumanGame({ playerMark, roomId }: OnlineGameProps) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
   const sessionSize = sessionStorage.getItem('gridSize') as string;
   const gridSize = parseInt(sessionSize, 10);
   const marks = useSelector((state: Reducers) => state.marks);
@@ -87,23 +85,9 @@ function OnlineHumanGame({
     };
   }, [roomId, dispatch]);
 
-  // Reconnect handling
-  useEffect(() => {
-    if (!clientIsReloaded || !response) return;
-    dispatch(hydrateBoard(response.boardSize, response.positions));
-  }, [clientIsReloaded, response, dispatch]);
-
-  // Restart game button
-  const handleRestartClick = () => {
-    navigate('/online');
-    dispatch(resetGameState());
-    sessionStorage.removeItem('room');
-    localStorage.removeItem('room');
-  };
-
   return (
     <GameLayout
-      onGameEndRestart={handleRestartClick}
+      onGameEndRestart={() => handleRestartClick(dispatch, navigate, '/online')}
       onGameEndLeave={() => handleLeaveGame(dispatch, navigate, roomId, winner)}
       onLeave={() => handleLeaveGame(dispatch, navigate, roomId, winner)}
       chat={<Chat />}

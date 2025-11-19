@@ -1,14 +1,22 @@
 ### UI tweaking
 
-- [ ] AI Dashboard
+- [ ] [TODO] AI Dashboard
 
 ---
 
-- [ ] System bar and chat names change to Player X/Y
+- [ ] [TODO] Chat names change to Player X/Y by default
+
+---
+
+### Gameplay (Local)
+
+- [ ] [BUG] Board goes empty after reload (F5)
 
 ---
 
 ### Gameplay (Online vs Human)
+
+- [ ] [BUG] Chat doesn't reload
 
 ---
 

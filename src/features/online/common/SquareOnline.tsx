@@ -8,7 +8,7 @@ interface SquareOnlineProps {
   colindex: number;
   roomId: string;
   isAIGame?: boolean;
-  aiMark?: Mark; // optional
+  aiMark?: Mark;
 }
 
 function SquareOnline({ id, rowindex, colindex, roomId }: SquareOnlineProps) {

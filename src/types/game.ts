@@ -1,5 +1,3 @@
-import type { ContinuePayload } from './network';
-
 export type Mark = 'X' | 'O';
 export type Cell = Mark | '';
 export type Board = Cell[][];
@@ -19,10 +17,8 @@ export interface Sqr {
 }
 
 export interface OnlineGameProps {
-  response: ContinuePayload | null;
   playerMark: Mark;
   roomId: string;
-  clientIsReloaded: boolean;
 }
 
 export interface Coord {

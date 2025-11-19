@@ -30,7 +30,6 @@ function OnlineAIMenu() {
   };
 
   const handleStartAIGame = () => {
-    // Make a room for play
     socket.emit('create-ai-game', {
       playerName,
       playerMark,
@@ -43,7 +42,6 @@ function OnlineAIMenu() {
   return (
     <>
       <PlayerInputsOnline clickEvent={handleNameChange} />
-
       <SelectMark label="Select your mark:" mark="playerMark" />
       <SelectStarter />
       <GridSize />
