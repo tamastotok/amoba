@@ -1,60 +1,61 @@
-🎮 Project: Gomoku with Learning AI
-🧠 Overview
+# Gomoku with Learning AI - Frontend
 
-This project is a full-stack, real-time Gomoku (Five in a Row) game featuring multiple play modes and a self-learning AI opponent.
-Players can compete locally, online versus other players, or against an AI that adapts its strategy through generations using a genetic algorithm.
-The system demonstrates real-time multiplayer communication, AI-driven gameplay, and data visualization in a unified architecture.
+This repository contains the **React-based frontend** for a real-time Gomoku game that includes a **genetic-algorithm powered self-learning AI**.
+Players can compete locally, online against other human players, or against an evolving AI bot.
 
-⚙️ Tech Stack
+Originally a personal portfolio project, it was later expanded and used as a submission for a university Artificial Intelligence course.
 
-Frontend: React (TypeScript), Redux, MUI (Emotion), Socket.io, Recharts
-Backend: Node.js, Express, MongoDB, Socket.io
-Architecture: Full MERN stack with WebSocket communication and persistent AI state.
+## Tech Stack
 
-🤖 AI Component
+**Vite + React** (TypeScript)  
+**Redux Toolkit** - game state, session state
+**Socket.io Client** - live multiplayer + AI communication  
+**MUI + Emotion** - UI components  
+**Recharts** - AI dashboard visualization
 
-The AI module includes three difficulty levels:
+## AI Overview
 
-Easy: Random-based decision-making.
+Although the AI itself runs on the backend, the frontend visualizes the learning process:
 
-Medium: Heuristic-based evaluation of board positions.
+- Fitness over generations
+- Best / average / worst strategy scores
+- Live updates via Socket.io
 
-Hard: A Genetic Algorithm that evolves strategies by simulating populations, crossover, and mutation.
-Each generation’s fitness scores, win rates, and performance metrics are stored in a MongoDB database and visualized in real time on an AI Dashboard built with Recharts.
+## Gameplay Features
 
-🌐 Features
+**Game modes:**  
+Local (hotseat)  
+PvP (online)  
+PvAI (online)
 
-Real-time online multiplayer powered by Socket.io
+**Three AI levels:**  
+Easy → Random  
+Medium → Heuristic  
+Hard → Genetic Algorithm (evolving strategies)
 
-AI learning process visualization via AI Dashboard
+## AI Dashboard
 
-Admin authentication for accessing training statistics
+The Dashboard allows real-time monitoring of:
 
-Smooth animations and modern UI using MUI + Framer Motion
+- eneration number
+- strategy populations
+- fitness metrics
+- win-rate trends
 
-Redux-based global state management for gameplay and session control
+Charts update automatically whenever the backend emits a new generation.
 
-Scroll-lock and overlay control for enhanced UX
+## Bug Report System
 
-Responsive design optimized for desktop and mobile devices
+A built-in bug report modal allows players to report issues directly in-game.
+All bug reports are saved in MongoDB (via backend).
 
-📊 AI Dashboard
+## Live Demo & Repositories
 
-The AI Dashboard provides real-time monitoring of the learning process.
-Each generation is plotted dynamically, showing average, best, and worst fitness values, as well as win rate trends over time.
-Updates are pushed live from the backend using WebSocket events, allowing users to visualize how the AI evolves and improves.
+Frontend Repo  
+(link)
 
-🏁 Outcome
+Backend Repo  
+(link)
 
-This project was originally developed as a university assignment for Artificial Intelligence, later extended into a portfolio-level full-stack application.
-It showcases strong practical understanding of real-time systems, AI integration, and full-stack architecture, making it both a technical achievement and a visually engaging interactive experience.
-
-🚀 Live Demo / Repository
-
-(You can add links here once deployed)
-
-Frontend: [your-frontend-link-here]
-
-Backend: [your-backend-link-here]
-
-GitHub: [repo-link-here]
+Live Demo  
+(link)
