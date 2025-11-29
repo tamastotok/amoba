@@ -14,7 +14,7 @@ function PlayerMarks({ gameMode, playerMark }: PlayerMarkProps) {
     <Box sx={{ display: 'flex' }}>
       <h1
         style={{
-          color: marks.nextMark === 'X' ? BLUE : 'black',
+          color: marks.nextMark === 'X' ? BLUE : 'grey',
           marginTop: '1rem',
           marginRight: '4rem',
           textAlign: 'center',
@@ -25,7 +25,7 @@ function PlayerMarks({ gameMode, playerMark }: PlayerMarkProps) {
       </h1>
       <h1
         style={{
-          color: marks.nextMark === 'O' ? RED : 'black',
+          color: marks.nextMark === 'O' ? RED : 'grey',
           marginTop: '1rem',
           marginLeft: '4rem',
           textAlign: 'center',
