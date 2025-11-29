@@ -4,9 +4,8 @@ import { useSelector, useDispatch } from 'react-redux';
 import { resetNextMark, selectStarterMark } from '@/store/marks/marks.action';
 import { setWinner } from '@/store/winner/winner.action';
 import { setGridIsDisabled } from '@/store/grid-disable/grid-disable.action';
-import { createMatrix } from '@/utils/helpers/createMatrix';
 import { BLUE_BORDER, RED_BORDER } from '@/utils/constants';
-import type { Reducers, Sqr } from '@/types';
+import type { Mark, Reducers, Sqr } from '@/types';
 import { handleLeaveGame } from '@/utils/helpers/gameActions';
 import { hydrateBoard } from '@/store/board/board.action';
 import GameLayout from '@/components/game/GameLayout';
@@ -14,6 +13,7 @@ import { Box } from '@mui/material';
 import { setDraw } from '@/store/draw/draw.action';
 import GameStatusLocal from './GameStatusLocal';
 import SquareLocal from './SquareLocal';
+import { setGridSize } from '@/store/grid-size/grid-size.action';
 
 function LocalGame() {
   const dispatch = useDispatch();
@@ -22,12 +22,80 @@ function LocalGame() {
   const winner = useSelector((state: Reducers) => state.winner);
   const gridSize = useSelector((state: Reducers) => state.gridSize);
   const board = useSelector((state: Reducers) => state.board);
+  const [isHydrated, setIsHydrated] = useState(false);
   const buttonsRef = useRef<HTMLDivElement>(null);
 
+  // Border color depends on next player or winner
   const [borderColor, setBorderColor] = useState(
     marks.starterMark === 'X' ? BLUE_BORDER : RED_BORDER
   );
 
+  // Restore local game state on initial load (F5)
+  useEffect(() => {
+    const saved = sessionStorage.getItem('localGame');
+    const localReload = sessionStorage.getItem('localReload') === 'true';
+
+    // If not reload we wont restore
+    if (!localReload || !saved) {
+      setIsHydrated(true);
+      return;
+    }
+
+    try {
+      const data = JSON.parse(saved) as {
+        gridSize: number;
+        positions: Sqr[];
+        marks: { starterMark: Mark; nextMark: Mark };
+        winner: Mark | null;
+      };
+
+      // Restore states
+      dispatch(setGridSize(data.gridSize));
+      dispatch(hydrateBoard(data.gridSize, data.positions));
+      dispatch(selectStarterMark(data.marks.starterMark));
+      dispatch(resetNextMark(data.marks.nextMark));
+
+      if (data.winner) {
+        dispatch(setWinner(data.winner));
+        dispatch(setGridIsDisabled(true));
+      }
+    } catch (err) {
+      console.error('Local game restore error:', err);
+    } finally {
+      sessionStorage.removeItem('localReload');
+      setIsHydrated(true);
+    }
+  }, [dispatch]);
+
+  // Save local game state (only after restore finished)
+  useEffect(() => {
+    if (!isHydrated) return;
+
+    const positions: Sqr[] = [];
+    for (let row = 0; row < gridSize; row++) {
+      for (let col = 0; col < gridSize; col++) {
+        positions.push({
+          row,
+          col,
+          value: board[row][col],
+        });
+      }
+    }
+
+    const saveState = {
+      gridSize,
+      positions,
+      marks: {
+        starterMark: marks.starterMark,
+        nextMark: marks.nextMark,
+      },
+      winner,
+    };
+
+    sessionStorage.setItem('localGame', JSON.stringify(saveState));
+  }, [isHydrated, board, gridSize, marks.starterMark, marks.nextMark, winner]);
+
+  // Update border color
   useEffect(() => {
     if (winner) {
       setBorderColor(winner === 'X' ? BLUE_BORDER : RED_BORDER);
@@ -36,48 +104,34 @@ function LocalGame() {
     }
   }, [winner, marks.nextMark]);
 
-  //  Get square DOM elements and put them in a 2d array
-  let allButton: HTMLButtonElement[] = [];
-  const allButtonMatrix: HTMLButtonElement[][] = [];
-  if (buttonsRef.current) {
-    allButton = Array.from(buttonsRef.current.children).map(
-      (el) => el as HTMLButtonElement
-    );
-  }
-  while (allButton.length) allButtonMatrix.push(allButton.splice(0, gridSize));
-
-  //  Check if game has a winner in every click
+  // Draw check
   useEffect(() => {
-    //  Check draw
-    if (buttonsRef.current) {
-      const buttonValues = [...buttonsRef.current.children].map(
-        (item) => (item as HTMLButtonElement).value
-      );
-      if (!buttonValues.includes('')) {
-        dispatch(setDraw(true));
-        dispatch(setGridIsDisabled(true));
-      }
+    if (!buttonsRef.current) return;
+
+    const values = [...buttonsRef.current.children].map(
+      (btn) => (btn as HTMLButtonElement).value
+    );
+
+    if (!values.includes('')) {
+      dispatch(setDraw(true));
+      dispatch(setGridIsDisabled(true));
     }
-  }, [dispatch, board]);
+  }, [board, dispatch]);
+
+  // Restart button handler
 
   const handleRestartClick = () => {
-    // Empty board (Redux version)
-    const emptyPositions: Sqr[] = [];
-    for (let row = 0; row < gridSize; row++) {
-      for (let col = 0; col < gridSize; col++) {
-        emptyPositions.push({ row, col, value: '' });
+    const empty: Sqr[] = [];
+    for (let r = 0; r < gridSize; r++) {
+      for (let c = 0; c < gridSize; c++) {
+        empty.push({ row: r, col: c, value: '' });
       }
     }
 
-    // Proper hydrateBoard call
-    dispatch(hydrateBoard(gridSize, emptyPositions));
-
-    // Alternate starting player
     const nextStarter = marks.starterMark === 'X' ? 'O' : 'X';
+    dispatch(hydrateBoard(gridSize, empty));
     dispatch(selectStarterMark(nextStarter));
     dispatch(resetNextMark(nextStarter));
-
-    // Reset UI state
     dispatch(setWinner(''));
     dispatch(setGridIsDisabled(false));
     dispatch(setDraw(false));
@@ -107,14 +161,14 @@ function LocalGame() {
           overflow: 'hidden',
         }}
       >
-        {createMatrix(gridSize).map((item, index) => (
-          <SquareLocal
-            key={index}
-            id={`${item.row}/${item.col}`}
-            row={item.row}
-            col={item.col}
-          />
-        ))}
+        {Array.from({ length: gridSize * gridSize }).map((_, index) => {
+          const row = Math.floor(index / gridSize);
+          const col = index % gridSize;
+
+          return (
+            <SquareLocal key={index} id={`${row}/${col}`} row={row} col={col} />
+          );
+        })}
       </Box>
     </GameLayout>
   );

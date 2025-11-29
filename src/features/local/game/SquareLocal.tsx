@@ -13,10 +13,10 @@ interface SquareLocalProps {
 
 function SquareLocal({ id, row, col }: SquareLocalProps) {
   const dispatch = useAppDispatch();
-  const value = useAppSelector((s) => s.board[row][col]); // '' | 'X' | 'O'
   const nextMark = useAppSelector((s) => s.marks.nextMark);
   const gridDisabled = useAppSelector((s) => s.gridIsDisabled);
   const board = useAppSelector((s) => s.board);
+  const value = board?.[row]?.[col] ?? ''; // '' | 'X' | 'O'
   const winner = useSelector((state: Reducers) => state.winner);
   const gameIsDraw = useSelector((state: Reducers) => state.gameIsDraw);
 
