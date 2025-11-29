@@ -19,7 +19,7 @@ function SquareOnline({ id, rowindex, colindex, roomId }: SquareOnlineProps) {
 
   const handleClick = () => {
     if (!roomId) {
-      console.warn('No roomId found — cannot emit move');
+      console.error('No roomId found — cannot emit move');
       return;
     }
 
