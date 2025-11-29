@@ -1,35 +1,15 @@
-### UI tweaking
+# TODO
 
-- [ ] [TODO] AI Dashboard
+### UI
 
----
-
-- [ ] [TODO] Chat names change to Player X/Y by default
-
----
-
-### Gameplay (Local)
-
-- [ ] [BUG] Board goes empty after reload (F5)
-
----
+- AI Dashboard
+- Chat names change to Player X/Y by default
 
 ### Gameplay (Online vs Human)
 
-- [ ] [BUG] Chat doesn't reload
-
----
+- Chat doesn't reload
+- 'match-expired' event is not handled on the client side
 
 ### Gameplay (Online vs AI)
 
----
-
-### Socket
-
----
-
-### Future plans
-
-- [ ] Change console.logs using prefixes or emojis
-
----
+- Matchmaking error events are not handled on the client side
