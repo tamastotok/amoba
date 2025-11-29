@@ -20,7 +20,13 @@ export const handleLeaveGame = (
     if (roomId) {
       // If the game ends normally
       if (winner) {
-        socket.emit('game-end', { roomId, winner });
+        const playerMark = sessionStorage.getItem('playerMark');
+        const result = winner === playerMark ? 'player' : 'ai';
+        socket.emit('game-end', { roomId, winner, result });
+        dispatch(resetGameState());
+        sessionStorage.removeItem('room');
+        localStorage.removeItem('room');
+        navigate('/');
         return;
       }
 
