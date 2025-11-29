@@ -51,11 +51,6 @@ All bug reports are saved in MongoDB (via backend).
 
 ## Live Demo & Repositories
 
-Frontend Repo  
-(link)
-
-Backend Repo  
-(link)
-
-Live Demo  
-(link)
+- [Frontend Repository](https://github.com/tamastotok/amoba)
+- [Backend Repository](https://github.com/tamastotok/amoba-server)
+- [Live Demo](https://amoba-68115.web.app/)
