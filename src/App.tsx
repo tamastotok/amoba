@@ -29,6 +29,7 @@ import OnlineAIGame from './features/online/ai/OnlineAIGame';
 import OnlineHumanMenu from './features/online/human/OnlineHumanMenu';
 import OnlineAIMenu from './features/online/ai/OnlineAIMenu';
 import AIDashboard from './features/ai-dashboard/AIDashboard';
+import BugReport from './components/game/BugReport';
 import socket from './server';
 import GameOverlay from './components/overlays/GameOverlay';
 import { resetGameState } from './store/game/game.action';
@@ -38,6 +39,7 @@ import SystemStatusBar from './components/ui/SystemStatusBar';
 import { LocalMenu } from './features/local/menu';
 import Home from './pages/Home';
 import { useOverlayActions, type OverlayType } from './hooks/useOverlayActions';
+import { Fab } from '@mui/material';
 
 function App() {
   const dispatch = useAppDispatch();
@@ -57,6 +59,8 @@ function App() {
   const [reconnectTime, setReconnectTime] = useState(0);
   const [overlayType, setOverlayType] = useState<OverlayType>(null);
 
+  const [bugOpen, setBugOpen] = useState(false);
+
   // Disable scroll
   useBodyScrollLock(!!(winner || isDraw));
 
@@ -72,31 +76,23 @@ function App() {
     const isGameScreen =
       path.startsWith('/online/game/') || path.startsWith('/ai/game/');
 
+    const isLocalGame = path.startsWith('/local/game');
+
+    if (isLocalGame) {
+      sessionStorage.setItem('localReload', 'true');
+      return;
+    }
+
     if (!isGameScreen) {
-      console.log('🔁 Reload skipped: not on a game screen');
       return;
     }
 
     const roomId = sessionStorage.getItem('room');
     const gameMode = sessionStorage.getItem('mode');
-    const isReconnect = Boolean(sessionStorage.getItem('isReconnect'));
-
-    if (!isReconnect) {
-      console.log('🔁 Reload skipped: reconnect is ', isReconnect);
-      return;
-    }
 
     if (!roomId || !gameMode) {
-      console.log('🔁 Reload skipped: missing room or mode');
       return;
     }
-
-    console.log(
-      '🔁 Attempting reload reconnect for room:',
-      roomId,
-      'mode:',
-      gameMode
-    );
 
     if (gameMode === 'human') {
       socket.emit('reload-human', { roomId });
@@ -116,7 +112,6 @@ function App() {
 
     'game-found': (res: unknown) => {
       const payload = res as GameFoundPayload;
-      console.log('🎯 game-found fired for client', socket.id);
 
       sessionStorage.removeItem('reconnectRoomId');
       sessionStorage.removeItem('reconnectTime');
@@ -128,8 +123,6 @@ function App() {
       sessionStorage.setItem('room', payload.roomId);
 
       setRoomId(payload.roomId);
-
-      sessionStorage.setItem('isReconnect', 'false');
 
       dispatch(setPlayerBlueName(payload.playerData.bluePlayer.name));
       dispatch(setPlayerRedName(payload.playerData.redPlayer.name));
@@ -162,7 +155,6 @@ function App() {
       localStorage.setItem('room', payload.roomId);
       setRoomId(payload.roomId);
 
-      sessionStorage.setItem('isReconnect', 'false');
       dispatch(setPlayerBlueName(payload.playerData.bluePlayer.name || ''));
       dispatch(setPlayerRedName(payload.playerData.redPlayer.name || ''));
       dispatch(setGridSize(payload.boardSize));
@@ -171,18 +163,15 @@ function App() {
     },
 
     'game-ended': () => {
-      dispatch(resetGameState());
       setRoomId('');
 
       setStatusMessage('');
       sessionStorage.removeItem('room');
       localStorage.removeItem('room');
-      navigate('/');
     },
 
     'left-game-perma': (res?: unknown) => {
       const payload = res as OpponentLeftPayload;
-      console.warn('Opponent has left the game permanently.');
 
       dispatch(resetGameState());
 
@@ -192,7 +181,6 @@ function App() {
 
     'opponent-left': (res?: unknown) => {
       const payload = res as OpponentLeftPayload;
-      console.warn('Opponent disconnected, waiting for possible reconnect…');
 
       // Store roomId so the player can reconnect
       if (payload.roomId) {
@@ -209,7 +197,6 @@ function App() {
 
     'you-left': (res?: unknown) => {
       const payload = res as OpponentLeftPayload;
-      console.log('You left the game:', payload);
 
       // Save data for reconnect
       sessionStorage.setItem('reconnectRoomId', payload.roomId);
@@ -225,24 +212,17 @@ function App() {
 
     // Opponent reconnected event
     'opponent-reconnected': (res?: unknown) => {
-      console.log('Opponent reconnected:', res);
+      const payload = res as { message: string };
       setOverlayType(null);
 
       // Close any "waiting for opponent" UI
-      setStatusMessage('Opponent reconnected.');
+      setStatusMessage(payload.message);
     },
   });
 
   // --- Handle reconnect success/fail (self reconnect only) ---
   useEffect(() => {
     const onReconnectSuccess = (payload: ContinuePayload) => {
-      console.log(
-        'Successfully reconnected to room:',
-        payload.roomId,
-        'isReconnect:',
-        payload.isReconnect
-      );
-
       if (!payload.isReconnect) return;
 
       dispatch(setGridSize(payload.boardSize));
@@ -256,13 +236,6 @@ function App() {
       ) as Mark | null;
 
       dispatch(selectPlayerMark(storedPlayerMark === 'X' ? 'X' : 'O'));
-
-      console.log(
-        'restore: nextMark=',
-        payload.nextMark,
-        'playerMark=',
-        storedPlayerMark
-      );
 
       // Restore nextMark from server
       dispatch(resetNextMark(payload.nextMark));
@@ -284,15 +257,10 @@ function App() {
       } else {
         navigate(`/online/game/${payload.roomId}`);
       }
-
-      console.log('Reconnect restored state:', {
-        storedPlayerMark,
-        nextMark: payload.nextMark,
-      });
     };
 
     const onReconnectFailed = (payload: { message: string }) => {
-      console.warn('Reconnect failed:', payload.message);
+      console.error('Reconnect failed:', payload.message);
       sessionStorage.removeItem('reconnectRoomId');
       sessionStorage.removeItem('reconnectTime');
       setRoomId('');
@@ -342,6 +310,23 @@ function App() {
 
         <Route path="/ai-dashboard" element={<AIDashboard />} />
       </Routes>
+
+      <Fab
+        color="primary"
+        onClick={() => setBugOpen(true)}
+        sx={{
+          position: 'fixed',
+          bottom: 40,
+          right: 20,
+          zIndex: 9999,
+          backgroundColor: '#f50057',
+          '&:hover': { backgroundColor: '#ff4081' },
+        }}
+      >
+        <span className="material-symbols-outlined">bug_report</span>
+      </Fab>
+
+      <BugReport open={bugOpen} onClose={() => setBugOpen(false)} />
 
       <SystemStatusBar />
 
