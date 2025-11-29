@@ -2,6 +2,7 @@ import store from '@/store';
 import { setWinner } from '@/store/winner/winner.action';
 import { setGridIsDisabled } from '@/store/grid-disable/grid-disable.action';
 import type { Mark, Board, Direction, MoveContext } from '@/types';
+import socket from '@/server';
 
 const isMark = (x: string): x is Mark => x === 'X' || x === 'O';
 
@@ -55,7 +56,11 @@ export const checkAndDispatchWinner = (
 ) => {
   const winner = getWinner(row, col, board);
   if (winner) {
+    const playerMark = sessionStorage.getItem('playerMark');
+    const roomId = sessionStorage.getItem('room');
+    const result = winner === playerMark ? 'player' : 'ai';
     store.dispatch(setGridIsDisabled(true));
     store.dispatch(setWinner(winner));
+    if (roomId) socket.emit('game-end', { roomId, winner, result });
   }
 };
