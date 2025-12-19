@@ -1,14 +1,31 @@
 export type Result = 'win' | 'loss' | 'draw';
 
+export interface Weights {
+  attack: number;
+  defense: number;
+  center: number;
+  randomness: number;
+}
+
 export interface StrategySummary {
+  id: string;
   fitness: number;
-  result?: Result;
+  wins?: number;
+  losses?: number;
+  draws?: number;
+  weights?: Weights;
 }
 
 export interface GenerationUpdatePayload {
   generation: number;
   population: StrategySummary[];
   timestamp: string;
+  stats: {
+    wins: number;
+    losses: number;
+    draw: number;
+    games: number;
+  };
 }
 
 export interface ServerToClientEvents {
@@ -18,6 +35,12 @@ export interface ServerToClientEvents {
 export interface PopulationData {
   generation: number;
   population: StrategySummary[];
+  stats: {
+    wins: number;
+    losses: number;
+    draw: number;
+    games: number;
+  };
 }
 
 export interface ChartRow {
@@ -26,4 +49,8 @@ export interface ChartRow {
   bestFitness: number;
   worstFitness: number;
   winRate?: number;
+  avgAttack?: number;
+  avgDefense?: number;
+  avgCenter?: number;
+  avgRandomness?: number;
 }

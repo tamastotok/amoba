@@ -171,6 +171,10 @@ function AIDashboard() {
             stroke="#f0a500"
             name="Avg. Win Rate (%)"
           />
+          <Line type="monotone" dataKey="avgAttack" name="Avg Attack" />
+          <Line type="monotone" dataKey="avgDefense" name="Avg Defense" />
+          <Line type="monotone" dataKey="avgCenter" name="Avg Center" />
+          <Line type="monotone" dataKey="avgRandomness" name="Avg Randomness" />
         </LineChart>
       </ResponsiveContainer>
 
