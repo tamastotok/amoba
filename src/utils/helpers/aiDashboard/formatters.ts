@@ -5,28 +5,31 @@ import type {
   StrategySummary,
 } from '@/types';
 
-// Segédfüggvény az új súlyok átlagolásához
+// Round a number to 2 decimal places
+const round2 = (n: number) => Number(n.toFixed(2));
+
+// Calculate average strategy weights for a generation
 const avgWeights = (population: StrategySummary[]) => {
   let n = 0;
 
-  // Inicializáljuk a gyűjtőváltozókat az ÚJ struktúra szerint
-  let center = 0,
-    randomness = 0;
+  // Base behavior weights
+  let center = 0;
+  let randomness = 0;
 
-  // Támadás (Saját sorok)
-  let myLine2 = 0,
-    myLine3 = 0,
-    myLine4 = 0;
+  // Offensive metrics (own lines)
+  let myLine2 = 0;
+  let myLine3 = 0;
+  let myLine4 = 0;
 
-  // Védekezés (Blokkolás)
-  let blockLine2 = 0,
-    blockLine3 = 0,
-    blockLine4 = 0;
+  // Defensive metrics (blocking opponent)
+  let blockLine2 = 0;
+  let blockLine3 = 0;
+  let blockLine4 = 0;
 
   for (const s of population) {
     if (!s.weights) continue;
 
-    // Összegezzük az értékeket (biztonságos hozzáféréssel)
+    // Accumulate weights (safe access)
     center += s.weights.center ?? 0;
     randomness += s.weights.randomness ?? 0;
 
@@ -41,38 +44,46 @@ const avgWeights = (population: StrategySummary[]) => {
     n++;
   }
 
-  // Átlagok kiszámítása
-  const div = n > 0 ? n : 1; // Osztás nullával védelem
+  // Prevent division by zero
+  const div = n > 0 ? n : 1;
 
   return {
-    avgCenter: center / div,
-    avgRandomness: randomness / div,
+    avgCenter: round2(center / div),
+    avgRandomness: round2(randomness / div),
 
-    // Új metrikák a grafikonhoz
-    avgMyLine2: myLine2 / div,
-    avgMyLine3: myLine3 / div,
-    avgMyLine4: myLine4 / div,
+    // Aggregated offensive behavior
+    avgMyLine2: round2(myLine2 / div),
+    avgMyLine3: round2(myLine3 / div),
+    avgMyLine4: round2(myLine4 / div),
 
-    avgBlockLine2: blockLine2 / div,
-    avgBlockLine3: blockLine3 / div,
-    avgBlockLine4: blockLine4 / div,
+    // Aggregated defensive behavior
+    avgBlockLine2: round2(blockLine2 / div),
+    avgBlockLine3: round2(blockLine3 / div),
+    avgBlockLine4: round2(blockLine4 / div),
   };
 };
 
+// Format historical population data (REST API)
 export const formatPopulations = (populations: PopulationData[]): ChartRow[] =>
   populations.map((p) => {
     const fitnessValues = p.population.map((s) => s.fitness);
 
-    const avgFitness =
+    const avgFitness = round2(
       fitnessValues.reduce((a, b) => a + b, 0) /
-      Math.max(fitnessValues.length, 1);
+        Math.max(fitnessValues.length, 1)
+    );
 
-    const bestFitness = fitnessValues.length ? Math.max(...fitnessValues) : 0;
-    const worstFitness = fitnessValues.length ? Math.min(...fitnessValues) : 0;
+    const bestFitness = fitnessValues.length
+      ? round2(Math.max(...fitnessValues))
+      : 0;
+
+    const worstFitness = fitnessValues.length
+      ? round2(Math.min(...fitnessValues))
+      : 0;
 
     const games = p.stats?.games ?? 0;
     const wins = p.stats?.wins ?? 0;
-    const winRate = games > 0 ? (wins / games) * 100 : 0;
+    const winRate = round2(games > 0 ? (wins / games) * 100 : 0);
 
     return {
       generation: p.generation,
@@ -80,23 +91,29 @@ export const formatPopulations = (populations: PopulationData[]): ChartRow[] =>
       bestFitness,
       worstFitness,
       winRate,
-      ...avgWeights(p.population), // Itt hívjuk meg az új logikát
+      ...avgWeights(p.population), // Apply weight aggregation
     };
   });
 
+// Format a single generation update (Socket.io event)
 export const formatGeneration = (gen: GenerationUpdatePayload): ChartRow => {
   const fitnessValues = gen.population.map((s) => s.fitness);
 
-  const avgFitness =
-    fitnessValues.reduce((a, b) => a + b, 0) /
-    Math.max(fitnessValues.length, 1);
+  const avgFitness = round2(
+    fitnessValues.reduce((a, b) => a + b, 0) / Math.max(fitnessValues.length, 1)
+  );
 
-  const bestFitness = fitnessValues.length ? Math.max(...fitnessValues) : 0;
-  const worstFitness = fitnessValues.length ? Math.min(...fitnessValues) : 0;
+  const bestFitness = fitnessValues.length
+    ? round2(Math.max(...fitnessValues))
+    : 0;
+
+  const worstFitness = fitnessValues.length
+    ? round2(Math.min(...fitnessValues))
+    : 0;
 
   const games = gen.stats?.games ?? 0;
   const wins = gen.stats?.wins ?? 0;
-  const winRate = games > 0 ? (wins / games) * 100 : 0;
+  const winRate = round2(games > 0 ? (wins / games) * 100 : 0);
 
   return {
     generation: gen.generation,
