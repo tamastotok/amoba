@@ -1,10 +1,19 @@
 export type Result = 'win' | 'loss' | 'draw';
 
+// FRISSÍTVE: Az új génkészlet definíciója
 export interface Weights {
-  attack: number;
-  defense: number;
   center: number;
   randomness: number;
+
+  // Támadás (Saját sorok)
+  myLine2: number;
+  myLine3: number;
+  myLine4: number;
+
+  // Védekezés (Blokkolás)
+  blockLine2: number;
+  blockLine3: number;
+  blockLine4: number;
 }
 
 export interface StrategySummary {
@@ -23,7 +32,7 @@ export interface GenerationUpdatePayload {
   stats: {
     wins: number;
     losses: number;
-    draw: number;
+    draw: number; // Figyelem: a backendben 'draws' van, itt 'draw'? Érdemes egységesíteni!
     games: number;
   };
 }
@@ -43,14 +52,23 @@ export interface PopulationData {
   };
 }
 
+// FRISSÍTVE: A grafikon sorainak új mezői
 export interface ChartRow {
   generation: number;
   avgFitness: number;
   bestFitness: number;
   worstFitness: number;
   winRate?: number;
-  avgAttack?: number;
-  avgDefense?: number;
+
+  // Új átlagok
   avgCenter?: number;
   avgRandomness?: number;
+
+  avgMyLine2?: number;
+  avgMyLine3?: number;
+  avgMyLine4?: number;
+
+  avgBlockLine2?: number;
+  avgBlockLine3?: number;
+  avgBlockLine4?: number;
 }

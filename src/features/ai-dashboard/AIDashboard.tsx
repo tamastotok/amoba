@@ -128,7 +128,7 @@ function AIDashboard() {
         </div>
       )}
 
-      <ResponsiveContainer width="100%" height={400}>
+      <ResponsiveContainer width="100%" height={500}>
         <LineChart
           data={filteredData}
           margin={{ top: 30, right: 30, left: 10, bottom: 10 }}
@@ -143,15 +143,18 @@ function AIDashboard() {
             }}
           />
           <YAxis
-            label={{ value: 'Fitness', angle: -90, position: 'insideLeft' }}
+            label={{ value: 'Value', angle: -90, position: 'insideLeft' }}
           />
           <Tooltip />
           <Legend />
+
+          {/* Fitness Metrics */}
           <Line
             type="monotone"
             dataKey="avgFitness"
             stroke="#8884d8"
-            name="Avg. Fitness"
+            name="Avg Fitness"
+            strokeWidth={2}
           />
           <Line
             type="monotone"
@@ -161,20 +164,59 @@ function AIDashboard() {
           />
           <Line
             type="monotone"
-            dataKey="worstFitness"
-            stroke="#ff6961"
-            name="Worst Fitness"
+            dataKey="winRate"
+            stroke="#f0a500"
+            name="Win Rate (%)"
+          />
+
+          {/* New Strategy Weights - Attack (Blue Shades) */}
+          <Line
+            type="monotone"
+            dataKey="avgMyLine4"
+            stroke="#00008B"
+            name="Avg My Line 4"
+            dot={false}
           />
           <Line
             type="monotone"
-            dataKey="winRate"
-            stroke="#f0a500"
-            name="Avg. Win Rate (%)"
+            dataKey="avgMyLine3"
+            stroke="#4169E1"
+            name="Avg My Line 3"
+            dot={false}
           />
-          <Line type="monotone" dataKey="avgAttack" name="Avg Attack" />
-          <Line type="monotone" dataKey="avgDefense" name="Avg Defense" />
-          <Line type="monotone" dataKey="avgCenter" name="Avg Center" />
-          <Line type="monotone" dataKey="avgRandomness" name="Avg Randomness" />
+
+          {/* New Strategy Weights - Defense (Red/Orange Shades) */}
+          <Line
+            type="monotone"
+            dataKey="avgBlockLine4"
+            stroke="#8B0000"
+            name="Avg Block Line 4"
+            dot={false}
+          />
+          <Line
+            type="monotone"
+            dataKey="avgBlockLine3"
+            stroke="#FF4500"
+            name="Avg Block Line 3"
+            dot={false}
+          />
+
+          {/* Base Weights */}
+          <Line
+            type="monotone"
+            dataKey="avgCenter"
+            stroke="#2E8B57"
+            name="Avg Center"
+            dot={false}
+          />
+          <Line
+            type="monotone"
+            dataKey="avgRandomness"
+            stroke="#808080"
+            name="Avg Randomness"
+            dot={false}
+            strokeDasharray="3 3"
+          />
         </LineChart>
       </ResponsiveContainer>
 
